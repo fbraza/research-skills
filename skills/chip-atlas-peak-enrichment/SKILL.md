@@ -1,10 +1,18 @@
 ---
 id: chip-atlas-peak-enrichment
 name: ChIP-Atlas Peak Enrichment
+description: >
+  Use this skill when the user has a gene list and wants to identify which transcription factors,
+  histone modifications, or chromatin regulators have ChIP-seq peaks enriched near those genes
+  using the ChIP-Atlas database. Trigger phrases: "which TFs bind near my genes", "ChIP-Atlas
+  peak enrichment", "TF binding enrichment", "chromatin regulators enriched near gene set",
+  "what factors regulate my gene list", "ChIP-seq enrichment analysis", "find regulators for
+  my DEGs". Requires a gene list as input. Do NOT use for comparing two experiment groups
+  (use chip-atlas-diff-analysis) or for getting target genes of a specific TF
+  (use chip-atlas-target-genes).
 category: epigenomics
 short-description: "Analyze enrichment of ChIP-seq peaks from 433,000+ experiments via the ChIP-Atlas API."
 detailed-description: "Analyze enrichment of ChIP-seq peaks from 433,000+ experiments via the official ChIP-Atlas Enrichment Analysis API. Submits gene lists for Fisher's exact test enrichment with Benjamini-Hochberg Q-values against all public ChIP-seq data. Generates 4-panel visualization. Supports 10 genomes - human (hg38, hg19), mouse (mm10, mm9), rat (rn6), fly (dm6, dm3), worm (ce11, ce10), yeast (sacCer3)."
-starting-prompt: Find ChIP-seq peak enrichment near my genes using ChIP-Atlas database . .
 ---
 
 # ChIP-Atlas Peak Enrichment

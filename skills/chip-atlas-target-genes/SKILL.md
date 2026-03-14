@@ -1,10 +1,17 @@
 ---
 id: chip-atlas-target-genes
 name: ChIP-Atlas Target Genes
+description: >
+  Use this skill when the user wants to retrieve or rank target genes for a specific transcription
+  factor using public ChIP-seq data from ChIP-Atlas. Trigger phrases: "target genes of TF",
+  "what genes does [TF] bind", "ChIP-Atlas targets for [protein]", "TF target gene list",
+  "find binding targets for transcription factor", "rank genes bound by TF", "ChIP-Atlas
+  target gene ranking". Requires a specific TF or protein name as input. Do NOT use for
+  enrichment of a user gene list (use chip-atlas-peak-enrichment) or for comparing two
+  experiment groups (use chip-atlas-diff-analysis).
 category: epigenomics
 short-description: "Retrieve pre-computed target genes for any transcription factor from ChIP-Atlas public ChIP-seq data."
 detailed-description: "Downloads binding score data across all public ChIP-seq experiments for a specified protein/TF, ranking genes by MACS2 scores with cell-type-specific filtering and STRING protein interaction integration. Supports 10 genomes - human (hg38, hg19), mouse (mm10, mm9), rat (rn6), fly (dm6, dm3), worm (ce11, ce10), yeast (sacCer3)."
-starting-prompt: Find target genes for a transcription factor using ChIP-Atlas public ChIP-seq data . .
 ---
 
 # ChIP-Atlas Target Genes

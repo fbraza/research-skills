@@ -1,10 +1,17 @@
 ---
 id: disease-progression-longitudinal
 name: Disease Progression Trajectory Analysis
+description: >
+  Use this skill when the user has longitudinal or time-series patient omics data (bulk RNA-seq,
+  proteomics, or metabolomics) and wants to reconstruct disease progression trajectories or order
+  patients along a disease pseudotime axis. Trigger phrases: "disease progression trajectory",
+  "longitudinal omics analysis", "TimeAx", "disease pseudotime from patient data", "order
+  patients by disease stage", "fast vs slow progressors", "disease staging from omics",
+  "time-series patient cohort trajectory", "trajectory from longitudinal bulk data". Do NOT use
+  for single-cell pseudotime or RNA velocity (use scrna-trajectory-inference).
 category: multi_omics
 short-description: Reconstruct disease progression trajectories from longitudinal patient omics data.
 detailed-description: Analyze time-series patient data (RNA-seq, proteomics, metabolomics) to reconstruct consensus disease trajectories using TimeAx multiple alignment. Orders samples by disease pseudotime, identifies trajectory-associated features, and validates against clinical outcomes. Handles irregular sampling patterns and works with cross-sectional or longitudinal cohorts.
-starting-prompt: Analyze disease progression trajectories from longitudinal patient omics data
 ---
 
 # Disease Progression Trajectory Analysis

@@ -1,6 +1,12 @@
 ---
 id: pcr-primer-design
 name: PCR Primer Design
+description: >
+  Use this skill when the user wants to design PCR or qPCR primers for a gene or sequence.
+  Trigger phrases: "design primers", "PCR primers", "qPCR primers", "primer design", "MIQE",
+  "TaqMan probe design", "multiplex PCR primers", "sequencing primers", "SNP genotyping
+  primers", "calculate primer Tm", "check primer dimers", "primer specificity", "oligo design",
+  "IDT primer ordering". Generates MIQE 2.0-compliant reports and exports in IDT ordering format.
 category: molecular_design
 short-description: Design and validate primers for PCR, qPCR, TaqMan, and sequencing applications.
 detailed-description: >
@@ -12,7 +18,6 @@ detailed-description: >
   biology applications with rigorous quality validation. Best for qPCR assays
   requiring MIQE 2.0 compliance, or any PCR application needing publication-quality
   documentation.
-starting-prompt: Design qPCR primers for human GAPDH with MIQE compliance checking . .
 ---
 
 # PCR Primer Design

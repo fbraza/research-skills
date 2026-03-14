@@ -1,10 +1,17 @@
 ---
 id: grn-pyscenic
 name: Gene Regulatory Network Inference (pySCENIC)
+description: >
+  Use this skill when the user wants to infer gene regulatory networks (GRNs) de novo from
+  single-cell RNA-seq data or score cells for transcription factor activity using pySCENIC.
+  Trigger phrases: "gene regulatory network single-cell", "pySCENIC", "SCENIC", "TF regulons",
+  "transcription factor activity score", "GRN inference scRNA-seq", "AUCell", "TF regulon
+  discovery", "cell-level TF activity", "infer regulons from scRNA-seq". Requires 500+ cells
+  and 16GB+ RAM. Do NOT use for bulk RNA-seq TF analysis (use upstream-regulator-analysis) or
+  for ChIP-seq-based TF target retrieval (use chip-atlas-target-genes).
 category: transcriptomics
 short-description: Infer transcription factor regulatory networks and cell-level TF activity from single-cell RNA-seq data.
 detailed-description: Discover gene regulatory networks (GRNs) de novo from single-cell RNA-seq using pySCENIC. Identifies transcription factor (TF) regulons through co-expression analysis (GRNBoost2), validates with motif enrichment (cisTarget), and calculates cell-level TF activity scores (AUCell). Use when you need to discover TF-target relationships directly from your data, identify cell-type-specific regulatory programs, or score individual cells for TF activity. Requires 500+ cells for robust inference. Not recommended for bulk RNA-seq (use functional enrichment or curated network approaches instead). Computationally intensive, requires reference databases and 16GB+ RAM.
-starting-prompt: Infer gene regulatory networks and TF activity from my single-cell RNA-seq data . . 
 ---
 
 # Gene Regulatory Network Inference (pySCENIC)

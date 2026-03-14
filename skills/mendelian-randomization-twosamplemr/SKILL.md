@@ -1,10 +1,17 @@
 ---
 id: mendelian-randomization-twosamplemr
 name: "Two-Sample Mendelian Randomization"
+description: >
+  Use this skill when the user wants to test whether there is a causal relationship between
+  two traits using Mendelian Randomization with GWAS summary statistics. Trigger phrases:
+  "Mendelian Randomization", "MR analysis", "causal effect between traits", "genetic
+  instruments", "two-sample MR", "IVW", "MR-Egger", "weighted median MR", "causal inference
+  GWAS", "does exposure causally affect outcome", "OpenGWAS", "test causal relationship
+  with genetic variants". Do NOT use for identifying effector genes from a single GWAS
+  (use gwas-to-function-twas).
 category: genomics_genetics
 short-description: "Assess causal relationships between traits using GWAS summary statistics and genetic instruments."
 detailed-description: "Performs two-sample Mendelian Randomization (MR) analysis using genetic variants as instrumental variables to test causal effects of an exposure on an outcome. Supports OpenGWAS database access and user-provided GWAS summary statistics. Applies IVW, MR-Egger, weighted median, and weighted mode methods with comprehensive sensitivity analyses."
-starting-prompt: "I want to test whether LDL cholesterol has a causal effect on coronary heart disease using Mendelian Randomization."
 ---
 
 # Two-Sample Mendelian Randomization

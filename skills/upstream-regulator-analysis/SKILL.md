@@ -1,10 +1,17 @@
 ---
 id: upstream-regulator-analysis
 name: Upstream Regulator Analysis
+description: >
+  Use this skill when the user has bulk RNA-seq differential expression results and wants to
+  identify which transcription factors are upstream drivers of the observed expression changes,
+  using ChIP-Atlas binding data. Trigger phrases: "upstream regulators", "TFs driving differential
+  expression", "transcription factors behind DE results", "ChIP-Atlas TF analysis", "activator
+  repressor identification", "what TF is causing these expression changes", "integrate ChIP-seq
+  with DE results", "TF regulatory score". Do NOT use for pathway enrichment (use
+  functional-enrichment-from-degs) or for GRN inference from single-cell data (use grn-pyscenic).
 category: multi_omics
 short-description: "Integrate ChIP-Atlas TF binding data with RNA-seq differential expression to identify upstream regulators driving transcriptomic changes."
 detailed-description: "Identifies transcription factors driving differential expression by integrating ChIP-Atlas peak enrichment (433,000+ public ChIP-seq experiments) with RNA-seq DE results. Submits DE gene lists to ChIP-Atlas API, downloads target gene lists for top enriched TFs, computes Fisher's exact test for target-DE overlap, measures directional concordance (activator vs repressor), and ranks TFs by a combined regulatory score. Supports 10 genomes including human (hg38, hg19), mouse (mm10, mm9), rat (rn6), and model organisms."
-starting-prompt: Identify upstream regulators driving my differential expression results using ChIP-Atlas binding data . .
 ---
 
 # Upstream Regulator Analysis

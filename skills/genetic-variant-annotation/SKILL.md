@@ -1,10 +1,17 @@
 ---
 id: genetic-variant-annotation
 name: Genetic Variant Annotation
+description: >
+  Use this skill when the user has a VCF file and wants to annotate genomic variants with
+  functional effects, clinical significance, or pathogenicity predictions. Trigger phrases:
+  "annotate variants", "VCF annotation", "variant functional effects", "VEP", "SNPEff",
+  "variant consequence", "pathogenicity prediction", "ClinVar annotation", "ACMG classification",
+  "annotate VCF", "clinical significance of variants", "missense variant impact", "germline
+  variant annotation", "somatic variant annotation". Supports human (clinical, VEP) and
+  non-model organisms (SNPEff).
 category: genomics_genetics
 short-description: Annotate genomic variants in VCF files with functional effects, clinical significance, and pathogenicity predictions.
 detailed-description: Annotate genomic variants in VCF files with functional effects, clinical significance, population frequencies, and pathogenicity predictions. Use when you have VCF files from variant calling and need functional annotation, clinical interpretation, or variant prioritization. Automatically selects between Ensembl VEP (best for human clinical analysis) or SNPEff (best for non-model organisms) based on organism, use case, and computational resources. Handles germline, somatic, and population variants.
-starting-prompt: Annotate my VCF file with functional effects and clinical significance . .
 ---
 
 # Genetic Variant Annotation

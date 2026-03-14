@@ -1,10 +1,17 @@
 ---
 id: scrna-trajectory-inference
 name: Single-Cell Trajectory Inference
+description: >
+  Use this skill when the user wants to infer differentiation or developmental trajectories,
+  compute pseudotime, analyze RNA velocity, or map cell fate probabilities from single-cell
+  RNA-seq data. Trigger phrases: "trajectory inference", "pseudotime single-cell", "RNA velocity",
+  "differentiation trajectory", "cell fate mapping", "CellRank", "PAGA", "scVelo", "diffusion
+  pseudotime", "branching trajectories", "cell state transition dynamics", "order cells along
+  differentiation". Chains from scrnaseq-scanpy-core-analysis (AnnData .h5ad input). Do NOT use
+  for bulk patient disease progression (use disease-progression-longitudinal).
 category: transcriptomics
 short-description: "Infer differentiation trajectories, pseudotime ordering, RNA velocity, and cell fate probabilities from scRNA-seq data."
 detailed-description: "Reconstruct developmental or differentiation trajectories from single-cell RNA-seq data using PAGA, diffusion pseudotime, scVelo RNA velocity, and CellRank fate mapping. Discovers cell ordering along pseudotime, identifies branching points and terminal fates, and reveals gene expression dynamics along trajectories. Chains from scrnaseq-scanpy-core-analysis or any preprocessed AnnData (.h5ad). Produces publication-ready trajectory visualizations and structured PDF reports."
-starting-prompt: Infer differentiation trajectories from my single-cell RNA-seq data using PAGA, pseudotime, and RNA velocity
 ---
 
 # Single-Cell Trajectory Inference

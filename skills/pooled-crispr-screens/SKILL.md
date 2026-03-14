@@ -1,10 +1,15 @@
 ---
 id: pooled-crispr-screens
 name: Pooled CRISPR Screen Analysis
+description: >
+  Use this skill when the user wants to analyze pooled CRISPR screens with single-cell RNA-seq
+  readout such as Perturb-seq or CROP-seq. Trigger phrases: "CRISPR screen analysis", "Perturb-seq",
+  "CROP-seq", "CRISPRi screen", "CRISPRa screen", "pooled CRISPR scRNA-seq", "sgRNA mapping",
+  "perturbation screen differential expression", "10X feature barcoding CRISPR", "identify
+  perturbations with transcriptional effects", "genetic screen single-cell readout".
 category: transcriptomics
 short-description: "Analyze pooled CRISPR screens with single-cell RNA-seq readout (Perturb-seq/CROP-seq)."
 detailed-description: "Process 10X feature-barcode matrices for pooled CRISPR screens with scRNA-seq readout (Perturb-seq, CROP-seq, CRISPRi/a). Maps sgRNAs to cells, performs QC, runs tiered analysis (fast t-test screening, target validation, batch-corrected DE with glmGamPoi), and identifies perturbations with significant transcriptional effects. Handles multi-library experiments with batch correction."
-starting-prompt: Analyze my pooled CRISPR screen data with single-cell RNA-seq readout . .
 ---
 
 # Pooled CRISPR Screen Analysis

@@ -1,10 +1,16 @@
 ---
 id: clinicaltrials-landscape
 name: ClinicalTrials.gov Disease Landscape Scanner
+description: >
+  Use this skill when the user wants to map, visualize, or analyze the clinical trial landscape
+  for a disease area. Trigger phrases: "clinical trial landscape", "competitive landscape",
+  "drug pipeline analysis", "clinical trials by mechanism", "ClinicalTrials.gov", "how many
+  trials are there for", "which companies are running trials in", "trial phase distribution",
+  "pipeline overview", "mechanism of action landscape", "IBD clinical trials", "what is in
+  clinical development for". Uses the ClinicalTrials.gov API v2 — no API key required.
 category: literature
 short-description: "Query ClinicalTrials.gov API v2 to map the clinical trial landscape for any disease area by mechanism, phase, and sponsor."
 detailed-description: "Programmatically query the free ClinicalTrials.gov API v2 to pull all active clinical trials for a disease area, classify by therapeutic mechanism of action, and generate competitive landscape visualizations. Supports any disease with pre-built configs for IBD (Crohn's, UC). Generic mode classifies by intervention type when no disease config exists. Supports filtering by mechanism, phase, sponsor, and status. Exports structured CSVs, publication-quality plots, and pickle objects for downstream analysis. No API key required."
-starting-prompt: Show me the current clinical trial landscape for IBD
 ---
 
 # ClinicalTrials.gov Disease Landscape Scanner

@@ -1,10 +1,17 @@
 ---
 id: scrnaseq-scanpy-core-analysis
 name: Single-Cell RNA-seq Core Analysis (Scanpy)
+description: >
+  Use this skill when the user explicitly wants to analyze single-cell RNA-seq data using
+  Python and Scanpy (scverse ecosystem). Trigger phrases: "scRNA-seq Scanpy", "single-cell
+  analysis Python", "AnnData", "scverse", "Scanpy clustering", "10X Chromium Scanpy",
+  "Leiden clustering", "scVI integration", "CellBender ambient RNA", "Scrublet doublets",
+  "single-cell Python workflow". If the user says "analyze my scRNA-seq data" without
+  specifying a language or tool, ask whether they prefer Python/Scanpy or R/Seurat before
+  proceeding. Do NOT use if the user prefers R (use scrnaseq-seurat-core-analysis).
 category: transcriptomics
 short-description: "Complete single-cell RNA-seq analysis using Scanpy from raw data to cell type annotation with clustering and visualization."
 detailed-description: "Complete single-cell RNA-seq analysis using Scanpy from raw data to cell type annotation. Use when you have 10X Chromium, Drop-seq, or other scRNA-seq data requiring QC, normalization, clustering, and visualization. Implements current best practices including ambient RNA correction (CellBender), batch-aware adaptive QC (MAD), doublet detection (Scrublet), standard or Pearson residuals normalization, batch integration (scVI/Harmony), multi-resolution Leiden clustering, and pseudobulk differential expression for condition comparisons. Best for human or mouse data with 500+ cells per sample. Produces publication-ready plots and annotated AnnData objects."
-starting-prompt: "Analyze single-cell RNA-seq data with Scanpy from QC through cell type annotation. Generate a PDF report with an intro, methods, results, conclusions and figures from all of the analyses you perform."
 ---
 
 # Single-Cell RNA-seq Core Analysis (Scanpy)

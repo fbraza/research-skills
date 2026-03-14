@@ -1,10 +1,17 @@
 ---
 id: literature-preclinical
 name: Preclinical Literature Extraction
+description: >
+  Use this skill when the user wants to systematically search for preclinical (non-clinical)
+  studies on a molecular target in a disease and extract structured in vitro and in vivo
+  experiment details from each paper. Trigger phrases: "preclinical studies", "preclinical
+  evidence for target", "in vitro experiments literature", "in vivo experiments literature",
+  "extract experiment details from papers", "preclinical literature review", "cell line
+  experiments published", "animal model studies for target", "in vitro in vivo concordance",
+  "survey preclinical data". Uses the Consensus API to search scientific literature.
 category: literature
 short-description: "Search for preclinical studies on a target in a disease and extract structured in vitro and in vivo experiment details from each paper."
 detailed-description: "Search Consensus (consensus.app) for preclinical (non-clinical) studies on a specific molecular target in a disease context. For each paper, parse the abstract to extract structured details about in vitro experiments (cell lines, assays, findings) and in vivo experiments (animal models, dosing, endpoints, findings). Synthesize results across papers to identify the most common model systems, assays, and concordance between in vitro and in vivo findings."
-starting-prompt: Search for recent preclinical studies on CDK4/6 inhibition in triple-negative breast cancer and extract the in vitro and in vivo experiments from each paper.
 ---
 
 # Preclinical Literature Extraction

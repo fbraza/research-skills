@@ -1,10 +1,17 @@
 ---
 id: lasso-biomarker-panel
 name: LASSO Biomarker Panel Discovery & Validation
+description: >
+  Use this skill when the user wants to select a minimal biomarker panel from high-dimensional
+  omics data to predict a binary clinical outcome. Trigger phrases: "biomarker panel", "LASSO
+  biomarker", "elastic net feature selection", "minimal gene signature", "predictive biomarker
+  discovery", "responder vs non-responder prediction", "biomarker panel validation", "stability
+  selection omics", "ROC AUC biomarker", "discovery validation cohort omics", "shrink gene
+  panel to minimal set". Supports RNA-seq, proteomics, or any quantitative feature matrix with
+  a binary outcome.
 category: multi_omics
 short-description: "Select minimal biomarker panels using LASSO regularization with nested cross-validation, stability selection, and independent cohort validation."
 detailed-description: "Build parsimonious biomarker panels (5-15 features) from high-dimensional omics data using penalized logistic regression (elastic net) with nested cross-validation and stability selection. Produces ROC/AUC curves, calibration plots, and feature importance visualizations suitable for clinical exploratory endpoint submissions. Supports discovery/validation cohort design following Ali et al. (Nat Med 2025) methodology. Works with RNA-seq, proteomics, or any quantitative feature matrix with binary outcomes."
-starting-prompt: Build a LASSO biomarker panel to predict treatment response from gene expression data.
 ---
 
 # LASSO Biomarker Panel Discovery & Validation

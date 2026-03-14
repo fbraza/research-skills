@@ -1,10 +1,16 @@
 ---
 id: survival-analysis-clinical
 name: Clinical Survival & Outcome Analysis
+description: >
+  Use this skill when the user wants to perform survival analysis or time-to-event analysis
+  on clinical data. Trigger phrases: "survival analysis", "Kaplan-Meier", "KM curves",
+  "Cox regression", "Cox proportional hazards", "hazard ratio", "overall survival", "progression-free
+  survival", "time-to-event analysis", "log-rank test", "survival curves", "prognostic factors",
+  "stratify patients by risk", "forest plot hazard ratios", "Schoenfeld residuals", "TCGA
+  survival", "real-world evidence survival".
 category: multi_omics
 short-description: "Perform Kaplan-Meier estimation, Cox proportional hazards regression, and risk stratification from clinical time-to-event data."
 detailed-description: "Analyze clinical survival outcomes using Kaplan-Meier estimation with log-rank tests, Cox proportional hazards regression with automatic covariate selection, proportional hazards assumption testing (Schoenfeld residuals), and risk stratification (median/tertile/quartile split). Produces publication-quality survival curves with risk tables, forest plots of hazard ratios, and diagnostic plots. Supports TCGA, clinical trial, and real-world evidence datasets. Exports risk scores and analysis objects (RDS) for downstream integration with biomarker panel discovery and multi-omics stratification."
-starting-prompt: Run a survival analysis on breast cancer clinical data to identify prognostic factors and stratify patients by risk. Generate a PDF report with an intro, methods, results, conclusions and figures from all of the analyses you perform.
 ---
 
 # Clinical Survival & Outcome Analysis

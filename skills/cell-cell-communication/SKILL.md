@@ -1,10 +1,17 @@
 ---
 id: cell-cell-communication
 name: Cell-Cell Communication Analysis (CellChat)
+description: >
+  Use this skill when the user wants to analyze cell-cell communication or intercellular signaling
+  from annotated single-cell RNA-seq data. Trigger phrases: "cell-cell communication", "ligand-receptor
+  interactions", "CellChat", "intercellular signaling", "sender receiver cell types", "signaling
+  pathways between cells", "cell communication network", "which cells are talking to each other",
+  "cell crosstalk". Requires an annotated scRNA-seq dataset with cell type labels — chains from
+  scrnaseq-seurat-core-analysis output (seurat_processed.rds). Do NOT use for TF regulatory
+  networks (use grn-pyscenic) or pathway enrichment (use functional-enrichment-from-degs).
 category: transcriptomics
 short-description: "Infer and visualize cell-cell communication networks from scRNA-seq data using CellChat v2 ligand-receptor interaction analysis."
 detailed-description: "Analyze intercellular communication from annotated single-cell RNA-seq data using CellChat v2. Infers ligand-receptor interactions between cell populations, builds communication probability networks, computes signaling pathway activity, and identifies dominant sender/receiver/mediator roles. Generates chord diagrams, network plots, bubble plots, and signaling role heatmaps. Accepts Seurat objects directly — chains from scrnaseq-seurat-core-analysis."
-starting-prompt: Analyze cell-cell communication from my scRNA-seq data using CellChat to identify ligand-receptor interactions and signaling networks between cell types.
 ---
 
 # Cell-Cell Communication Analysis (CellChat v2)

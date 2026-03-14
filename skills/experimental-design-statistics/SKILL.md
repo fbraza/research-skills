@@ -1,10 +1,17 @@
 ---
 id: experimental-design-statistics
 name: Experimental Design
+description: >
+  Use this skill when the user wants to plan a genomics experiment, calculate required sample
+  sizes, perform power analysis, or design a batch-balanced layout before data collection.
+  Trigger phrases: "power analysis", "sample size calculation", "how many replicates do I need",
+  "experimental design", "batch design", "batch balanced layout", "statistical power genomics",
+  "pilot data power estimation", "multiple testing correction strategy", "justify sample size
+  grant", "design RNA-seq experiment", "optimal batch assignment". Use at the planning stage,
+  before data is collected.
 category: experimental_design
 short-description: Design genomics experiments with power analysis, sample size estimation, batch design, and multiple testing correction.
 detailed-description: Guide statistical experimental design for genomics studies including power analysis, sample size estimation, batch-balanced layouts, and multiple testing correction. Use when planning new experiments, justifying sample sizes for grants, optimizing budget constraints (depth vs. replicates), or designing batch structures. Supports RNA-seq, ATAC-seq, scRNA-seq, ChIP-seq, methylation, and proteomics. Includes pilot data-based power estimation, optimal batch assignment algorithms, and modern multiple testing methods (IHW, adaptive shrinkage). Best for pre-experiment planning with 4+ samples per group.
-starting-prompt: Help me design a genomics experiment with power analysis and optimal batch assignment . .
 ---
 
 # Experimental Design and Statistical Planning

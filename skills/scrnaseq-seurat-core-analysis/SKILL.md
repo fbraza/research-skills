@@ -1,10 +1,17 @@
 ---
 id: scrnaseq-seurat-core-analysis
 name: Single-Cell RNA-seq Core Analysis (Seurat)
+description: >
+  Use this skill when the user explicitly wants to analyze single-cell RNA-seq data using R
+  and Seurat. Trigger phrases: "scRNA-seq Seurat", "single-cell analysis R", "Seurat object",
+  "Seurat v5", "SCTransform", "DoubletFinder", "SoupX ambient RNA", "Harmony Seurat",
+  "FindClusters Seurat", "10X Chromium Seurat", "single-cell R workflow". If the user says
+  "analyze my scRNA-seq data" without specifying a language or tool, ask whether they prefer
+  Python/Scanpy or R/Seurat before proceeding. Do NOT use if the user prefers Python
+  (use scrnaseq-scanpy-core-analysis).
 category: transcriptomics
 short-description: Complete single-cell RNA-seq analysis using Seurat from raw data to cell type annotation with clustering and visualization.
 detailed-description: Complete single-cell RNA-seq analysis using Seurat v5 from raw data to cell type annotation. Use when you have 10X Chromium, Drop-seq, or other scRNA-seq data requiring QC, normalization, clustering, and visualization. Implements current best practices including ambient RNA correction (SoupX), batch-aware adaptive QC (MAD), doublet detection (DoubletFinder), SCTransform normalization, batch integration (Harmony/CCA), multi-resolution clustering, and pseudobulk differential expression for condition comparisons. Best for human or mouse data with 500+ cells per sample. Produces publication-ready plots and annotated Seurat objects.
-starting-prompt: "Analyze my single-cell RNA-seq data using Seurat from QC through cell type annotation. Generate a PDF report with an intro, methods, results, conclusions and figures from all of the analyses you perform."
 ---
 
 # Single-Cell RNA-seq Core Analysis (Seurat)

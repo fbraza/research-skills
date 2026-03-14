@@ -1,10 +1,18 @@
 ---
 id: gwas-to-function-twas
 name: GWAS to Function via TWAS
+description: >
+  Use this skill when the user has GWAS summary statistics and wants to identify effector genes,
+  determine therapeutic directionality, or prioritize drug targets using Transcriptome-Wide
+  Association Study (TWAS) analysis. Trigger phrases: "TWAS", "GWAS to function", "effector
+  genes from GWAS", "causal genes GWAS", "GWAS target prioritization", "colocalization GWAS",
+  "FUSION", "S-PrediXcan", "gene-level association from GWAS", "what genes mediate GWAS signal",
+  "druggable targets from GWAS", "inhibit or activate target from GWAS". Requires GWAS summary
+  statistics (N > 5,000). Do NOT use for causal inference between two traits (use
+  mendelian-randomization-twosamplemr).
 category: genomics_genetics
 short-description: Identify causal genes and therapeutic targets from GWAS using transcriptome-wide association studies
 detailed-description: "Identifies genes whose genetically regulated expression mediates disease risk and determines therapeutic directionality (inhibit vs activate). Combines TWAS association testing with colocalization analysis to distinguish causal genes from LD artifacts, Mendelian Randomization for causal inference, and druggability scoring for target prioritization. Use when you have genome-wide GWAS summary statistics (N > 5,000) and want to: (1) identify effector genes for drug targeting, (2) establish causal evidence for gene-disease relationships, or (3) prioritize targets by genetic support. Supports FUSION (comprehensive) and S-PrediXcan (fast) with GTEx v8 expression weights across 54 tissues."
-starting-prompt: Find causal genes and therapeutic targets from my GWAS results . .
 ---
 
 # GWAS to Function via TWAS

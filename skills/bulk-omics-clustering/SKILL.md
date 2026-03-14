@@ -1,10 +1,17 @@
 ---
 id: bulk-omics-clustering
 name: Bulk Omics Clustering Analysis
+description: >
+  Use this skill when the user wants to cluster bulk omics data — bulk RNA-seq, proteomics,
+  or metabolomics — into sample groups or feature groups. Trigger phrases: "cluster my samples",
+  "identify biological subtypes", "sample grouping by expression", "find expression patterns",
+  "unsupervised clustering", "hierarchical clustering", "k-means on omics data", "discover
+  disease subtypes from bulk data". Do NOT use for single-cell clustering (that is handled by
+  scrnaseq-scanpy-core-analysis or scrnaseq-seurat-core-analysis) or for gene module detection
+  with network analysis (use coexpression-network instead).
 category: multi_omics
 short-description: Cluster samples or features from bulk transcriptomics, proteomics, or metabolomics data.
 detailed-description: Perform systematic clustering analysis on biological data matrices (samples or features) using multiple algorithms with rigorous validation and interpretation. Use when you need to identify natural groupings in expression data, discover biological subtypes, group genes by expression patterns, or compare clustering methods. Supports hierarchical, k-means, HDBSCAN, and Gaussian mixture models. Includes optimal cluster number determination, quality validation, stability testing, and comprehensive visualization. Best for bulk transcriptomics, proteomics, metabolomics, or any quantitative data matrix with 10+ samples/features.
-starting-prompt: Cluster my samples by gene expression to identify biological subtypes . .
 ---
 
 # Bulk Omics Clustering Analysis

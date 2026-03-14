@@ -1,10 +1,16 @@
 ---
 id: multi-omics-integration
 name: Multi-Omics Integration (MOFA+)
+description: >
+  Use this skill when the user wants to integrate two or more omics layers (e.g., RNA-seq +
+  proteomics, methylation + mutations + drug response) into a unified latent factor model
+  using MOFA+. Trigger phrases: "multi-omics integration", "MOFA", "MOFA+", "multi-omics
+  factor analysis", "integrate omics layers", "latent factors across omics", "shared variation
+  across omics", "cross-omics analysis", "combine RNA proteomics methylation", "what drives
+  variation across multiple omics". Handles missing data across views natively.
 category: multi_omics
 short-description: "Integrate 2+ omics layers using MOFA+ to identify latent factors explaining cross-omics variation, with variance decomposition and factor interpretation."
 detailed-description: "Performs multi-omics factor analysis using MOFA2 to decompose multi-omics datasets into interpretable latent factors. Handles missing data across views, identifies shared and view-specific sources of variation, associates factors with clinical covariates, and exports factor scores for downstream patient stratification. Supports any combination of omics layers (RNA-seq, proteomics, methylation, drug response, mutations). Includes the CLL blood cancer dataset (200 patients, 4 omics) as a pharma-relevant demonstration."
-starting-prompt: Integrate my multi-omics data using MOFA+ to identify latent factors driving cross-omics variation . .
 ---
 
 # Multi-Omics Integration (MOFA+)
