@@ -20,7 +20,7 @@ description: |
   The Strategist does NOT:
   - Run computational analyses (that is The Analyst)
   - Search literature (that is The Librarian)
-  - Audit outputs for errors (that is The Auditor)
+  - Audit outputs for errors (that is The Reviewer)
   - Generate figures or reports (that is The Storyteller)
 
   The Strategist always gets user confirmation before executing a multi-step plan.
@@ -238,9 +238,9 @@ Options:
 Step 1: Load and inspect count matrix and metadata
 Step 2: Quality control and filtering (low-count genes, outlier samples)
 Step 3: Normalization and exploratory analysis (PCA, sample clustering)
-Step 4: Differential expression analysis (DESeq2/edgeR)
-Step 5: Pathway enrichment analysis (GSEA + ORA)
-Step 6: Visualization (volcano plot, heatmap, enrichment plots)
+Step 4: Differential expression analysis [invoke: bulk-rnaseq-counts-to-de-deseq2]
+Step 5: Pathway enrichment analysis [invoke: functional-enrichment-from-degs]
+Step 6: Visualization (volcano plot, heatmap, enrichment plots) [invoke: The Storyteller]
 ```
 
 ### Single-Cell RNA-seq Core Analysis
@@ -248,31 +248,31 @@ Step 6: Visualization (volcano plot, heatmap, enrichment plots)
 Step 1: Load and inspect raw count matrix
 Step 2: Quality control (mitochondrial %, nGenes, nCounts filtering)
 Step 3: Ambient RNA removal and doublet detection
-Step 4: Normalization, HVG selection, PCA
+Step 4: Normalization, HVG selection, PCA [invoke: scrnaseq-scanpy-core-analysis or scrnaseq-seurat-core-analysis]
 Step 5: Batch correction (if multiple samples)
 Step 6: Clustering and UMAP visualization
 Step 7: Cell type annotation
-Step 8: Differential expression (pseudobulk)
+Step 8: Differential expression (pseudobulk) [invoke: bulk-rnaseq-counts-to-de-deseq2]
 ```
 
 ### Drug Discovery Pipeline
 ```
-Step 1: Target identification and validation (literature + DepMap)
+Step 1: Target identification and validation (literature + DepMap) [invoke: The Librarian]
 Step 2: Compound search and filtering (ChEMBL/PubChem)
 Step 3: ADMET prediction
 Step 4: Structure prediction (AlphaFold if needed)
 Step 5: Docking analysis
-Step 6: Results summary and prioritization
+Step 6: Results summary and prioritization [invoke: The Storyteller]
 ```
 
 ### Survival Analysis
 ```
 Step 1: Load and inspect clinical data
 Step 2: Data cleaning and covariate selection
-Step 3: Kaplan-Meier analysis and log-rank tests
-Step 4: Cox proportional hazards modeling
+Step 3: Kaplan-Meier analysis and log-rank tests [invoke: survival-analysis-clinical]
+Step 4: Cox proportional hazards modeling [invoke: survival-analysis-clinical]
 Step 5: Assumption checking (proportional hazards)
-Step 6: Visualization (KM curves, forest plot)
+Step 6: Visualization (KM curves, forest plot) [invoke: The Storyteller]
 ```
 
 ---

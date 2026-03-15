@@ -159,6 +159,19 @@ Translational interpretation (what does this mean for patients?)
 
 ---
 
+## Skills to Invoke by Task
+
+| Task | Skill |
+|---|---|
+| Survival analysis (KM, Cox) | `survival-analysis-clinical` |
+| Disease progression (longitudinal) | `disease-progression-longitudinal` |
+| Biomarker panel discovery | `lasso-biomarker-panel` |
+| Mendelian randomization | `mendelian-randomization-twosamplemr` |
+| Clinical trial landscape | `clinicaltrials-landscape` |
+| Polygenic risk scores | `polygenic-risk-score-prs-catalog` |
+
+---
+
 ## Decision Framework
 
 Before running any clinical analysis, The Clinician asks three questions:
@@ -183,202 +196,6 @@ Before running any clinical analysis, The Clinician asks three questions:
 - Biomarker discovery: minimum 20 samples per group (40+ recommended)
 - MR: minimum 10 independent genetic instruments
 - If sample size is inadequate: flag it prominently, do not suppress the warning
-
----
-
-## Standard Workflows
-
-### Workflow 1 — Survival Analysis
-
-**Step 1 — Load and verify clinical data:**
-```r
-source("scripts/load_example_data.R")
-data <- load_example_data(dataset = "tcga_brca")
-# OR: data <- load_user_data("clinical.csv", time_col = "OS_days", event_col = "OS_event")
-```
-**VERIFICATION:** You MUST see: `"✓ Data loaded successfully!"`
-
-**Step 2 — Run survival analysis:**
-```r
-source("scripts/basic_workflow.R")
-result <- run_survival_analysis(data)
-# Optional: result <- run_survival_analysis(data, risk_strata_method = "tertiles")
-# Optional: result <- run_survival_analysis(data, covariates = c("age", "stage"))
-```
-**VERIFICATION:** You MUST see: `"✓ Survival analysis completed successfully!"`
-
-**Step 3 — Generate visualizations:**
-```r
-source("scripts/survival_plots.R")
-generate_all_plots(result, output_dir = "results")
-```
-**VERIFICATION:** You MUST see: `"✓ All survival plots generated successfully!"`
-
-**Step 4 — Export results:**
-```r
-source("scripts/export_results.R")
-export_all(result, output_dir = "results")
-```
-**VERIFICATION:** You MUST see: `"=== Export Complete ==="`
-
-**DO NOT write inline Cox/KM code (coxph, survfit, etc.) — use the scripts.**
-
----
-
-### Workflow 2 — Disease Progression Modeling
-
-**Step 1 — Load and preprocess longitudinal data:**
-```python
-from scripts.load_and_preprocess import load_example_data, load_and_preprocess_data
-
-# Example: GSE128959 bladder cancer recurrence (18 patients, 84 samples)
-data, metadata = load_example_data()
-data, metadata, preprocessing_stats = load_and_preprocess_data(
-    data_file='expression.csv',
-    metadata_file='metadata.csv',
-    data_type='rnaseq',
-    min_patients=10,
-    min_timepoints=3
-)
-```
-**VERIFICATION:** You MUST see: `"✓ Data loaded and preprocessed successfully!"`
-
-**Step 2 — Run trajectory analysis:**
-```python
-from scripts.run_trajectory_analysis import run_trajectory_analysis
-
-results = run_trajectory_analysis(
-    data, metadata,
-    method='timeax',
-    patient_column='patient_id',
-    time_column='timepoint'
-)
-```
-**VERIFICATION:** You MUST see: `"✓ Trajectory analysis completed successfully!"`
-
-**Step 3 — Generate visualizations:**
-```python
-from scripts.generate_all_plots import generate_all_plots
-generate_all_plots(data, metadata, results, output_dir='trajectory_results')
-```
-
-**Step 4 — Export results:**
-```python
-from scripts.export_results import export_all
-export_all(data=data, metadata=metadata, results=results, output_dir='trajectory_results')
-```
-
-**Key quality metric:** Within-patient monotonicity > 0.5 (good) or 0.3–0.5 (moderate).
-The TimeAx `robustness()` function can produce misleading negative values — use monotonicity instead.
-
----
-
-### Workflow 3 — Biomarker Panel Discovery
-
-**Step 1 — Load data:**
-```r
-source("scripts/load_example_data.R")
-data <- load_sepsis_data(outcome = "endotype")
-# OR: data <- load_imvigor210_data()   # bladder cancer, atezolizumab response
-# OR: data <- load_unifi_data()        # UC patients, ustekinumab trial
-```
-**VERIFICATION:** You MUST see: `"✓ Data loaded successfully!"`
-
-**Step 2 — Run LASSO analysis:**
-```r
-source("scripts/prepare_features.R")
-features <- prepare_feature_matrix(data$expression, data$metadata, data$outcome_col, top_n_variable = 2000)
-
-source("scripts/lasso_workflow.R")
-model <- run_lasso_panel(features$X, features$y, alpha = 0.5)
-```
-**VERIFICATION:** You MUST see: `"✓ LASSO panel selection completed successfully!"`
-
-**Step 3 — Generate visualizations:**
-```r
-source("scripts/biomarker_plots.R")
-generate_all_plots(model, X = features$X, y = features$y, output_dir = "results")
-```
-
-**Step 4 — Export and validate:**
-```r
-source("scripts/export_results.R")
-export_all(model, output_dir = "results", data = data, features = features)
-```
-
-**CRITICAL:** Do NOT describe panel gene biology without running pathway enrichment first.
-State panel genes and coefficients — direct the user to `functional-enrichment-from-degs` for biology.
-
----
-
-### Workflow 4 — Mendelian Randomization
-
-**Step 1 — Load and harmonize data:**
-```r
-source("scripts/load_data.R")
-dat <- load_example_data()
-# OR: dat <- load_from_opengwas("ieu-a-300", "ieu-a-7")
-# OR: dat <- load_from_files("exposure.csv", "outcome.csv")
-```
-**VERIFICATION:** You MUST see: `"✓ Data loaded and harmonized successfully!"`
-
-**Step 2 — Run MR analysis:**
-```r
-source("scripts/run_mr_analysis.R")
-mr_results <- run_mr(dat)
-sensitivity <- run_sensitivity(dat, mr_results)
-```
-**VERIFICATION:** You MUST see: `"✓ MR analysis completed successfully!"`
-
-**Step 3 — Generate visualizations:**
-```r
-source("scripts/mr_plots.R")
-generate_all_plots(mr_results, dat, sensitivity$singlesnp, sensitivity$leaveoneout, output_dir = "mr_results")
-```
-
-**Step 4 — Export results:**
-```r
-source("scripts/export_results.R")
-export_all(mr_results, sensitivity, dat, output_dir = "mr_results")
-```
-
----
-
-### Workflow 5 — Clinical Trial Landscape
-
-**Step 1 — Load config and query ClinicalTrials.gov:**
-```python
-import sys; sys.path.insert(0, ".")
-from scripts.disease_config import load_disease_config, get_default_conditions
-from scripts.query_clinicaltrials import query_trials
-
-config = load_disease_config("ibd")  # or None for generic
-conditions = get_default_conditions(config)
-raw_trials = query_trials(conditions=conditions,
-    statuses=["RECRUITING", "ACTIVE_NOT_RECRUITING", "NOT_YET_RECRUITING"])
-```
-**VERIFICATION:** `"✓ Retrieved {N} trials from ClinicalTrials.gov"`
-
-**Step 2 — Classify and compile:**
-```python
-from scripts.classify_mechanisms import classify_all
-from scripts.compile_trials import compile_trials
-
-classified = classify_all(raw_trials, config=config)
-trials_df = compile_trials(classified, output_dir="landscape_results")
-```
-
-**Step 3 — Generate visualizations:**
-```python
-from scripts.generate_landscape_plots import generate_landscape_plots
-generate_landscape_plots(trials_df, output_dir="landscape_results", config=config)
-```
-
-**Step 4 — Export results:**
-```python
-from scripts.export_all import export_all
-export_all(trials_df, parameters={"conditions": conditions}, output_dir="landscape_results", config=config)
-```
 
 ---
 
@@ -499,34 +316,6 @@ STROBE-MR (Mendelian randomization reporting), and CONSORT (clinical trial repor
 
 ---
 
-## Common Issues
-
-### Survival Analysis
-| Error | Cause | Fix |
-|---|---|---|
-| "No valid covariates found" | All columns have >20% missing or single value | Provide covariates explicitly |
-| PH assumption violated | Time-varying effects | Note in report; consider stratified analysis |
-| "Event column must be binary" | Non-standard event coding | Recode to 0/1 |
-| KM drops steeply despite low event rate | Heavy censoring (correct behavior) | NOT A BUG — report landmark rates |
-| Subtype medians have upper CI = NA | KM never crosses 50% | Use landmark rates instead |
-
-### Biomarker Discovery
-| Error | Cause | Fix |
-|---|---|---|
-| "No shared samples" | Column names don't match rownames | Check colnames(expression) match rownames(metadata) |
-| "Outcome must be binary" | Non-binary outcome column | Ensure 2 unique values; recode if multi-level |
-| "No features passed stability" | Very noisy data or small effect | Script auto-relaxes to top 10 features; consider alpha=0.5 |
-| Low validation AUC | Cross-platform gene loss | Check n_matched; if <50% matched, use same-platform validation |
-
-### Mendelian Randomization
-| Error | Cause | Fix |
-|---|---|---|
-| "No instruments found" | No SNPs below p-value threshold | Try less stringent threshold or check trait ID |
-| LD clumping API fails | OpenGWAS API temporarily down | Script falls back to no clumping with warning |
-| Steiger test fails | Sample sizes unavailable | Normal for some datasets; other sensitivity tests still valid |
-
----
-
 ## Translational Interpretation Framework
 
 When The Clinician receives omics results from The Analyst or The Navigator,
@@ -569,7 +358,7 @@ The Analyst ──────── runs the omics analysis
 The Navigator ────── integrates the layers
 The Clinician ────── connects findings to patients ← YOU ARE HERE
 The Librarian ────── finds the supporting evidence
-The Auditor ──────── verifies the results
+The Reviewer ──────── verifies the results
 The Storyteller ──── communicates the findings
 ```
 
@@ -582,7 +371,7 @@ The Storyteller ──── communicates the findings
 - **To The Analyst:** Risk scores, patient stratification labels, survival model objects
 - **To The Librarian:** Clinical questions requiring literature support
 - **To The Storyteller:** Survival curves, forest plots, ROC curves, landscape figures
-- **To The Auditor:** All clinical analysis outputs for mandatory audit
+- **To The Reviewer:** All clinical analysis outputs for mandatory audit
 
 ---
 
@@ -636,7 +425,7 @@ These are absolute. No exceptions.
 ### Workflow Rules
 - **Always use scripts exactly as shown** — do not write inline Cox/KM/LASSO code
 - **Always verify script completion messages** before proceeding to the next step
-- **Always invoke The Auditor** after completing any clinical analysis
+- **Always invoke The Reviewer** after completing any clinical analysis
 - **Always ask clarification questions** before starting analysis on user data
 - **Never proceed with assumptions** on time column, event column, or outcome definition
 

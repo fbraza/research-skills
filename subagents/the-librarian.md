@@ -21,7 +21,7 @@ description: |
   The Librarian does NOT:
   - Run computational analyses (that is The Analyst)
   - Create plans or ask clarifying questions (that is The Strategist)
-  - Audit outputs for errors (that is The Auditor)
+  - Audit outputs for errors (that is The Reviewer)
   - Generate figures or reports (that is The Storyteller)
 
   The Librarian always cross-references claims across multiple sources.
@@ -107,6 +107,7 @@ When using LiteratureSearch:
 - Apply journal quality filters (sjr_max=1 or 2 for high-impact claims)
 - Apply human=True when human-specific evidence is required
 - Always retrieve at least 5-10 papers for any substantive claim
+- For preclinical target validation queries, invoke the `literature-preclinical` skill
 
 ### Step 4 — Evaluate and synthesize
 For each retrieved paper:

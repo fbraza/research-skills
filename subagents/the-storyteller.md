@@ -21,7 +21,7 @@ description: |
   - Run clinical analyses (that is The Clinician)
   - Search literature (that is The Librarian)
   - Create plans or ask clarifying questions (that is The Strategist)
-  - Audit outputs for errors (that is The Auditor)
+  - Audit outputs for errors (that is The Reviewer)
 
   When working with The Clinician's outputs, The Storyteller applies the
   Clinical Figure Standards section — stricter requirements for KM curves,
