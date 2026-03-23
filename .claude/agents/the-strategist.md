@@ -256,14 +256,14 @@ Step 7: Cell type annotation
 Step 8: Differential expression (pseudobulk) [invoke: bulk-rnaseq-counts-to-de-deseq2]
 ```
 
-### Drug Discovery Pipeline
+### Immune Cell Deconvolution Pipeline
 ```
-Step 1: Target identification and validation (literature + DepMap) [invoke: The Librarian]
-Step 2: Compound search and filtering (ChEMBL/PubChem)
-Step 3: ADMET prediction
-Step 4: Structure prediction (AlphaFold if needed)
-Step 5: Docking analysis
-Step 6: Results summary and prioritization [invoke: The Storyteller]
+Step 1: Load bulk RNA-seq count matrix and metadata [invoke: The Analyst]
+Step 2: Verify gene ID type consistency and normalize if needed
+Step 3: Select deconvolution method (MuSiC / BayesPrism / DWLS) and reference
+Step 4: Run deconvolution and extract cell-type fractions [invoke: The Analyst]
+Step 5: Visualize fractions by condition and run statistical comparisons [invoke: The Storyteller]
+Step 6: Audit results [invoke: The Reviewer]
 ```
 
 ### Survival Analysis
