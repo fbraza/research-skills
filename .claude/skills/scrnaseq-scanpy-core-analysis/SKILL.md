@@ -99,6 +99,7 @@ Complete workflow for single-cell RNA-seq analysis using Scanpy and the scverse 
 ### 3. **Batch structure:**
    - a) Single sample (no integration needed)
    - b) Multiple batches (scVI recommended, Harmony for speed)
+   - **If multiple samples:** How many h5ad files, and do they fit in RAM? If >10 samples or total >2 GB, use `concat_samples_on_disk()` instead of loading all files first — see [references/large_dataset_handling.md](references/large_dataset_handling.md)
 
 ### 4. **Analysis scope:**
    - a) Standard: QC + normalize + cluster + annotate (recommended)
@@ -239,6 +240,8 @@ Exports: H5AD, expression matrices (raw + normalized CSV), cell metadata, UMAP/P
 | **Integration** | scVI (complex batches). Harmony (fast, simple) | [integration_methods.md](references/integration_methods.md) |
 | **Resolution** | Test 0.4, 0.6, 0.8, 1.0. Choose by biology and stability | [scanpy_best_practices.md](references/scanpy_best_practices.md) |
 | **Annotation** | Manual (accurate). CellTypist (fast). Both (validate) | [marker_gene_database.md](references/marker_gene_database.md) |
+| **Large dataset (>50k cells or >2 GB)** | Use backed mode or `concat_on_disk`; never load all samples then concat | [large_dataset_handling.md](references/large_dataset_handling.md) |
+| **Multi-sample concatenation** | >10 samples or files don't fit in RAM → `concat_samples_on_disk()`; otherwise `concat_samples_inmemory()` | [large_dataset_handling.md](references/large_dataset_handling.md) |
 
 **Complete working examples:** [references/common-patterns.md](references/common-patterns.md)
 
@@ -248,7 +251,7 @@ Exports: H5AD, expression matrices (raw + normalized CSV), cell metadata, UMAP/P
 |-------|-------|----------|
 | `ImportError: No module named 'scanpy'` | Not installed | `pip install scanpy anndata numpy pandas matplotlib seaborn` |
 | Low cell retention (<70%) | Strict QC thresholds | Use MAD (nmads=5→7) or tissue-specific thresholds |
-| Out of memory | Large dataset (>50k cells) | Use backed mode or subsample |
+| Out of memory | Large dataset (>50k cells) | Use backed mode, `concat_on_disk`, or subsample — see [large_dataset_handling.md](references/large_dataset_handling.md) and [scripts/large_dataset_utils.py](scripts/large_dataset_utils.py) |
 | Clusters driven by batch | Insufficient integration | Use scVI, increase n_latent, check confounding |
 | Poor UMAP separation | Wrong parameters | Check PCA elbow, use 20-40 PCs, adjust n_neighbors |
 | High MT% in all cells | Degradation or tissue-specific | Check distribution — bimodal: stricter filter; uniform: may be biological |
@@ -279,6 +282,12 @@ Exports: H5AD, expression matrices (raw + normalized CSV), cell metadata, UMAP/P
 
 **Alternative:** scrnaseq-seurat-core-analysis (R-based) | **Downstream:** functional-enrichment-from-degs, de-results-to-plots, de-results-to-gene-lists | **Complementary:** bulk-omics-clustering, experimental-design-statistics
 
+**Advanced probabilistic modeling** — this skill handles standard scVI batch correction via `scripts/integrate_scvi.py`. For use cases beyond that, load `scvi-tools`:
+- CITE-seq (RNA + protein surface) → **TOTALVI**
+- Multiome (RNA + ATAC) → **MultiVI**
+- Cell type annotation with uncertainty → **scANVI**
+- Bayesian DE with posterior credible intervals → **scvi-tools DE**
+
 ## References
 
 1. **Scanpy:** Wolf FA, et al. (2018) *Genome Biol*. 19:15.
@@ -286,6 +295,6 @@ Exports: H5AD, expression matrices (raw + normalized CSV), cell metadata, UMAP/P
 3. **Pseudobulk DE:** Squair JW, et al. (2021) *Nat Commun*. 12:5692.
 4. **scVI:** Lopez R, et al. (2018) *Nat Methods*. 15:1053-1058.
 
-**Detailed guides:** [workflow-details.md](references/workflow-details.md) | [common-patterns.md](references/common-patterns.md) | [scanpy_best_practices.md](references/scanpy_best_practices.md) | [qc_guidelines.md](references/qc_guidelines.md) | [integration_methods.md](references/integration_methods.md) | [pseudobulk_de_guide.md](references/pseudobulk_de_guide.md) | [marker_gene_database.md](references/marker_gene_database.md) | [troubleshooting_guide.md](references/troubleshooting_guide.md)
+**Detailed guides:** [workflow-details.md](references/workflow-details.md) | [common-patterns.md](references/common-patterns.md) | [scanpy_best_practices.md](references/scanpy_best_practices.md) | [qc_guidelines.md](references/qc_guidelines.md) | [integration_methods.md](references/integration_methods.md) | [pseudobulk_de_guide.md](references/pseudobulk_de_guide.md) | [marker_gene_database.md](references/marker_gene_database.md) | [troubleshooting_guide.md](references/troubleshooting_guide.md) | [large_dataset_handling.md](references/large_dataset_handling.md)
 
 **Scripts:** [scripts/](scripts/) | **Evaluation:** [assets/eval/complete_example_analysis.py](assets/eval/complete_example_analysis.py)

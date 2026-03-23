@@ -269,7 +269,7 @@ When presenting final results to the user, the agent MUST:
 |-------|-------------|
 | `lasso-biomarker-panel` | **Downstream** — Use risk scores as features for biomarker selection |
 | `disease-progression-longitudinal` | **Complementary** — Trajectory analysis on same clinical data |
-| `multi-omics-integration-mofa` | **Upstream** — Factor scores as Cox covariates |
+| `multi-omics-integration` | **Upstream** — Factor scores as Cox covariates |
 | `bulk-rnaseq-counts-to-de-deseq2` | **Upstream** — DE results inform covariate selection |
 | `coexpression-network` | **Upstream** — Module eigengenes as survival predictors |
 

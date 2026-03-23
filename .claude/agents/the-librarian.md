@@ -190,6 +190,16 @@ When asked to verify that something is real (gene name, pathway, database ID, dr
 
 ## Search Tools and Usage
 
+### biorxiv-database skill (structured preprint search — preferred over WebSearch for bioRxiv)
+Best for: systematic preprint discovery in life sciences
+```
+Use for: recent findings not yet in PubMed, emerging methods, author tracking
+Invoke: read .claude/skills/biorxiv-database/SKILL.md, then run scripts/biorxiv_search.py
+Covers: immunology, genomics, cell-biology, bioinformatics, systems-biology, pathology
+Always label results: [PREPRINT — not peer-reviewed]
+Always pair with a PubMed search to cover peer-reviewed literature
+```
+
 ### WebSearch (PubMed / bioRxiv / Semantic Scholar queries)
 Best for: systematic literature queries
 ```
@@ -198,6 +208,59 @@ Prefer PubMed (pubmed.ncbi.nlm.nih.gov) and bioRxiv for scientific literature
 Use site: filters to restrict to trusted domains
 Always retrieve and evaluate >= 10 papers for substantive claims
 ```
+
+### PubMed Advanced Query Syntax
+Use when constructing precise queries for systematic reviews or complex searches.
+
+**Field tags:**
+- `[tiab]` — title or abstract
+- `[mh]` — MeSH term (includes narrower terms automatically)
+- `[majr]` — MeSH term as major topic only
+- `[pt]` — publication type
+- `[au]` — author
+- `[dp]` — publication date
+- `[la]` — language
+
+**MeSH subheadings** (append to MeSH term for specificity):
+- `/drug therapy`, `/immunology`, `/metabolism`, `/genetics`, `/surgery`, `/transplantation`
+- Example: `lung transplantation[mh]/immunology`
+
+**Publication type filters** (`[pt]`):
+- `Randomized Controlled Trial`, `Meta-Analysis`, `Systematic Review`, `Review`, `Clinical Trial`, `Case Reports`, `Guideline`
+
+**Date and availability:**
+- Date range: `2020:2024[dp]`
+- Free full text only: `AND free full text[sb]`
+- Has abstract: `AND hasabstract[text]`
+
+**Example queries:**
+```
+# Systematic reviews on a topic with date range
+<topic>[mh] AND systematic review[pt] AND 2018:2024[dp]
+
+# Free full-text RCTs on a drug
+<drug>[nm] AND <disease>[mh] AND randomized controlled trial[pt] AND free full text[sb]
+
+# Author search
+<lastname> <initials>[au] AND <topic>[tiab]
+```
+
+**Programmatic batch access** (for systematic reviews requiring >100 PMIDs):
+```python
+from Bio import Entrez
+Entrez.email = "your@email.com"
+
+handle = Entrez.esearch(db="pubmed", term="macrophage[mh] AND lung transplantation[mh]",
+                        retmax=200, usehistory="y")
+record = Entrez.read(handle)
+pmids = record["IdList"]
+
+# Fetch abstracts in batch
+fetch_handle = Entrez.efetch(db="pubmed", id=",".join(pmids),
+                              rettype="abstract", retmode="text")
+abstracts = fetch_handle.read()
+```
+Rate limit: 3 requests/sec without API key; 10/sec with NCBI API key.
 
 ### WebSearch
 Best for: recent news, preprints, database updates, tool documentation

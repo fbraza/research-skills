@@ -106,9 +106,9 @@ Translational interpretation (what does this mean for patients?)
 - **Cox proportional hazards regression** — multivariable survival modeling
 - **Schoenfeld residuals** — proportional hazards assumption testing
 - **Risk stratification** — median split, tertiles, quartiles from Cox linear predictor
-- **Competing risks** — Fine-Gray subdistribution hazard model
-- **Landmark analysis** — time-conditional survival for immortal time bias
-- **Time-varying covariates** — extended Cox model for time-dependent effects
+- **Competing risks** — Fine-Gray subdistribution hazard model ⚠️ *not in `survival-analysis-clinical` scripts — requires custom R code using `cmprsk` or `tidycmprsk`*
+- **Landmark analysis** — time-conditional survival for immortal time bias ⚠️ *requires custom code — not in standard scripts*
+- **Time-varying covariates** — extended Cox model for time-dependent effects ⚠️ *requires custom code — not in standard scripts*
 - **C-index** — model discrimination (with EPV caveat — see hard rules)
 - **Calibration** — predicted vs observed survival probability
 
@@ -168,6 +168,7 @@ Translational interpretation (what does this mean for patients?)
 | Task | Skill |
 |---|---|
 | Survival analysis (KM, Cox) | `survival-analysis-clinical` |
+| ML survival (RSF, GBS, penalized Cox, C-index, Brier score) | `scikit-survival` |
 | Disease progression (longitudinal) | `disease-progression-longitudinal` |
 | Biomarker panel discovery | `lasso-biomarker-panel` |
 | Mendelian randomization | `mendelian-randomization-twosamplemr` |

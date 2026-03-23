@@ -175,8 +175,61 @@ scale_fill_gradient2(low="blue", mid="white", high="red", midpoint=0)
 ### Export Standards
 - **Default:** Save in both SVG (vector) and PNG (raster)
 - **Resolution:** Minimum 300 DPI for PNG; 600 DPI for publication
+- **Never use JPEG for scientific data figures** — lossy compression corrupts data values
 - **Size:** Match journal requirements if specified; otherwise use standard sizes
 - **Naming:** Descriptive filenames with version suffixes (`volcano_plot_v1.svg`)
+
+### Publication Figure Standards
+
+#### Journal column widths
+| Journal | Single column | Double column |
+|---------|--------------|---------------|
+| Nature  | 89 mm (3.5 in) | 183 mm (7.2 in) |
+| Science | 55 mm (2.2 in) | 175 mm (6.9 in) |
+| Cell    | 85 mm (3.35 in) | 178 mm (7.0 in) |
+
+When journal is unspecified: default to Nature single (89 mm) for single panels, Nature double (183 mm) for multi-panel.
+
+#### Okabe-Ito palette (preferred for all categorical data)
+```python
+# Best colorblind-safe palette — use by default for categorical figures
+okabe_ito = ['#E69F00', '#56B4E9', '#009E73', '#F0E442',
+             '#0072B2', '#D55E00', '#CC79A7', '#000000']
+import matplotlib.pyplot as plt
+plt.rcParams['axes.prop_cycle'] = plt.cycler(color=okabe_ito)
+```
+
+#### Multi-panel figures
+```python
+from string import ascii_uppercase
+import matplotlib.pyplot as plt
+
+fig = plt.figure(figsize=(7.2, 4))  # Nature double column
+gs = fig.add_gridspec(2, 2, hspace=0.4, wspace=0.35)
+axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+
+# Bold panel labels — uppercase for most journals, lowercase for Nature
+for idx, ax in enumerate(axes):
+    ax.text(-0.15, 1.05, ascii_uppercase[idx],
+            transform=ax.transAxes, fontsize=10,
+            fontweight='bold', va='top', ha='right')
+```
+
+#### Typography at print size
+```python
+import matplotlib as mpl
+mpl.rcParams.update({
+    'font.family': 'sans-serif',
+    'font.sans-serif': ['Arial', 'Helvetica'],
+    'font.size': 8,
+    'axes.labelsize': 9,
+    'xtick.labelsize': 7,
+    'ytick.labelsize': 7,
+    'axes.titlesize': 9,
+})
+```
+- Axis labels: sentence case with units — `"Time (hours)"` not `"TIME (HOURS)"`
+- Minimum label font at final print size: 7pt tick labels, 8–9pt axis labels
 - **Location:** Always save to `./results/` or appropriate subfolder
 
 ---
@@ -283,6 +336,129 @@ Slide guidelines:
 - Consistent formatting throughout
 - Clean, professional layout
 - Title slide + content slides + summary slide
+
+---
+
+### LaTeX Beamer slides
+Create a Beamer PDF (`./results/slides_<title>.pdf`) ONLY when explicitly requested or when the user asks for "Beamer slides", "LaTeX slides", or "beautiful slides".
+
+**Default theme: Metropolis** (modern, minimal, conference-ready). Fall back to a custom clean theme if Metropolis is unavailable.
+
+#### Compilation
+```bash
+# Write .tex to /tmp/scripts/, compile to ./results/
+xelatex -output-directory /tmp/scripts/ /tmp/scripts/slides.tex
+xelatex -output-directory /tmp/scripts/ /tmp/scripts/slides.tex  # Run twice for ToC/refs
+cp /tmp/scripts/slides.pdf ./results/slides_<title>.pdf
+```
+
+#### Beamer template (Metropolis)
+```latex
+\documentclass[aspectratio=169, 12pt]{beamer}
+\usetheme{metropolis}
+
+% Fonts
+\usepackage{fontspec}
+\setsansfont{Fira Sans}
+\setmonofont{Fira Mono}
+
+% Colors — colorblind-safe palette
+\definecolor{mDarkTeal}{HTML}{23373B}
+\definecolor{mAccent}{HTML}{0072B2}   % colorblind-safe blue
+\definecolor{mAlert}{HTML}{E69F00}    % colorblind-safe orange
+\setbeamercolor{alerted text}{fg=mAlert}
+\setbeamercolor{progress bar}{fg=mAccent}
+
+% Packages
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{siunitx}
+\usepackage[backend=biber, style=nature, maxcitenames=2]{biblatex}
+
+\title{<Title>}
+\subtitle{<Subtitle>}
+\author{<Author>}
+\institute{<Institution>}
+\date{<Conference, Year>}
+
+\begin{document}
+
+\maketitle
+
+%% --- SECTION DIVIDER ---
+\section{Background}
+
+%% --- CONTENT SLIDE (bullets + figure) ---
+\begin{frame}{Slide Title}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item Key point one
+        \item Key point two \alert{(highlight)}
+        \item Key point three
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \includegraphics[width=\linewidth]{figures/figure1.pdf}
+    \end{column}
+  \end{columns}
+  \vfill
+  \tiny \textcite{Author2024}
+\end{frame}
+
+%% --- FULL-WIDTH FIGURE SLIDE ---
+\begin{frame}{Results}
+  \centering
+  \includegraphics[width=0.9\textwidth, height=0.75\textheight, keepaspectratio]{figures/results.pdf}
+\end{frame}
+
+%% --- SUMMARY SLIDE ---
+\begin{frame}{Summary}
+  \begin{enumerate}
+    \item Finding one
+    \item Finding two
+    \item Finding three
+  \end{enumerate}
+  \vfill
+  \metroset{block=fill}
+  \begin{block}{Take-home message}
+    One memorable sentence.
+  \end{block}
+\end{frame}
+
+\appendix
+\begin{frame}[allowframebreaks]{References}
+  \printbibliography
+\end{frame}
+
+\end{document}
+```
+
+#### Fallback: clean custom theme (no Metropolis required)
+```latex
+\documentclass[aspectratio=169, 12pt]{beamer}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamercolor{frametitle}{bg=white, fg=black}
+\setbeamercolor{title}{fg=black}
+\setbeamerfont{frametitle}{series=\bfseries, size=\large}
+```
+
+#### Slide design rules
+- One main idea per slide — never more than 5 bullets
+- Every bullet: 4–7 words maximum (verbal explanation is separate)
+- Figures: embed as PDF/SVG for vector quality; fallback PNG ≥ 300 DPI
+- Narrative arc: Hook → Context/Gap → Approach → Results → Implications
+- Talk types:
+  - 10–15 min conference: 12–18 slides, 1–2 key findings
+  - 45 min seminar: 35–45 slides, full story
+  - Thesis defense: 45–55 slides, all studies
+- Never use red/green as the only color distinction (colorblind rule)
+- Section slides auto-generated for every `\section{}`
+- Appendix slides for backup data — never cut content, move it to appendix
 
 ---
 
