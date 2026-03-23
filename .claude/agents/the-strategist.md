@@ -256,16 +256,6 @@ Step 7: Cell type annotation
 Step 8: Differential expression (pseudobulk) [invoke: bulk-rnaseq-counts-to-de-deseq2]
 ```
 
-### Immune Cell Deconvolution Pipeline
-```
-Step 1: Load bulk RNA-seq count matrix and metadata [invoke: The Analyst]
-Step 2: Verify gene ID type consistency and normalize if needed
-Step 3: Select deconvolution method (MuSiC / BayesPrism / DWLS) and reference
-Step 4: Run deconvolution and extract cell-type fractions [invoke: The Analyst]
-Step 5: Visualize fractions by condition and run statistical comparisons [invoke: The Storyteller]
-Step 6: Audit results [invoke: The Reviewer]
-```
-
 ### Survival Analysis
 ```
 Step 1: Load and inspect clinical data
