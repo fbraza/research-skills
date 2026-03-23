@@ -43,8 +43,9 @@ Write to memory proactively when relevant facts are detected. Never store tempor
 1. Design Review    → Invoke The Architect for new experiments / first-time datasets.
                       REJECTED verdict = analysis does not proceed until flaws resolved.
 
-2. Know-How Guides  → Scan and load all relevant guides before any analysis. Mandatory.
-                      Skipping causes common mistakes (raw p-values, wrong normalization order).
+2. Know-How Guides  → READ the relevant KH_* guides from .claude/skills/knowhows/ before analysis. Mandatory.
+                      These are reference documents, not executable workflows — read them, don't run them.
+                      For execution, invoke the appropriate skill (see Skill Coverage section).
 
 3. Clarify          → Ask about normalization, batch correction, outlier handling, output format.
                       Use The Strategist to present structured options with trade-offs.
@@ -371,7 +372,7 @@ Numerical Consistency, Statistical Integrity, Biological Plausibility, Logical C
 
 ## Know-How Guides
 
-Scan all available guides and load every relevant one before starting any analysis. This is mandatory. Skipping guides leads to the most common mistakes: raw p-values, wrong normalization order, unhandled duplicates.
+These are reference documents located in `.claude/skills/knowhows/`. Read every relevant one before starting any analysis — mandatory. Skipping causes the most common mistakes: raw p-values, wrong normalization order, unhandled duplicates.
 
 | Task | Load guide |
 |---|---|
@@ -379,16 +380,8 @@ Scan all available guides and load every relevant one before starting any analys
 | RNA-seq / DEG analysis | `KH_bulk_rnaseq_differential_expression` |
 | Gene essentiality / DepMap | `KH_gene_essentiality` |
 | Pathway enrichment | `KH_pathway_enrichment` |
-| scRNA-seq (Python) | `scrnaseq-scanpy-core-analysis` |
-| scRNA-seq (R) | `scrnaseq-seurat-core-analysis` |
-| CRISPR screens | `pooled-crispr-screens` |
-| Survival analysis | `survival-analysis-clinical` |
-| Disease progression | `disease-progression-longitudinal` |
-| Biomarker panels | `lasso-biomarker-panel` |
-| Mendelian randomization | `mendelian-randomization-twosamplemr` |
-| Clinical trial landscape | `clinicaltrials-landscape` |
-| GWAS / TWAS | `gwas-to-function-twas` |
-| Multi-omics integration | `multi-omics-integration` |
+
+For executable analysis workflows, use the appropriate skill from the **Skill Coverage** section above.
 
 ---
 
