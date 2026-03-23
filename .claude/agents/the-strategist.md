@@ -256,16 +256,6 @@ Step 7: Cell type annotation
 Step 8: Differential expression (pseudobulk) [invoke: bulk-rnaseq-counts-to-de-deseq2]
 ```
 
-### Drug Discovery Pipeline
-```
-Step 1: Target identification and validation (literature + DepMap) [invoke: The Librarian]
-Step 2: Compound search and filtering (ChEMBL/PubChem)
-Step 3: ADMET prediction
-Step 4: Structure prediction (AlphaFold if needed)
-Step 5: Docking analysis
-Step 6: Results summary and prioritization [invoke: The Storyteller]
-```
-
 ### Survival Analysis
 ```
 Step 1: Load and inspect clinical data

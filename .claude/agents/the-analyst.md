@@ -93,7 +93,7 @@ Before any analysis, verify:
 - [ ] Log the dimensions of the loaded data (n_samples, n_features)
 
 ### Step 3 — Invoke The Reviewer
-After every major analytical step, invoke the-auditor subagent with:
+After every major analytical step, invoke the-reviewer subagent with:
 - A description of what was just computed
 - A focus area for the audit
 - The relevant output files or printed results
@@ -129,6 +129,34 @@ On FAIL: fix the identified issues and re-run before continuing.
   ```
 - Document all parameters explicitly — no hidden defaults
 - Record all database query dates (databases change over time)
+
+### Ensembl REST API patterns
+Rate limit: 15 req/s. Use `https://rest.ensembl.org` for GRCh38; `https://grch37.rest.ensembl.org` for GRCh37/hg19.
+
+```python
+import requests
+SERVER = "https://rest.ensembl.org"
+HEADERS = {"Content-Type": "application/json"}
+
+# Gene symbol → Ensembl ID + coordinates
+# Source: https://rest.ensembl.org
+r = requests.get(f"{SERVER}/lookup/symbol/homo_sapiens/<GENE>", headers=HEADERS)
+gene = r.json()  # gene['id'], gene['start'], gene['end'], gene['seq_region_name']
+
+# Batch symbol lookup (up to 1000 genes)
+r = requests.post(f"{SERVER}/lookup/symbol/homo_sapiens",
+                  headers=HEADERS, json={"symbols": ["TP53", "BRCA2"]})
+
+# Ortholog lookup — mouse/rat → human (or any species)
+r = requests.get(f"{SERVER}/homology/id/<ENSG_ID>?target_species=mus_musculus",
+                 headers=HEADERS)
+
+# Assembly coordinate mapping GRCh37 → GRCh38
+r = requests.get("https://grch37.rest.ensembl.org/map/human/GRCh37/7:140453136..140453136/GRCh38",
+                 headers=HEADERS)
+```
+
+**Always verify assembly build** before any variant or coordinate operation — mixing GRCh37 and GRCh38 is a silent error source.
 
 ### Source Attribution
 Always include a `# Source: <url>` comment before any database or API call:
@@ -202,10 +230,124 @@ These are absolute. No exceptions.
 - Check for influential observations (Cook's distance)
 - Document the reference group/intercept explicitly
 
+**GLM — overdispersion check (always do this for count data):**
+```python
+import statsmodels.api as sm
+
+# Fit Poisson first
+model_pois = sm.GLM(y_counts, X, family=sm.families.Poisson()).fit()
+overdispersion = model_pois.pearson_chi2 / model_pois.df_resid
+print(f"Overdispersion ratio: {overdispersion:.2f}")
+# > 1.5 → switch to Negative Binomial
+if overdispersion > 1.5:
+    from statsmodels.discrete.count_model import NegativeBinomial
+    model_nb = NegativeBinomial(y_counts, X).fit()
+```
+
+**Zero-inflated models (excess zeros — cell counts, flow cytometry, etc.):**
+```python
+from statsmodels.discrete.count_model import ZeroInflatedPoisson, ZeroInflatedNegativeBinomialP
+# Use when many observations are exactly zero beyond what Poisson/NB predicts
+model_zip = ZeroInflatedPoisson(y_counts, X, exog_infl=np.ones((len(y_counts), 1))).fit()
+model_zinb = ZeroInflatedNegativeBinomialP(y_counts, X).fit()
+# Compare AIC: lower = better
+print(f"ZIP AIC: {model_zip.aic:.1f}  |  ZINB AIC: {model_zinb.aic:.1f}")
+```
+
+**Robust standard errors (when heteroskedasticity present but model is correct):**
+```python
+# HC3 robust SEs — use when Breusch-Pagan p < 0.05
+results_robust = sm.OLS(y, X).fit(cov_type='HC3')
+# Cluster-robust SEs — use when observations are grouped (same animal, same donor)
+results_clustered = sm.OLS(y, X).fit(cov_type='cluster', cov_kwds={'groups': group_var})
+```
+
+**Model comparison (AIC/BIC and likelihood ratio test for nested models):**
+```python
+import pandas as pd
+from scipy import stats
+
+# AIC/BIC comparison (lower = better)
+comparison = pd.DataFrame({
+    'AIC': {name: res.aic for name, res in models.items()},
+    'BIC': {name: res.bic for name, res in models.items()},
+}).sort_values('AIC')
+
+# Likelihood ratio test (for nested models only)
+lr_stat = 2 * (full_model.llf - reduced_model.llf)
+df_diff = full_model.df_model - reduced_model.df_model
+p_lrt = 1 - stats.chi2.cdf(lr_stat, df_diff)
+print(f"LRT: χ²({df_diff:.0f}) = {lr_stat:.2f}, p = {p_lrt:.4f}")
+# p < 0.05 → full model significantly better; prefer parsimony otherwise
+```
+
 ### DepMap / Gene Essentiality
 - Negative gene effect scores = essential genes (more negative = more essential)
 - When correlating with essentiality: invert the sign if needed
 - Never confuse gene effect score direction
+
+### General / Preclinical Statistical Tests
+Load `statistical-analysis` skill for all general hypothesis testing. Use `pingouin` as the primary Python library (returns test stat, p-value, effect size, and CI in one call).
+
+**Test selection — quick reference:**
+
+| Scenario | Normal data | Non-normal or small n |
+|---|---|---|
+| 2 independent groups | Independent t-test (Welch if unequal variances) | Mann-Whitney U |
+| 2 paired / same animal | Paired t-test | Wilcoxon signed-rank |
+| 3+ independent groups | One-way ANOVA + Tukey HSD | Kruskal-Wallis + Dunn |
+| 3+ groups, same animal (1 time factor) | Repeated measures ANOVA | Friedman + Dunn |
+| 2 factors (e.g., treatment × time) | Two-way ANOVA | Aligned Rank Transform (ART) |
+| Same animal, multiple timepoints + groups | Mixed ANOVA (between+within) or LME | LME with non-parametric fallback |
+
+**Effect size benchmarks:**
+
+| Test | Metric | Small | Medium | Large |
+|---|---|---|---|---|
+| t-test | Cohen's d | 0.20 | 0.50 | 0.80 |
+| ANOVA | partial η² | 0.01 | 0.06 | 0.14 |
+| Correlation | r | 0.10 | 0.30 | 0.50 |
+| Chi-square | Cramér's V | 0.07 | 0.21 | 0.35 |
+
+**Assumption violation rules:**
+- Normality violated, n > 30 per group → proceed with parametric (CLT protects it)
+- Normality violated, n ≤ 30 → use non-parametric alternative
+- Homogeneity of variance violated → use Welch's t-test / Welch's ANOVA
+- Always check assumptions before interpreting results
+
+**Repeated measures / animal experiments (NOT in `statistical-analysis` skill — write custom code):**
+```python
+import pingouin as pg
+
+# Repeated measures ANOVA (same animal at multiple timepoints)
+aov = pg.rm_anova(dv='measurement', within='timepoint',
+                  subject='animal_id', data=df, detailed=True)
+# Always check sphericity — pingouin reports Mauchly's test automatically
+# If sphericity violated: use Greenhouse-Geisser correction (pingouin applies it)
+
+# Post-hoc after RM-ANOVA
+posthoc = pg.pairwise_tests(dv='measurement', within='timepoint',
+                             subject='animal_id', data=df,
+                             padjust='bonf')  # or 'fdr_bh'
+
+# Mixed ANOVA (treatment group × timepoint, same animals)
+aov = pg.mixed_anova(dv='measurement', between='treatment',
+                     within='timepoint', subject='animal_id', data=df)
+
+# Linear mixed model (recommended for unbalanced designs or missing timepoints)
+import statsmodels.formula.api as smf
+lme = smf.mixedlm("measurement ~ treatment * timepoint",
+                  data=df, groups=df["animal_id"])
+result = lme.fit()
+print(result.summary())
+```
+
+**Reporting standard for preclinical statistics:**
+- Always state the test, n per group, and what the group represents (animals, wells, donors)
+- Always report effect size alongside p-value
+- For post-hoc tests: state the correction method and all pairwise comparisons
+- For animal studies: state biological replicates (n animals) vs technical replicates clearly
+- Never report only p-value without effect size
 
 ---
 
@@ -217,6 +359,7 @@ Before starting any analysis, load the relevant skill for the task type:
 |---|---|
 | Bulk RNA-seq DE | `bulk-rnaseq-counts-to-de-deseq2` |
 | scRNA-seq (Python) | `scrnaseq-scanpy-core-analysis` |
+| scRNA-seq multimodal / probabilistic (TOTALVI, MultiVI, scANVI, Bayesian DE) | `scvi-tools` |
 | scRNA-seq (R) | `scrnaseq-seurat-core-analysis` |
 | Trajectory / RNA velocity | `scrna-trajectory-inference` |
 | Spatial transcriptomics | `spatial-transcriptomics` |
@@ -234,6 +377,19 @@ Before starting any analysis, load the relevant skill for the task type:
 | PGS / PRS | `polygenic-risk-score-prs-catalog` |
 | PCR primer design | `pcr-primer-design` |
 | Literature (preclinical) | `literature-preclinical` |
+| CELLxGENE Census (atlas query) | `cellxgene-census` |
+| GEO dataset download / reanalysis | `geo-database` |
+| Bulk RNA-seq DE (Python only, explicit) | `pydeseq2` |
+| Bayesian / hierarchical modeling | `pymc` |
+| General statistical testing (t-test, ANOVA, correlation, regression) | `statistical-analysis` |
+| General ML (classification, regression, clustering, CV, pipelines) | `scikit-learn` |
+| ML model interpretability / feature importance (SHAP values) | `shap` |
+| KEGG pathway/gene/drug lookups, ID conversion, drug-drug interactions | `kegg-database` |
+| Target-disease associations, druggability, known drugs (Open Targets) | `opentargets-database` |
+| ML survival models (RSF, GBS, penalized Cox, C-index, Brier score) | `scikit-survival` |
+| ChIP-Atlas differential peaks / chromatin accessibility between conditions | `chip-atlas-diff-analysis` |
+| ChIP-Atlas TF/histone mark enrichment near a gene list | `chip-atlas-peak-enrichment` |
+| ChIP-Atlas target genes for a transcription factor | `chip-atlas-target-genes` |
 
 ---
 
