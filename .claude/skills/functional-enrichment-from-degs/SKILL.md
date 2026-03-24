@@ -205,7 +205,7 @@ gsea_result <- run_gsea(ranked_genes, term2gene)
 ```r
 generate_all_plots(gsea_result)
 ```
-🚨 **DO NOT write inline plotting code (ggsave, dotplot, etc.). Just use generate_all_plots().** 🚨
+🚨 **DO NOT write inline plotting code. Use `generate_all_plots(gsea_result)` for GSEA plots. ORA plots use `generate_ora_barplot()` directly — they are NOT covered by `generate_all_plots()`.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -225,7 +225,7 @@ export_all(gsea_result, ranked_genes, output_prefix = "enrichment")
 
 ⚠️ **CRITICAL - DO NOT:**
 - ❌ **Write inline enrichment code** → **STOP: Use `run_gsea()`**
-- ❌ **Write inline plotting code (ggsave, dotplot, gseaplot2, etc.)** → **STOP: Use `generate_all_plots()`**
+- ❌ **Write inline GSEA plotting code (ggsave, dotplot, gseaplot2, etc.)** → **STOP: Use `generate_all_plots(gsea_result)` for GSEA; for ORA plots call `generate_ora_barplot()` directly (not covered by `generate_all_plots()`)**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Use absolute paths** like `/mnt/knowhow/` → use relative paths `scripts/`
 - ❌ **Skip the background parameter in ORA** → causes inflated p-values
@@ -263,6 +263,16 @@ export_all(gsea_result, ranked_genes, output_prefix = "enrichment")
 2. **Database selection (Step 3):** Hallmark + KEGG (default exploratory), GO:BP (detailed processes), Reactome (KEGG alternative, commercial-friendly), or C6/C7 (cancer/immunology)
 
 3. **Ranking metric (Step 2):** Test statistic (best, balances effect + significance), signed -log10(pvalue) (good alternative), or log2FC only (not recommended)
+
+4. **p.adjust cutoff:** The `pvalue_cutoff` parameter in `run_gsea()` and `run_ora()` filters reported gene sets by BH-adjusted p-value. Choosing the right threshold matters:
+
+   | Cutoff | When to use |
+   |---|---|
+   | `0.05` (default) | Standard; appropriate for well-powered datasets and publication-ready results |
+   | `0.1` | Common for exploratory analyses; justified because pathway gene sets overlap heavily, making BH correction conservative at the pathway level |
+   | `0.2` | Last resort when 0.1 returns nothing; flag results as exploratory |
+
+   **Rationale for 0.1:** Unlike individual genes, pathways are not independent — shared genes cause correlated test statistics. BH correction assumes independence, so it over-corrects. Using 0.1 recovers pathways that are biologically real but penalized by conservative correction. Always report the threshold used.
 
 **For detailed decision guidance with options and recommendations, see [references/decision-guide.md](references/decision-guide.md).**
 
@@ -317,6 +327,42 @@ export_all(gsea_result, ora_up, ora_down, ranked_genes, output_prefix = "enrichm
 ```
 
 **For results interpretation guidance, see [references/interpretation_guidelines.md](references/interpretation_guidelines.md).**
+
+### Pattern 3: Multi-Contrast Comparative Enrichment
+
+**Use when:** You have ≥3 DE contrasts (e.g., 4 tissues vs blood, 3 treatment arms) and want a single comparative dotplot showing which pathways are enriched — and where — across all contrasts simultaneously.
+
+```r
+# Load scripts
+source("scripts/load_de_results.R")
+source("scripts/prepare_gene_lists.R")
+source("scripts/get_msigdb_genesets.R")
+source("scripts/multi_contrast_enrichment.R")
+
+# Build named list: one vector of significant gene symbols per contrast
+contrast_genes <- list(
+  "Lung_vs_Blood"  = filter_significant_genes(load_de_results("lung_vs_blood.csv"))$up,
+  "Gut_vs_Blood"   = filter_significant_genes(load_de_results("gut_vs_blood.csv"))$up,
+  "Liver_vs_Blood" = filter_significant_genes(load_de_results("liver_vs_blood.csv"))$up
+)
+
+# Background = all genes tested (from any one DE result, they share the same background)
+bg <- load_de_results("lung_vs_blood.csv")$gene
+
+# Get gene sets
+term2gene <- get_msigdb_genesets("human", c("H"))  # Hallmark
+
+# Run comparative ORA and plot
+ck <- run_comparative_enrichment(contrast_genes, term2gene, background = bg,
+                                 pvalue_cutoff = 0.1)
+plot_comparative_dotplot(ck, top_n = 20,
+                         output_file = "results/comparative_enrichment.svg")
+export_comparative_results(ck, "results/comparative_enrichment.csv")
+```
+
+**Output:** A single dotplot with contrasts on the x-axis, pathways on the y-axis, dot size = gene ratio, dot color = adjusted p-value. Far more informative than stacking individual barplots.
+
+**Script:** [scripts/multi_contrast_enrichment.R](scripts/multi_contrast_enrichment.R)
 
 ## Common Errors
 
@@ -387,7 +433,8 @@ Use CSV results for supplementary tables, SVG plots for figures (300+ DPI), and 
 - [scripts/get_msigdb_genesets.R](scripts/get_msigdb_genesets.R) - Retrieve MSigDB gene sets
 - [scripts/run_gsea.R](scripts/run_gsea.R) - Execute GSEA
 - [scripts/run_ora.R](scripts/run_ora.R) - Execute ORA
-- [scripts/generate_plots.R](scripts/generate_plots.R) - Visualization functions
+- [scripts/multi_contrast_enrichment.R](scripts/multi_contrast_enrichment.R) - Comparative enrichment across ≥3 contrasts via compareCluster()
+- [scripts/generate_plots.R](scripts/generate_plots.R) - Visualization functions (GSEA dotplot, ORA barplot, enrichment map, ridgeplot)
 - [scripts/export_results.R](scripts/export_results.R) - Export results and summaries
 
 **Evaluation:**

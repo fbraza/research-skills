@@ -4,3 +4,9 @@
 
 # Results
 results/
+treg_tissue_analysis/
+
+# R session artifacts
+.RData
+.Rhistory
+Rplots.pdf

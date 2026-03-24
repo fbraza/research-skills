@@ -297,6 +297,40 @@ export_all(dds, res, resLFC, output_dir = "results")
 
 **To understand patterns and choose the appropriate design formula for your experimental setup:** Read [references/comprehensive-reference.md#design-formulas](references/comprehensive-reference.md#design-formulas) and adapt the syntax to your specific experimental design.
 
+### Intercept-free (multi-group) designs
+
+For experiments with **3+ groups where you want all pairwise comparisons** (e.g., 4 tissues × 2 cell types), use an intercept-free design with `~0`:
+
+```r
+# ~0 encodes all groups as explicit levels — no implicit reference
+dds <- DESeqDataSetFromMatrix(counts, coldata, design = ~0 + group)
+dds <- DESeq(dds)
+
+# Extract any pairwise contrast by naming both levels explicitly
+res <- results(dds, contrast = c("group", "Lung_Treg", "Blood_Treg"))
+```
+
+**`~0` vs `~ group` — when to use which:**
+
+| Situation | Recommended design |
+|---|---|
+| One reference group, all comparisons vs control | `~ group` + `relevel()` |
+| Multi-group, any pairwise comparison possible | `~0 + group` |
+| Interaction model (group A effect changes with group B) | `~ A * B` or `~0 + A:B` |
+
+**LFC shrinkage with intercept-free designs:**
+`apeglm` requires a named coefficient from `resultsNames(dds)` and cannot be used with `contrast = c(...)` vectors. For `~0` designs where you subtract group means, use `ashr`:
+
+```r
+# apeglm — only works with named coefficients (not available for ~0 contrasts)
+# resLFC <- lfcShrink(dds, coef = "group_Lung_vs_Blood", type = "apeglm")  # works if coefficient exists
+
+# ashr — works with any contrast vector, good for multi-group designs
+resLFC <- lfcShrink(dds,
+                    contrast = c("group", "Lung_Treg", "Blood_Treg"),
+                    type = "ashr")
+```
+
 ## Extracting Results
 
 Extract comparisons using `results()` with either **coefficient name** (`name = 'condition_treated_vs_control'`) or **contrast** (`contrast = c('condition', 'treated', 'control')`).
@@ -435,12 +469,15 @@ export_all(dds, res, res_shrunk, output_dir = "deseq2_results")
    - Scripts handle all package installation, validation, and error checking automatically
 2. ✅ **REQUIRED: Validate sample IDs** match between counts and metadata (scripts do this automatically, or use `validate_input_data()`)
 3. ✅ **REQUIRED: Pre-filter** low-count genes before `DESeq()` (basic_workflow.R does this)
+   - Default: `rowSums(counts(dds)) >= 10` (adequate for simple 2-group designs)
+   - Preferred for multi-group / unbalanced: use `filter_by_cpm()` from basic_workflow.R (keeps genes with CPM ≥ 0.5 in all replicates of at least one group)
 4. ✅ **REQUIRED: Set reference level** explicitly with `relevel()` (basic_workflow.R does this)
 5. ✅ **REQUIRED: Apply LFC shrinkage** for visualization/ranking, use unshrunk for testing (basic_workflow.R does this)
 6. ✅ **Use padj** (not pvalue) for significance calling
 7. ✅ **Check QC plots** before trusting results (PCA, dispersion, MA) - use `run_all_qc()`
 8. ✅ **Use vst()** for >30 samples, rlog() for <30 samples (qc_plots.R auto-selects)
 9. ✅ **Document design formula** and report DESeq2 version
+10. ✅ **Enable parallelization for large datasets** (>10k genes, >20 samples): uncomment the BiocParallel block at the top of basic_workflow.R to distribute DESeq() computation across CPU cores (uses 75% of available cores by default)
 
 ## Suggested Next Steps
 

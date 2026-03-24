@@ -5,6 +5,7 @@
 library(enrichplot)
 library(ggplot2)
 library(dplyr)
+library(stringr)
 
 # Try to load svglite for high-quality SVG (optional)
 .has_svglite <- requireNamespace("svglite", quietly = TRUE)
@@ -48,21 +49,35 @@ if (.has_svglite) {
 #' Generate GSEA Dot Plot (PRIMARY - always generate)
 #'
 #' Creates a dot plot showing activated vs suppressed pathways from GSEA.
+#' Pathway names are automatically wrapped to prevent cramped y-axis labels.
 #'
 #' @param gsea_result enrichResult object from run_gsea()
 #' @param top_n Number of top pathways to show (default: 20)
 #' @param output_file Output filename (default: "gsea_dotplot.svg")
+#' @param label_wrap Width in characters for wrapping pathway names (default: 35)
 #' @return ggplot object
 #' @export
+#'
+#' @note For custom ggplot2 dotplots built from as.data.frame(gsea_result),
+#'   the GeneRatio column is a string like "5/100". Convert to numeric with:
+#'   gr <- str_split(df$GeneRatio, "/", simplify = TRUE)
+#'   df$GeneRatioNum <- as.numeric(gr[, 1]) / as.numeric(gr[, 2])
+#'   Then use aes(size = GeneRatioNum) for proper continuous size scaling.
 
-generate_gsea_dotplot <- function(gsea_result, top_n = 20, output_file = "gsea_dotplot.svg") {
+generate_gsea_dotplot <- function(gsea_result, top_n = 20, output_file = "gsea_dotplot.svg",
+                                  label_wrap = 35) {
   if (is.null(gsea_result) || nrow(gsea_result@result) == 0) {
     message("No GSEA results to plot")
     return(NULL)
   }
 
+  # Build the enrichplot dotplot, then wrap y-axis labels via scale_y_discrete.
+  # Do NOT mutate gsea_result@result$Description directly — enrichplot uses
+  # Description as an internal key; mutating it before dotplot() causes label
+  # mismatches in emapplot/ridgeplot downstream.
   p <- dotplot(gsea_result, showCategory = top_n, split = ".sign") +
     facet_grid(~.sign) +
+    scale_y_discrete(labels = function(x) str_wrap(x, width = label_wrap)) +
     theme_bw() +
     theme(
       axis.text.y = element_text(size = 8),
@@ -109,15 +124,18 @@ generate_gsea_running_plot <- function(gsea_result, top_n = 4, output_file = "gs
 #' Generate ORA Bar Plot
 #'
 #' Creates a bar plot for over-representation analysis results.
+#' Pathway names are automatically wrapped to prevent cramped y-axis labels.
 #'
 #' @param ora_result enrichResult object from run_ora()
 #' @param direction Direction label (e.g., "Upregulated", "Downregulated")
 #' @param top_n Number of top pathways to show (default: 15)
 #' @param output_file Output filename (default: auto-generated from direction)
+#' @param label_wrap Width in characters for wrapping pathway names (default: 35)
 #' @return ggplot object
 #' @export
 
-generate_ora_barplot <- function(ora_result, direction, top_n = 15, output_file = NULL) {
+generate_ora_barplot <- function(ora_result, direction, top_n = 15, output_file = NULL,
+                                 label_wrap = 35) {
   if (is.null(ora_result) || nrow(ora_result@result) == 0) {
     message(sprintf("No ORA results to plot for %s genes", direction))
     return(NULL)
@@ -128,6 +146,7 @@ generate_ora_barplot <- function(ora_result, direction, top_n = 15, output_file 
   }
 
   p <- barplot(ora_result, showCategory = top_n) +
+    scale_y_discrete(labels = function(x) str_wrap(x, width = label_wrap)) +
     theme_bw() +
     theme(axis.text.y = element_text(size = 8)) +
     ggtitle(sprintf("ORA: %s Genes", direction))
