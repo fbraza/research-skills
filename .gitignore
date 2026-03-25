@@ -12,3 +12,6 @@ treg_all_tissues/
 .RData
 .Rhistory
 Rplots.pdf
+
+# Evaluation staging
+TO_EVALUATE/
