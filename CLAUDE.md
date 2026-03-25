@@ -76,6 +76,7 @@ Guides are located in `skills/knowhows/`.
 | Upstream regulator analysis | `upstream-regulator-analysis` |
 | Bulk omics clustering | `bulk-omics-clustering` |
 | Spatial transcriptomics | `spatial-transcriptomics` |
+| Spatial deconvolution / cell type mapping | `scvi-tools-spatial` |
 | Survival / clinical analysis | `survival-analysis-clinical` |
 | Biomarker panel discovery | `lasso-biomarker-panel` |
 | Mendelian randomization | `mendelian-randomization-twosamplemr` |
