@@ -267,10 +267,11 @@ Exports: H5AD, expression matrices (raw + normalized CSV), cell metadata, UMAP/P
 1. **Functional Enrichment** — functional-enrichment-from-degs for pathway analysis of DE results
 2. **Trajectory Analysis** — PAGA, Palantir, or scVelo for developmental datasets
 3. **Cell-Cell Communication** — CellPhoneDB, LIANA, or NicheNet for ligand-receptor interactions
+4. **Advanced Deep Generative Modeling** — scvi-tools-scrna for probabilistic label transfer (scANVI), interpretable gene programs (LDVAE), marker-based annotation (CellAssign), Bayesian DE, or RNA velocity with uncertainty (VeloVI)
 
 ## Related Skills
 
-**Alternative:** scrnaseq-seurat-core-analysis (R-based) | **Downstream:** functional-enrichment-from-degs, de-results-to-plots, de-results-to-gene-lists | **Complementary:** bulk-omics-clustering, experimental-design-statistics
+**Alternative:** scrnaseq-seurat-core-analysis (R-based) | **Downstream:** functional-enrichment-from-degs, de-results-to-plots, de-results-to-gene-lists | **Complementary:** bulk-omics-clustering, experimental-design-statistics, scvi-tools-scrna (advanced deep generative models)
 
 ## References
 

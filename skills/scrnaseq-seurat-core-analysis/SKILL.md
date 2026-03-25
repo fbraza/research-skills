@@ -560,6 +560,7 @@ After completing core scRNA-seq analysis:
 2. **Trajectory Analysis** - Monocle3, Slingshot, or RNA velocity for developmental/differentiation datasets
 3. **Cell-Cell Communication** - CellChat, CellPhoneDB, or NicheNet for ligand-receptor interactions
 4. **Advanced Visualization** - Alluvial diagrams, proportional bar plots, gene regulatory networks
+5. **Advanced Deep Generative Modeling (Python)** - Export Seurat object to h5ad format, then use scvi-tools-scrna for probabilistic label transfer (scANVI), gene programs (LDVAE), marker-based annotation (CellAssign), or Bayesian DE. Requires Python environment.
 
 ## Related Skills
 
@@ -567,7 +568,7 @@ After completing core scRNA-seq analysis:
 
 **Downstream:** functional-enrichment-from-degs, de-results-to-plots, de-results-to-gene-lists
 
-**Complementary:** bulk-omics-clustering (non-scRNA-seq), experimental-design-statistics (plan experiments)
+**Complementary:** bulk-omics-clustering (non-scRNA-seq), experimental-design-statistics (plan experiments), scvi-tools-scrna (Python-based deep generative models; requires h5ad export)
 
 ## References
 

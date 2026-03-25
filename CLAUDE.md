@@ -65,6 +65,7 @@ Guides are located in `skills/knowhows/`.
 | Functional enrichment (GSEA/ORA) | `functional-enrichment-from-degs` |
 | scRNA-seq (Python) | `scrnaseq-scanpy-core-analysis` |
 | scRNA-seq (R) | `scrnaseq-seurat-core-analysis` |
+| scVI-tools deep generative models (scRNA-seq) | `scvi-tools-scrna` |
 | Trajectory inference | `scrna-trajectory-inference` |
 | Multi-omics (≥2 layers) | `multi-omics-integration` |
 | GWAS → gene function | `gwas-to-function-twas` |
