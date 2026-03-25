@@ -20,8 +20,8 @@ Rplots.pdf
 
 # Data / model artifacts
 data/
-skills/scvi-tools-scrna/scripts/data/
-skills/scvi-tools-spatial/scripts/data/
+!skills/scvi-tools-scrna/scripts/data/
+!skills/scvi-tools-spatial/scripts/data/
 
 # Version manager
 mise.toml
