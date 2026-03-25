@@ -2,8 +2,8 @@
 id: literature-review
 name: Scientific Literature Review
 category: literature
-short-description: Systematic literature search, citation verification, evidence synthesis, and biological claim validation using PubMed, bioRxiv, Semantic Scholar, and biological databases.
-detailed-description: Systematic protocol for finding, evaluating, and synthesizing scientific evidence. Use when any biological claim needs a citation, when conducting a literature review on a gene/pathway/disease/drug, when checking whether a finding is novel, when verifying gene names or database IDs, or when searching for preclinical or clinical evidence. Covers PubMed E-utilities API, bioRxiv/medRxiv API, Semantic Scholar API, GEO API, and 20+ biological databases. Includes retrieval protocol, verification protocol, evidence quality standards, and search strategy guidelines.
+short-description: Systematic literature search, citation verification, evidence synthesis, and biological claim validation using PubMed, bioRxiv, medRxiv, and Semantic Scholar.
+detailed-description: Systematic protocol for finding, evaluating, and synthesizing scientific evidence from published literature. Use when any biological claim needs a citation, when conducting a literature review on a gene/pathway/disease/drug, when checking whether a finding is novel or already published, or when searching for preclinical or clinical evidence for a hypothesis. Covers PubMed E-utilities API, bioRxiv/medRxiv API, Semantic Scholar API, and full-text PDF access. Includes retrieval protocol, verification protocol, evidence quality standards, search strategy guidelines, and literature-to-hypothesis synthesis.
 starting-prompt: Conduct a literature review on my research topic with verified citations and evidence synthesis . .
 ---
 
@@ -18,11 +18,10 @@ Systematic search, evaluation, and synthesis of scientific evidence. Every biolo
 - ✅ Conducting a literature review on a gene, pathway, disease, or drug
 - ✅ Finding papers relevant to a research question
 - ✅ Checking whether a finding is novel or already published
-- ✅ Verifying that a gene name, pathway, database ID, or drug name is real
-- ✅ Looking up drug mechanisms, targets, or clinical status
-- ✅ Checking database versions, release notes, or data provenance
+- ✅ Looking up drug mechanisms, targets, or clinical status from published literature
 - ✅ Searching for preclinical or clinical evidence for a hypothesis
 - ✅ Checking if a dataset, tool, or method has known issues or retractions
+- ✅ Downloading full-text PDFs for in-depth review
 
 **Do not use for:**
 - ❌ Running computational analyses — use appropriate analysis skills
@@ -45,16 +44,13 @@ Before searching, classify what you are looking for:
 
 | Claim type | Primary source | Secondary source |
 |---|---|---|
-| Gene function | UniProt, NCBI Gene, GeneCards | PubMed review |
-| Pathway membership | KEGG, Reactome, GO | MSigDB |
-| Drug mechanism | ChEMBL, DrugBank, DailyMed | PubMed |
-| Clinical evidence | PubMed (RCT, meta-analysis) | ClinicalTrials.gov |
-| Disease genetics | GWAS Catalog, ClinVar, OMIM | DisGeNET |
-| Protein structure | PDB, UniProt | AlphaFold DB |
-| Cancer mutations | COSMIC, cBioPortal | TCGA papers |
-| Gene expression | GTEx, Human Protein Atlas | GEO |
-| Drug-target interaction | ChEMBL, BindingDB | PubChem |
-| Novelty check | PubMed, bioRxiv, Google Scholar | Semantic Scholar |
+| Gene function | PubMed (reviews, primary literature) | Semantic Scholar |
+| Pathway membership | PubMed (reviews, primary literature) | Semantic Scholar |
+| Drug mechanism | PubMed (RCT, pharmacology papers) | Semantic Scholar |
+| Clinical evidence | PubMed (RCT, meta-analysis, systematic review) | Semantic Scholar |
+| Novelty check | PubMed, bioRxiv | Semantic Scholar |
+| Recent preprints | bioRxiv (life sciences), medRxiv (clinical) | Semantic Scholar |
+| Citation discovery | Semantic Scholar | PubMed ELink |
 
 ### Step 3 — Search with quality filters
 
@@ -80,21 +76,9 @@ For each retrieved paper:
 - Use inline numbered citations: `[N]` immediately after the relevant claim
 - Multiple citations: `[1, 2, 3]` — not `[1][2][3]`
 - Cite once per paragraph — do not repeat the same number
-- Use `[[DATABASE:ID]]` badges for database record IDs (e.g., `[[UniProt:P04637]]`)
+- Use `[[DATABASE:ID]]` badges for database record IDs (e.g., `[[PMID:12345678]]`)
 
 ## Verification Protocol
-
-### Gene name verification
-1. Check HGNC (human) or MGI (mouse) for the official symbol
-2. Check for common aliases and outdated symbols
-3. Verify the gene exists in the stated organism
-4. Note if the symbol is ambiguous across organisms
-
-### Database ID verification
-1. Attempt to retrieve the record from the database
-2. Verify the record exists and matches the stated entity
-3. Note the database version and access date
-4. Flag if the ID format is inconsistent with the database convention
 
 ### Citation verification
 1. Search PubMed for the stated PMID or DOI
@@ -102,18 +86,11 @@ For each retrieved paper:
 3. Check the retraction database (Retraction Watch)
 4. Note if the paper has corrections or expressions of concern
 
-### Drug/compound verification
-1. Check ChEMBL or PubChem for the compound name or ID
-2. Verify the stated mechanism and targets
-3. Check clinical status on ClinicalTrials.gov
-4. Note approved indications vs investigational uses
-
 ## Evidence Quality Standards
 
 ### What to state as established:
 - Findings replicated in multiple independent studies
 - Findings supported by meta-analysis or systematic review
-- Database annotations from curated, high-confidence sources
 - Mechanistic findings with strong experimental support
 
 ### What to flag as preliminary:
@@ -129,243 +106,132 @@ For each retrieved paper:
 - Any claim that contradicts the weight of evidence
 - Any causal claim from correlational data
 
-## API Reference: PubMed E-utilities
+## Literature-to-Hypothesis Synthesis
 
-### Search (ESearch)
+*This section distills implicit and explicit hypotheses from a collected paper set into structured, testable propositions. Activate this phase after retrieval and evidence evaluation are complete.*
 
-```
-Base URL: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi
-Parameters:
-  db=pubmed
-  term=<query>
-  retmax=<N>           # max results (default 20, max 10000)
-  retstart=<N>         # pagination offset
-  usehistory=y         # for large result sets
-  sort=relevance       # or "pub_date", "first_author"
-  datetype=pdat        # publication date filter
-  mindate=YYYY/MM/DD
-  maxdate=YYYY/MM/DD
-```
+### When to Use This Phase
 
-### Fetch abstracts (EFetch)
+- Gap analysis: identify which hypotheses in the literature are well-supported vs. under-tested
+- Contradiction synthesis: multiple papers report conflicting findings — surface contradictions and propose resolution hypotheses
+- Grant or proposal preparation: generate candidate hypotheses with evidence grades and validation plans
+- Mechanism inference: papers describe correlations or associations — infer mechanistic if-then propositions
+- Cross-domain synthesis: literature spans multiple fields — identify integrative hypotheses connecting domains
 
-```
-Base URL: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi
-Parameters:
-  db=pubmed
-  id=<PMID1,PMID2,...>  # comma-separated PMIDs
-  rettype=abstract       # or "xml" for structured data
-  retmode=text           # or "xml"
-```
+### Hypothesis Extraction Modes
 
-### PubMed advanced query syntax
+**Explicit** — Papers state hypotheses directly:
+`"We hypothesized that …"` / `"If X, then Y"` — extracted via pattern matching and LLM parsing.
 
-**Field tags:**
-- `[tiab]` — title or abstract
-- `[mh]` — MeSH term (includes narrower terms automatically)
-- `[majr]` — MeSH term as major topic only
-- `[pt]` — publication type
-- `[au]` — author
-- `[dp]` — publication date
-- `[la]` — language
+**Implicit** — Conclusions or claims imply testable propositions:
+- `"X is associated with Y"` → `"If X varies, then Y varies"`
+- `"X inhibits Y"` → `"If X is present, then Y activity decreases"`
 
-**MeSH subheadings:**
-- `/drug therapy`, `/immunology`, `/metabolism`, `/genetics`, `/surgery`
-- Example: `lung transplantation[mh]/immunology`
+**Mechanistic** — Inferred causal chains:
+- `"X upregulates Y, which promotes Z"` → `"If X is inhibited, then Z decreases via Y"`
 
-**Publication type filters (`[pt]`):**
-- `Randomized Controlled Trial`, `Meta-Analysis`, `Systematic Review`, `Review`, `Clinical Trial`, `Case Reports`, `Guideline`
+### If-Then Formalization & Falsifiability
 
-**Date and availability:**
-- Date range: `2020:2024[dp]`
-- Free full text: `AND free full text[sb]`
-- Has abstract: `AND hasabstract[text]`
+Every hypothesis is cast in standard form:
 
-**Example queries:**
-```
-# Systematic reviews on a topic with date range
-<topic>[mh] AND systematic review[pt] AND 2018:2024[dp]
+> **If** [condition or intervention] **then** [expected outcome] **because** [mechanism or rationale].
 
-# Free full-text RCTs on a drug
-<drug>[nm] AND <disease>[mh] AND randomized controlled trial[pt] AND free full text[sb]
-```
+Reject hypotheses that are:
+- Vague or tautological ("X affects Y somehow")
+- Not testable with available technology
+- Insufficiently scoped (no population, species, or context specified)
 
-**Rate limits:** 3 requests/sec without API key; 10/sec with NCBI API key.
+| Criterion | Description |
+|---|---|
+| Falsifiable | Clear condition under which the hypothesis would be refuted |
+| Specific | Includes measurable variables |
+| Scoped | Specifies population, cell type, species, context |
+| Mechanistic | Includes "because" or pathway rationale when possible |
+| Evidence-grounded | Tied to at least one source; not purely speculative |
 
-### Programmatic batch access (Python)
+Assign a **strength score** (Strong / Moderate / Weak) based on directness of evidence and number of supporting sources.
 
-```python
-from Bio import Entrez
-Entrez.email = "your@email.com"
+### Evidence Synthesis
 
-handle = Entrez.esearch(db="pubmed", term="macrophage[mh] AND lung transplantation[mh]",
-                        retmax=200, usehistory="y")
-record = Entrez.read(handle)
-pmids = record["IdList"]
+For each hypothesis, build an evidence table:
 
-# Fetch abstracts in batch
-fetch_handle = Entrez.efetch(db="pubmed", id=",".join(pmids),
-                              rettype="abstract", retmode="text")
-abstracts = fetch_handle.read()
-```
+| Source | Finding | Supports / Contradicts | Study Type | Notes |
+|---|---|---|---|---|
+| PMID X | Key finding excerpt | Supports | in vitro | Sample size n=3 |
 
-## API Reference: bioRxiv / medRxiv
+Grade evidence by quality: RCT > cohort > case-control > in vitro; multiple independent replications > single study.
 
-### Content API (search by date range)
+Mark:
+- **Consensus**: high agreement across sources
+- **Controversial**: conflicting findings with no resolution
+- **Gap**: hypothesis with weak or no direct evidence
 
-```
-Base URL: https://api.biorxiv.org/details/{server}/{interval}/{cursor}
+### Contradiction Analysis
 
-Parameters:
-  server: "biorxiv" or "medrxiv"
-  interval: YYYY-MM-DD/YYYY-MM-DD (start/end dates)
-  cursor: integer offset for pagination (0, 30, 60, ...)
+1. **Detect** — pairs of papers with incompatible claims (e.g., "X increases Y" vs. "X decreases Y")
+2. **Reconcile** — propose resolution hypotheses: *"If the effect of X on Y depends on Z (cell type, dose, stage), then both findings could be correct."*
+3. **Prioritize** — flag high-impact contradictions (frequently cited, central to the field) for resolution
 
-Example:
-  https://api.biorxiv.org/details/biorxiv/2024-01-01/2024-06-30/0
-```
+Build a **Contradiction Matrix**:
 
-Returns JSON with: doi, title, authors, abstract, date, category, jatsxml URL.
+| Hypothesis | Source A | Source B | Resolution Hypothesis |
+|---|---|---|---|
+| H1: If MET amplification... | PMID A | PMID B | If EGFR resistance depends on co-mutations... |
 
-### Pagination
-- Returns 30 results per call (max 100 with format=json parameter)
-- Increment cursor by 30 for next page
-- Continue until `messages[0].count` < 30
+### Experimental Validation Suggestions
 
-### Subject categories (bioRxiv)
-`bioinformatics`, `genomics`, `cell-biology`, `immunology`, `systems-biology`, `pathology`, `neuroscience`, `genetics`, `molecular-biology`, `cancer-biology`, `biochemistry`, `developmental-biology`, `microbiology`, `pharmacology-and-toxicology`, `biophysics`, `plant-biology`, `ecology`, `evolutionary-biology`, `physiology`, `zoology`
+For each hypothesis, propose concrete experiments:
 
-**Always label bioRxiv/medRxiv results as:** `[PREPRINT — not peer-reviewed]`
+| Element | Content |
+|---|---|
+| Validation type | Direct test, replication, extension, or refutation |
+| Design | Intervention, control, outcome, sample size, key confounders |
+| Feasibility | Low / Medium / High (based on common lab resources) |
+| Falsification criterion | What result would refute the hypothesis |
+| Priority | Ranked by impact × feasibility |
 
-## API Reference: Semantic Scholar
+Reference protocols.io or standard methods when applicable (e.g., CRISPR knockout protocol for gene X).
 
-### Paper search
+### Structured Report Output
 
-```
-Base URL: https://api.semanticscholar.org/graph/v1/paper/search
+When synthesis is the deliverable, emit a Markdown report:
 
-Parameters:
-  query=<search terms>
-  limit=<N>             # max 100
-  offset=<N>            # pagination
-  fields=<field1,field2,...>
-  year=<YYYY> or <YYYY-YYYY>
-  fieldsOfStudy=<field>
+```markdown
+# Literature-to-Hypothesis Report: [Topic]
 
-Fields available:
-  paperId, title, abstract, year, referenceCount, citationCount,
-  authors, journal, publicationTypes, tldr, openAccessPdf, externalIds
+## Executive Summary
+- N hypotheses extracted
+- M contradictions identified
+- Top 3 validation priorities
+
+## 1. Hypotheses
+
+### H1: [If-then statement]
+- **Scope:** [cell type, species, context]
+- **Strength:** Strong / Moderate / Weak
+- **Supporting evidence:** [table]
+- **Contradicting evidence:** [table or "None identified"]
+- **Validation suggestion:** [experiment design]
+- **Falsification criterion:** [what would refute]
+
+### H2: ...
+
+## 2. Contradiction Matrix
+| Hypothesis | Source A | Source B | Resolution Hypothesis |
+|---|---|---|---|
+
+## 3. Validation Roadmap
+| Priority | Hypothesis | Experiment | Feasibility |
+|---|---|---|---|
+
+## 4. Source Papers
+- [PMID] Author. Title. Journal. Year.
+
+## 5. Appendix: Evidence Excerpts
+[Key quotes supporting/contradicting each hypothesis]
 ```
 
-### Paper details (by ID)
-
-```
-GET https://api.semanticscholar.org/graph/v1/paper/{paper_id}
-  paper_id: S2 ID, DOI (DOI:10.xxx), PMID (PMID:12345), ArXiv ID, etc.
-  ?fields=title,abstract,year,citationCount,references,citations
-```
-
-### Author search
-
-```
-GET https://api.semanticscholar.org/graph/v1/author/search?query=<name>
-GET https://api.semanticscholar.org/graph/v1/author/{author_id}/papers
-```
-
-**Rate limits:** 100 requests/5 min (unauthenticated); higher with API key.
-
-## API Reference: GEO (Gene Expression Omnibus)
-
-### Search for datasets
-
-```
-# Via E-utilities (same as PubMed)
-https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=<query>
-
-# GEO DataSets search
-https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=<disease>[Description]+AND+gse[Entry+Type]
-```
-
-### Fetch dataset metadata
-
-```
-https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gds&id=<GDS_UID>
-```
-
-### Direct GEO series access
-
-```
-# Series matrix (expression data + metadata)
-https://ftp.ncbi.nlm.nih.gov/geo/series/<GSEnnn>/<GSE_ID>/matrix/
-
-# Soft format (detailed metadata)
-https://ftp.ncbi.nlm.nih.gov/geo/series/<GSEnnn>/<GSE_ID>/soft/
-
-# GEOquery in R (preferred)
-library(GEOquery)
-gse <- getGEO("GSE12345")
-```
-
-### NCBI SRA (Sequence Read Archive)
-
-```
-# Search SRA
-https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=<query>
-
-# SRA Run Selector (for downloading)
-https://www.ncbi.nlm.nih.gov/Traces/study/?acc=<SRP_ID>
-```
-
-## Database Quick Reference
-
-### Literature
-| Database | URL | Use for |
-|---|---|---|
-| PubMed / MEDLINE | pubmed.ncbi.nlm.nih.gov | Primary peer-reviewed literature |
-| bioRxiv / medRxiv | biorxiv.org / medrxiv.org | Preprints (flag as not peer-reviewed) |
-| Semantic Scholar | semanticscholar.org | Citation network, paper recommendations |
-
-### Gene & Protein
-| Database | URL | Use for |
-|---|---|---|
-| UniProt | uniprot.org | Protein function, structure, interactions, variants |
-| NCBI Gene | ncbi.nlm.nih.gov/gene | Gene function, expression, orthologs |
-| GeneCards | genecards.org | Comprehensive gene summaries |
-| Human Protein Atlas | proteinatlas.org | Tissue and cell expression |
-| OMIM | omim.org | Genetic disease associations |
-
-### Pathways & Ontologies
-| Database | URL | Use for |
-|---|---|---|
-| KEGG | genome.jp/kegg | Metabolic and signaling pathways |
-| Reactome | reactome.org | Curated biological pathways |
-| Gene Ontology | geneontology.org | BP, MF, CC terms |
-| MSigDB | gsea-msigdb.org | Curated gene sets for enrichment |
-
-### Disease & Genetics
-| Database | URL | Use for |
-|---|---|---|
-| GWAS Catalog | ebi.ac.uk/gwas | GWAS results |
-| ClinVar | ncbi.nlm.nih.gov/clinvar | Clinical variant interpretations |
-| COSMIC | cancer.sanger.ac.uk/cosmic | Cancer somatic mutations |
-| DisGeNET | disgenet.org | Gene-disease associations |
-| gnomAD | gnomad.broadinstitute.org | Population allele frequencies |
-
-### Drugs & Compounds
-| Database | URL | Use for |
-|---|---|---|
-| ChEMBL | ebi.ac.uk/chembl | Bioactive compounds and drug targets |
-| PubChem | pubchem.ncbi.nlm.nih.gov | Chemical structures and bioassays |
-| DrugBank | drugbank.com | Drug mechanisms and interactions |
-| ClinicalTrials.gov | clinicaltrials.gov | Clinical trial status and results |
-
-### Cancer & Expression
-| Database | URL | Use for |
-|---|---|---|
-| cBioPortal | cbioportal.org | Cancer genomics data |
-| GEO | ncbi.nlm.nih.gov/geo | Gene Expression Omnibus |
-| GTEx | gtexportal.org | Tissue-specific gene expression |
-| DepMap | depmap.org | Cancer dependency map |
+Export format: Markdown (default), HTML, or JSON for programmatic use. Citation style: APA, Vancouver, or Nature — verify via a citation manager.
 
 ## Hard Rules
 
@@ -376,18 +242,142 @@ https://www.ncbi.nlm.nih.gov/Traces/study/?acc=<SRP_ID>
 - **Always cross-reference key claims across multiple sources**
 - **Always flag retracted papers and expressions of concern**
 - **Never state a biological claim without a source**
-- **Never confuse database annotation confidence levels (curated vs predicted)**
 - **Always distinguish human evidence from animal model evidence**
 - **Always distinguish in vitro from in vivo evidence**
 - **Always distinguish correlation from causation in cited studies**
-- **Always include the access date for database records** (databases change)
+- **Always check institutional access and open-access sources before using Sci-Hub**
+
+## API Reference: PubMed E-utilities
+
+> **Load reference:** `references/pubmed_routine.md` — quick-start for routine searches (≤200 PMIDs, common field tags).
+> For batch operations, history server, or all 9 endpoints → `references/pubmed_api_reference.md`.
+> For advanced search syntax (proximity operators, wildcards, MeSH subheadings) → `references/pubmed_search_syntax.md`.
+> For query templates by research scenario → `references/pubmed_common_queries.md`.
+
+### Core Endpoints (Routine)
+
+| Endpoint | Purpose | When to use |
+|---|---|---|
+| `esearch.fcgi` | Search and retrieve PMIDs | Every PubMed search |
+| `efetch.fcgi` | Download full records / abstracts | Retrieving paper details |
+| `esummary.fcgi` | Get document summaries (title, authors, journal) | Quick metadata checks |
+| `epost.fcgi` | Upload UIDs for batch processing | Processing > 200 PMIDs |
+| `elink.fcgi` | Find related articles, cross-database links | Citation discovery |
+| `ecitmatch.cgi` | Match partial citations to PMIDs | Verifying incomplete references |
+
+## API Reference: bioRxiv / medRxiv
+
+> **Load reference:** `references/biorxiv_routine.md` — quick-start for routine searches (date range, DOI lookup, recent pubs).
+> For all endpoints, full response schema, version tracking, or custom pagination → `references/biorxiv_api_reference.md`.
+> The `biorxiv_search.py` script in `scripts/` implements the full search client used in `biorxiv_api_reference.md`.
+
+### Content API (Search by Date Range)
+
+```
+https://api.biorxiv.org/details/{server}/{interval}/{cursor}
+```
+
+| Parameter | Value |
+|---|---|
+| `server` | `"biorxiv"` or `"medrxiv"` |
+| `interval` | `YYYY-MM-DD/YYYY-MM-DD` (start/end) |
+| `cursor` | Integer offset: `0`, `30`, `60`, … |
+
+Returns JSON with: `doi`, `title`, `authors`, `abstract`, `date`, `category`, `jatsxml URL`, `version`, `license`, `published`.
+
+### DOI Lookup
+
+```
+https://api.biorxiv.org/details/biorxiv/{doi}
+```
+
+### Pagination
+
+- `/details/` returns 30 results/page — increment cursor by 30
+- `/pubs/` returns up to 100 results/page — increment cursor by 100
+- Stop when `messages[0].count` < page size
+
+### PDF Download URL
+
+```
+https://www.biorxiv.org/content/{doi}v{version}.full.pdf
+```
+
+**Always label bioRxiv/medRxiv results as:** `[PREPRINT — not peer-reviewed]`.
+
+## API Reference: Semantic Scholar
+
+> **Load reference:** `references/semanticscholar_routine.md` — quick-start for paper search, lookup, and author search.
+> For citation network analysis or bulk queries → consult the full Semantic Scholar API documentation.
+
+### Paper Search
+
+```
+GET https://api.semanticscholar.org/graph/v1/paper/search
+```
+
+| Parameter | Value |
+|---|---|
+| `query` | Search terms |
+| `limit` | Max results (default 10, max 100) |
+| `fields` | Comma-separated fields to return |
+
+Useful fields: `title`, `abstract`, `year`, `citationCount`, `openAccessPdf`, `externalIds`.
+
+### Paper Details (by ID)
+
+```
+GET https://api.semanticscholar.org/graph/v1/paper/{paper_id}
+```
+
+`paper_id` accepts: S2 ID, DOI (`DOI:10.xxx`), PMID (`PMID:12345`), ArXiv ID.
+
+**Rate limits:** 100 requests/5 min (unauthenticated); higher with API key.
+
+## Full-Text Access: Sci-Hub PDF Resolver
+
+> **Load reference:** `references/scihub_routine.md` — CLI usage, output codes, Python API.
+> **Always check institutional access and open-access sources first** (PubMed Central, publisher OA, bioRxiv). Use Sci-Hub only as a last resort.
+
+**Script:** `scripts/scihub_pdf_resolver.py` — zero-dependency Python script.
+
+### Usage
+
+```bash
+python scripts/scihub_pdf_resolver.py "10.1038/s41586-024-07000-0"
+```
+
+### Output Codes
+
+| Output | Meaning |
+|---|---|
+| Prints a URL | Direct PDF link, ready to download |
+| `NOT_FOUND` | Sci-Hub does not have this paper. Check for `OA_LINK <url>` for open-access alternatives. |
+| `MIRROR_ERROR` | Sci-Hub mirrors could not be reached reliably |
+| `INVALID_INPUT` | The DOI is malformed |
+
+**Exit codes:** `0` = found, `1` = not found, `2` = mirror error, `3` = invalid input.
+
+## Database Quick Reference
+
+> This skill covers only publication databases. For non-publication databases (UniProt, KEGG, ChEMBL, ClinVar, etc.), use the appropriate domain-specific skill.
+
+### Literature
+| Database | URL | Use for |
+|---|---|---|
+| PubMed / MEDLINE | pubmed.ncbi.nlm.nih.gov | Primary peer-reviewed literature |
+| bioRxiv / medRxiv | biorxiv.org / medrxiv.org | Preprints (label as `[PREPRINT — not peer-reviewed]`) |
+| Semantic Scholar | semanticscholar.org | Citation network, paper recommendations |
 
 ## Related Skills
 
 **Use alongside:**
-- `literature-preclinical` — Structured preclinical evidence synthesis with experiment extraction
+- `literature-preclinical` — Structured preclinical evidence synthesis with experiment extraction; complementary to Phase 3 when moving from hypothesis to in vivo validation planning
 - `scientific-writing` — Synthesize literature into manuscripts, grants, and rebuttals
 - `scientific-audit` — Verify that citations and claims in outputs are accurate
 
 **Provides citations for:**
-- All analysis skills that produce biological findings requiring literature context
+- `scientific-writing` — manuscripts, grants, and rebuttals
+- `literature-preclinical` — preclinical evidence synthesis
+- `scientific-audit` — verifying citations and claims in outputs
+- All analysis and domain skills that need published evidence to support biological, clinical, or methodological claims
