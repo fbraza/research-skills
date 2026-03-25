@@ -6,6 +6,8 @@
 results/
 treg_tissue_analysis/
 
+treg_all_tissues/
+
 # R session artifacts
 .RData
 .Rhistory
