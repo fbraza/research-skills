@@ -203,7 +203,7 @@ export_all(seurat_obj, output_dir = "results")
 
 ## Standard Workflow
 
-Complete scRNA-seq analysis in 10 steps using modular scripts. **CRITICAL: Use relative paths (scripts/, references/). DO NOT construct absolute paths like /mnt/knowhow/**
+Complete scRNA-seq analysis in 10 steps using modular scripts. **CRITICAL: Use relative paths (scripts/, references/). DO NOT construct absolute paths.**
 
 **Detailed code examples and explanations:** [references/workflow-details.md](references/workflow-details.md)
 

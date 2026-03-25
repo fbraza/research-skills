@@ -202,7 +202,7 @@ Before starting, gather:
 
 🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
 
-**CRITICAL: Use relative paths (scripts/). DO NOT construct absolute paths like /mnt/knowhow/ or /workspace/.**
+**CRITICAL: Use relative paths (scripts/). DO NOT construct absolute paths.**
 
 This is a 4-step workflow. Scripts handle all complexity automatically.
 
@@ -340,7 +340,7 @@ export_all(
 ⚠️ **CRITICAL - DO NOT:**
 - ❌ **Write inline validation/annotation/plotting/export code** → **STOP: Use the scripts shown above**
 - ❌ **Fall back to VEP API mode when tools are missing** → **STOP: Use `install_tools.py` to install via conda**
-- ❌ Use absolute paths like `/mnt/knowhow/` or `/workspace/` → use relative paths `scripts/`
+- ❌ Use absolute paths → use relative paths `scripts/`
 - ❌ Skip validation step → catches format errors early
 - ❌ Mix genome builds → VCF and annotation database must match (check VCF header)
 - ❌ Write custom export code → **STOP: Use `export_all()`**

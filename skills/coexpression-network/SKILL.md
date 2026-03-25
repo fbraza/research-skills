@@ -240,7 +240,7 @@ export_all(results, output_dir = "wgcna_results")
 - ❌ **Write inline plotting code (png, svg, plotDendroAndColors, etc.)** → **STOP: Use `plot_all_wgcna()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install svglite** → script handles SVG fallback automatically
-- ❌ Use absolute paths like `/mnt/knowhow/` → use relative paths `scripts/`
+- ❌ Use absolute paths → use relative paths `scripts/`
 - ❌ Skip soft power selection → required for scale-free topology
 - ❌ Use raw counts → normalize first with DESeq2 VST or rlog
 

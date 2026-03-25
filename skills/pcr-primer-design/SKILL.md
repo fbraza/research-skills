@@ -308,7 +308,7 @@ products = in_silico_pcr(
 ```
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ Use absolute paths like `/mnt/knowhow/` → use relative paths `scripts/`
+- ❌ Use absolute paths → use relative paths `scripts/`
 - ❌ Write inline primer design code → use provided scripts
 - ❌ Skip dimer/structure checks → these catch common failures
 

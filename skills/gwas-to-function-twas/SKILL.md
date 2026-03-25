@@ -122,7 +122,7 @@ Ask these questions before starting analysis:
 
 🚨 **EXECUTE EXACTLY AS SHOWN - Do not modify these commands.**
 
-**CRITICAL: Use relative paths (scripts/, references/). DO NOT construct absolute paths like /mnt/knowhow/ or /workspace/.**
+**CRITICAL: Use relative paths (scripts/, references/). DO NOT construct absolute paths.**
 
 **IMPORTANT: Call scripts via command line. DO NOT import and write inline Python code.**
 
@@ -317,7 +317,7 @@ Creates publication-ready Excel workbook with executive summary, evidence layers
 ⚠️ **CRITICAL - DO NOT:**
 - ❌ Write inline TWAS code → causes model mismatches, missing QC steps
 - ❌ Write inline colocalization code → incorrect PP.H4 calculations, wrong priors
-- ❌ Use absolute paths like `/mnt/knowhow/workflows/` → use relative paths `scripts/` exactly as shown
+- ❌ Use absolute paths → use relative paths `scripts/` exactly as shown
 - ❌ Import script functions directly → use command-line interface for proper error handling and validation
 - ❌ Skip phases based on tier → breaks dependency chain (e.g., Phase 4 requires Phase 3 colocalization results)
 
