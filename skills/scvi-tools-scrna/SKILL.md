@@ -24,7 +24,8 @@ Advanced deep generative modeling for single-cell RNA-seq using scvi-tools. This
 - Standard preprocessing/QC → use `scrnaseq-scanpy-core-analysis`
 - R-based single-cell workflows → use `scrnaseq-seurat-core-analysis`
 - Basic scVI integration within a standard pipeline → already covered by the Scanpy skill's `integrate_scvi.py`
-- ATAC-seq, multimodal, or spatial transcriptomics → future skills
+- ATAC-seq or multimodal → future skills
+- Spatial transcriptomics deconvolution → use `scvi-tools-spatial`
 
 **Prerequisite:** Preprocessed AnnData from the Scanpy or Seurat skill with **raw counts preserved** in `adata.layers['counts']` or `adata.X`.
 
@@ -44,7 +45,7 @@ Advanced deep generative modeling for single-cell RNA-seq using scvi-tools. This
 
 **GPU support:** `pip install scvi-tools[cuda12]`
 
-**Minimum versions:** Python ≥3.9, scvi-tools ≥1.1, torch ≥2.0
+**Minimum versions:** Python ≥3.11 (required by scvi-tools ≥1.4), recommended Python 3.12, torch ≥2.0
 
 ## Inputs
 
@@ -392,6 +393,8 @@ plot_batch_mixing(adata, batch_key="batch", rep_key="X_scVI", output_dir="result
 **Downstream:** `functional-enrichment-from-degs`, `scrna-trajectory-inference`, `cell-cell-communication`
 
 **Complementary:** `experimental-design-statistics`
+
+**Spatial extension:** `scvi-tools-spatial` (Cell2location, DestVI, Tangram, scVIVA for spatial deconvolution)
 
 ## References
 

@@ -175,7 +175,7 @@ adata_subset = adata[mask].copy()
 
 ## Downstream Analysis Suggestions
 
-1. **Cell type deconvolution:** Use SVG results + scRNA-seq reference to estimate cell type proportions per spot (cell2location, RCTD, STdeconvolve)
+1. **Cell type deconvolution:** Use `scvi-tools-spatial` skill for probabilistic deconvolution (Cell2location, DestVI) or single-cell mapping (Tangram). Requires scRNA-seq reference.
 2. **Receptor-ligand analysis:** Identify spatially co-localized ligand-receptor pairs using CellChat or COMMOT
 3. **Spatial gene-gene correlation:** Compute spatially-weighted correlation between SVGs to identify co-regulated programs
 4. **Multi-sample comparison:** Integrate multiple Visium sections (e.g., MI vs control) using batch correction + differential spatial analysis

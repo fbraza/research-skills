@@ -231,7 +231,7 @@ When presenting results to the user, the agent should:
 ## Suggested Next Steps
 
 - **Functional enrichment** on SVG gene sets → `functional-enrichment-from-degs`
-- **Cell type deconvolution** with cell2location or RCTD (specialized workflow)
+- **Cell type deconvolution & niche analysis** → use `scvi-tools-spatial` skill (Cell2location, DestVI, Tangram, scVIVA)
 - **Cell-cell communication** with CellChat or COMMOT on spatial data
 - **Multi-sample integration** for comparing conditions (e.g., MI vs healthy)
 - **Gene regulatory networks** on spatial clusters → `grn-pyscenic`
@@ -245,6 +245,7 @@ When presenting results to the user, the agent should:
 | `de-results-to-gene-lists` | Downstream: gene list preparation from SVGs |
 | `grn-pyscenic` | Downstream: regulatory networks from spatial clusters |
 | `coexpression-network` | Downstream: co-expression on spatial domains |
+| `scvi-tools-spatial` | Downstream: cell type deconvolution and niche analysis |
 
 ## References
 
