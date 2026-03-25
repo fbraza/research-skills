@@ -64,6 +64,25 @@ except ImportError:
 from setup_spatial import filter_genes_for_deconvolution
 
 
+def _use_gpu_to_accelerator(use_gpu: bool) -> str:
+    """Convert legacy use_gpu bool to accelerator string.
+
+    cell2location 0.1.x was built for scvi-tools <1.1 which used use_gpu=.
+    scvi-tools >=1.1 uses accelerator=. This helper bridges the gap.
+    """
+    if not use_gpu:
+        return "cpu"
+    try:
+        import torch
+        if torch.cuda.is_available():
+            return "gpu"
+        if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            return "cpu"  # MPS often has float64 issues with cell2location
+    except ImportError:
+        pass
+    return "cpu"
+
+
 def train_reference_model(
     adata_ref: sc.AnnData,
     labels_key: str = "cell_type",
@@ -185,17 +204,19 @@ def train_reference_model(
     print("\n  Building RegressionModel...")
     model = cell2location.models.RegressionModel(adata_ref)
     print("  ✓ Model built")
+    accelerator = _use_gpu_to_accelerator(use_gpu)
     print(f"\n  Training parameters:")
     print(f"    max_epochs  = {max_epochs}")
     print(f"    batch_size  = 2500")
     print(f"    train_size  = 1  (no validation split)")
-    print(f"    use_gpu     = {use_gpu}")
+    print(f"    accelerator = {accelerator}")
     print(f"\n  Starting training...")
 
     # --- Train ---
+    # cell2location 0.1.x with scvi-tools >=1.1: use accelerator= not use_gpu=
     model.train(
         max_epochs=max_epochs,
-        use_gpu=use_gpu,
+        accelerator=accelerator,
         batch_size=2500,
         train_size=1,
     )
@@ -208,7 +229,7 @@ def train_reference_model(
         sample_kwargs={
             "num_samples": 1000,
             "batch_size": 2500,
-            "use_gpu": use_gpu,
+            "accelerator": accelerator,
         },
     )
     print("  ✓ Posterior exported")
@@ -420,16 +441,18 @@ def train_cell2location(
     print("  ✓ Model built")
 
     # --- Train ---
+    accelerator = _use_gpu_to_accelerator(use_gpu)
     print(f"\n  Training parameters:")
-    print(f"    max_epochs = {max_epochs}")
-    print(f"    batch_size = None  (full dataset per batch)")
-    print(f"    train_size = 1  (no validation split)")
-    print(f"    use_gpu    = {use_gpu}")
+    print(f"    max_epochs  = {max_epochs}")
+    print(f"    batch_size  = None  (full dataset per batch)")
+    print(f"    train_size  = 1  (no validation split)")
+    print(f"    accelerator = {accelerator}")
     print(f"\n  Starting training (this will take a while)...")
 
+    # cell2location 0.1.x with scvi-tools >=1.1: use accelerator= not use_gpu=
     model.train(
         max_epochs=max_epochs,
-        use_gpu=use_gpu,
+        accelerator=accelerator,
         batch_size=None,
         train_size=1,
     )
@@ -442,7 +465,7 @@ def train_cell2location(
         sample_kwargs={
             "num_samples": 1000,
             "batch_size": 1000,
-            "use_gpu": use_gpu,
+            "accelerator": accelerator,
         },
     )
     print("  ✓ Posterior exported")
