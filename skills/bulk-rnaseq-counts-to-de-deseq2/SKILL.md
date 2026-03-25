@@ -222,7 +222,7 @@ export_all(dds, res, resLFC, output_dir = "results")
 - ❌ **Write custom export code** → **STOP: This violates the skill design. Use `source("scripts/export_results.R")` and `export_all()` instead.** Custom export code misses RDS objects and transformed counts needed downstream.
 - ❌ **Try to install svglite** → script handles SVG fallback automatically
 - ❌ **Use absolute paths for scripts** → Always use relative paths `scripts/file.R`
-  - ❌ WRONG: `source("/mnt/knowhow/workflows/bulk-rnaseq-counts-to-de-deseq2/scripts/load_example_data.R")`
+  - ❌ WRONG: `source("/absolute/path/to/scripts/load_example_data.R")`
   - ❌ WRONG: `setwd("/absolute/path/to/skill")`
   - ✅ CORRECT: `source("scripts/load_example_data.R")` (skill should already be working directory)
 
@@ -236,7 +236,7 @@ export_all(dds, res, resLFC, output_dir = "results")
 
 **📁 Output Directory Paths:**
 - ✅ Recommended: Use relative paths like `output_dir = "results"` (creates folder in working directory)
-- ✅ Also valid: Environment-specific absolute paths like `output_dir = "/mnt/results"` (containerized environments only)
+
 
 **✅ When to read references for adaptation (NOT rewriting):**
 - **Design formulas** (multi-factor, interactions): Read [references/comprehensive-reference.md#design-formulas](references/comprehensive-reference.md#design-formulas) to understand patterns
@@ -411,7 +411,7 @@ export_all(dds, res, res_shrunk, output_dir = "deseq2_results")
 | Issue | Solution | Details |
 |-------|----------|---------|
 | **Not seeing verification messages** ("✓ Pasilla dataset loaded successfully", "✓ Basic workflow completed successfully!") | **You wrote inline code instead of using source().** Stop and use the 3 commands in Standard Workflow section exactly as shown. | See Standard Workflow section |
-| **"cannot open file" or "No such file"** when using absolute paths | **Use relative paths ONLY:** `source("scripts/file.R")` not `/mnt/knowhow/...` or `/workspace/...`. Skills use relative paths that work in any environment. | See Standard Workflow section |
+| **"cannot open file" or "No such file"** when using absolute paths | **Use relative paths ONLY:** `source("scripts/file.R")` not absolute paths. Skills use relative paths that work in any environment. | See Standard Workflow section |
 | **"cannot open file"** for `scripts/load_example_data.R` | Working directory is not the skill root. Use `setwd("bulk-rnaseq-counts-to-de-deseq2")` or run from correct directory. | [Troubleshooting](references/troubleshooting.md#cannot-open-file) |
 | "trying to use CRAN without setting a mirror" | Set with `options(repos = c(CRAN = "https://cloud.r-project.org"))` before `install.packages()` (scripts handle this automatically) | [Troubleshooting](references/troubleshooting.md#cran-mirror-error) |
 | "there is no package called 'X'" | Install with `BiocManager::install('X')` (set CRAN mirror first, or use scripts which handle this) | [Troubleshooting](references/troubleshooting.md#missing-packages) |

@@ -226,7 +226,7 @@ export_all(gsea_result, ranked_genes, output_prefix = "enrichment")
 - ❌ **Write inline enrichment code** → **STOP: Use `run_gsea()`**
 - ❌ **Write inline plotting code (ggsave, dotplot, gseaplot2, etc.)** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
-- ❌ **Use absolute paths** like `/mnt/knowhow/` → use relative paths `scripts/`
+- ❌ **Use absolute paths** → use relative paths `scripts/`
 - ❌ **Skip the background parameter in ORA** → causes inflated p-values
 - ❌ **Try to install svglite** → script handles SVG fallback automatically
 
