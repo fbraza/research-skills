@@ -2,6 +2,19 @@
 
 ---
 
+## Know-How Guides (Mandatory Pre-Reading)
+
+Before any analysis, read the relevant know-how guides from `skills/knowhows/`. These are general guidelines — not executable workflows. Skipping them causes the most common mistakes: raw p-values, wrong normalization order, unhandled duplicates.
+
+| Guide | Read before | Covers |
+|---|---|---|
+| `KH_data_analysis_best_practices` | **ALL analysis tasks** | Data validation, duplicate handling, missing data, documenting removals |
+| `KH_bulk_rnaseq_differential_expression` | RNA-seq / DEG analysis | padj vs pvalue, fold change thresholds, DESeq2 best practices |
+| `KH_gene_essentiality` | DepMap / CRISPR screen work | Score direction (negative = essential), mandatory inversion before correlation |
+| `KH_pathway_enrichment` | Pathway / enrichment analysis | ORA vs GSEA selection, up/down separation, background gene sets |
+
+---
+
 ## Decision Framework
 
 ```
