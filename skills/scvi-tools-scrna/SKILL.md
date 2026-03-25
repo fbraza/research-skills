@@ -45,7 +45,7 @@ Advanced deep generative modeling for single-cell RNA-seq using scvi-tools. This
 
 **GPU support:** `pip install scvi-tools[cuda12]`
 
-**Minimum versions:** Python ≥3.9, scvi-tools ≥1.1, torch ≥2.0
+**Minimum versions:** Python ≥3.11 (required by scvi-tools ≥1.4), recommended Python 3.12, torch ≥2.0
 
 ## Inputs
 

@@ -46,6 +46,8 @@ Estimate cell type compositions, map individual cells to spatial locations, impu
 
 **GPU support:** `pip install cell2location scvi-tools[cuda12]`
 
+**Minimum versions:** Python ≥3.11 (required by scvi-tools ≥1.4), recommended Python 3.12. scvi-tools 1.4.2 introduced breaking API changes (see troubleshooting). If using a version manager (e.g., mise, pyenv), switch to Python ≥3.11 before installing.
+
 ## Inputs
 
 **Required for all methods:**
