@@ -193,15 +193,16 @@ proportions = get_cell_type_proportions(adata_sp, quantile="q05")
 **Step 2b — DestVI (Multi-Resolution Deconvolution)** [OPTION B] | [scripts/run_destvi.py](scripts/run_destvi.py)
 
 ```python
-from run_destvi import train_destvi, get_cell_type_expression, get_continuous_variation
+from run_destvi import train_condscvi, train_destvi, get_cell_type_expression, get_continuous_variation
 
-# PREREQUISITE: Train scVI on reference first (use scvi-tools-scrna skill)
-# from run_scvi import train_scvi
-# adata_ref, scvi_model = train_scvi(adata_ref, batch_key="batch", n_latent=30)
+# PREREQUISITE: Train CondSCVI on reference (NOT standard SCVI)
+adata_ref, condscvi_model = train_condscvi(
+    adata_ref, labels_key="cell_type", max_epochs=400
+)
 
-# Train DestVI from scVI reference model (~30 min GPU)
+# Train DestVI from CondSCVI reference model (~30 min GPU)
 adata_sp, destvi_model = train_destvi(
-    adata_sp, scvi_model, cell_type_key="cell_type", max_epochs=2500
+    adata_sp, condscvi_model, cell_type_key="cell_type", max_epochs=2500
 )
 
 # Get cell-type-specific expression at each spot
@@ -213,7 +214,7 @@ gamma = get_continuous_variation(destvi_model, adata_sp)
 
 **VERIFICATION:** Proportions extracted, gamma captures meaningful variation (not constant).
 
-**Note:** DestVI requires a pretrained scVI model on the reference. Use the `scvi-tools-scrna` skill to train scVI first.
+**Note:** DestVI requires a CondSCVI model (NOT standard SCVI) trained on the reference with cell type labels. Use `train_condscvi()` from this script.
 
 ---
 
@@ -348,7 +349,7 @@ plot_proportion_validation(adata_sp, marker_genes_dict={
 - `spatial-transcriptomics` — spatial data preprocessing (QC → clustering → SVGs)
 - `scrnaseq-scanpy-core-analysis` or `scrnaseq-seurat-core-analysis` — reference scRNA-seq preprocessing
 
-**DestVI prerequisite:** `scvi-tools-scrna` — train scVI model on reference before DestVI
+**DestVI prerequisite:** CondSCVI model on reference — use `train_condscvi()` from `run_destvi.py`
 
 **Downstream:** `functional-enrichment-from-degs`, `cell-cell-communication`, `scrna-trajectory-inference`
 

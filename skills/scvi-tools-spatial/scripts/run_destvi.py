@@ -3,9 +3,8 @@ Cell Type Deconvolution of Spatial Transcriptomics with DestVI
 
 This module implements DestVI (Deconvolution of Spatial Transcriptomics using
 Variational Inference) for reference-based deconvolution of spot-based spatial
-transcriptomics data (e.g., Visium). DestVI requires a pretrained scVI model
-trained on a matched single-cell RNA-seq reference; the scVI encoder weights
-are transferred to the spatial context via from_rna_model().
+transcriptomics data (e.g., Visium). DestVI requires a CondSCVI model (NOT
+standard SCVI) trained on the scRNA-seq reference with cell type labels.
 
 DestVI's defining feature over other deconvolution tools is the continuous
 variation variable (gamma), which captures within-cell-type functional
@@ -15,11 +14,12 @@ but in what transcriptional state.
 For methodology and best practices, see references/models-spatial.md
 
 Prerequisites:
-  Run the scvi-tools-scrna skill to train an scVI model on the reference
-  single-cell dataset before calling any function in this module.
+  Train a CondSCVI model on the reference using train_condscvi() from this
+  module, or manually via scvi.model.CondSCVI.
 
 Functions:
-  - train_destvi(): Transfer scVI reference model to spatial and estimate
+  - train_condscvi(): Train CondSCVI on scRNA-seq reference (prerequisite)
+  - train_destvi(): Transfer CondSCVI reference model to spatial and estimate
     cell type proportions at each spot
   - get_cell_type_expression(): Retrieve cell-type-specific gene expression
     profiles at each spatial spot
@@ -50,6 +50,133 @@ import scanpy as sc
 from setup_spatial import detect_accelerator
 
 
+def train_condscvi(
+    adata_ref: sc.AnnData,
+    labels_key: str = "cell_type",
+    batch_key: Optional[str] = None,
+    n_latent: int = 10,
+    n_hidden: int = 128,
+    n_layers: int = 2,
+    max_epochs: int = 400,
+    save_model: Optional[Union[str, Path]] = None,
+    random_state: int = 0,
+) -> Tuple[sc.AnnData, Any]:
+    """
+    Train CondSCVI on scRNA-seq reference data (prerequisite for DestVI).
+
+    CondSCVI (Conditional scVI) models gene expression conditioned on cell
+    type labels. DestVI's from_rna_model() requires a trained CondSCVI model,
+    NOT a standard SCVI model.
+
+    Parameters
+    ----------
+    adata_ref : AnnData
+        Reference scRNA-seq AnnData with raw counts and cell type labels.
+    labels_key : str, optional
+        Column in adata_ref.obs with cell type labels (default: "cell_type").
+    batch_key : str, optional
+        Column for batch correction (default: None).
+    n_latent : int, optional
+        Latent space dimensionality (default: 10).
+    n_hidden : int, optional
+        Hidden layer size (default: 128).
+    n_layers : int, optional
+        Number of hidden layers (default: 2).
+    max_epochs : int, optional
+        Training epochs (default: 400).
+    save_model : str or Path, optional
+        Directory to save model (default: None).
+    random_state : int, optional
+        Random seed (default: 0).
+
+    Returns
+    -------
+    tuple of (AnnData, scvi.model.CondSCVI)
+        adata_ref with CondSCVI registered, and trained model instance.
+
+    Examples
+    --------
+    >>> adata_ref, condscvi_model = train_condscvi(
+    ...     adata_ref, labels_key="cell_type", max_epochs=400
+    ... )
+    >>> adata_sp, destvi_model = train_destvi(
+    ...     adata_sp, condscvi_model, cell_type_key="cell_type"
+    ... )
+    """
+    print("=" * 60)
+    print("CondSCVI Reference Model Training")
+    print("=" * 60)
+
+    # Validate labels
+    if labels_key not in adata_ref.obs.columns:
+        raise ValueError(
+            f"Labels key '{labels_key}' not found in adata_ref.obs. "
+            f"Available: {list(adata_ref.obs.columns[:10])}"
+        )
+
+    n_types = adata_ref.obs[labels_key].nunique()
+    print(f"\n  Cells: {adata_ref.n_obs:,}")
+    print(f"  Genes: {adata_ref.n_vars:,}")
+    print(f"  Cell types ({n_types}): {sorted(adata_ref.obs[labels_key].unique().tolist())}")
+
+    # Determine count layer
+    layer: Optional[str] = "counts" if "counts" in adata_ref.layers else None
+    layer_desc = "adata.layers['counts']" if layer else "adata.X"
+    print(f"  Count layer: {layer_desc}")
+
+    # Setup AnnData
+    print("\n  Setting up AnnData with CondSCVI...")
+    scvi.model.CondSCVI.setup_anndata(
+        adata_ref,
+        labels_key=labels_key,
+        layer=layer,
+        batch_key=batch_key,
+    )
+    print("  ✓ AnnData registered")
+
+    # Create model
+    scvi.settings.seed = random_state
+    model = scvi.model.CondSCVI(
+        adata_ref,
+        n_latent=n_latent,
+        n_hidden=n_hidden,
+        n_layers=n_layers,
+        prior="vamp",  # Required for DestVI's from_rna_model() to work
+    )
+    print(f"\n  Model: CondSCVI (n_latent={n_latent}, n_hidden={n_hidden}, n_layers={n_layers}, prior=vamp)")
+
+    # Train
+    accelerator = detect_accelerator()
+
+    # CondSCVI with prior='vamp' may use float64 internally. MPS does not
+    # support float64, so fall back to CPU when MPS is detected.
+    if accelerator == "mps":
+        print("\n  [INFO] Falling back to CPU (MPS does not support float64).")
+        accelerator = "cpu"
+
+    print(f"\n  Training CondSCVI...")
+    print(f"  Max epochs: {max_epochs}")
+    print(f"  Accelerator: {accelerator}")
+
+    model.train(max_epochs=max_epochs, accelerator=accelerator)
+    print("  ✓ CondSCVI training complete")
+
+    # Save if requested
+    if save_model is not None:
+        save_path = Path(save_model)
+        save_path.mkdir(parents=True, exist_ok=True)
+        model.save(save_path, overwrite=True)
+        print(f"\n  Model saved to: {save_path}")
+
+    print("\n" + "=" * 60)
+    print("CondSCVI reference model ready for DestVI")
+    print("=" * 60)
+    print("\nNext step:")
+    print("  adata_sp, destvi_model = train_destvi(adata_sp, condscvi_model)")
+
+    return adata_ref, model
+
+
 def train_destvi(
     adata_sp: sc.AnnData,
     scvi_model: Any,
@@ -58,16 +185,20 @@ def train_destvi(
     save_model: Optional[Union[str, Path]] = None,
 ) -> Tuple[sc.AnnData, Any]:
     """
-    Transfer a pretrained scVI reference model to spatial data and train DestVI.
+    Transfer a pretrained CondSCVI reference model to spatial data and train DestVI.
 
     DestVI deconvolves each spatial spot into cell type proportions by learning
-    from a pretrained scVI model on the matched single-cell reference. The scVI
-    encoder encodes reference cell states; DestVI then learns to explain spatial
-    spot expression as mixtures of those states.
+    from a pretrained CondSCVI model on the matched single-cell reference.
+    CondSCVI encodes reference cell states conditioned on cell type labels;
+    DestVI then learns to explain spatial spot expression as mixtures of those
+    states.
+
+    IMPORTANT: DestVI requires a CondSCVI model (NOT standard SCVI). Use
+    train_condscvi() from this module to prepare the reference model.
 
     This function:
     - Registers the spatial AnnData with DestVI
-    - Constructs the DestVI model from the scVI reference via from_rna_model()
+    - Constructs the DestVI model from the CondSCVI reference via from_rna_model()
     - Trains with the best available hardware accelerator
     - Stores proportions in obsm['destvi_proportions'] (DataFrame)
     - Adds per-cell-type proportion columns to obs (e.g., 'destvi_prop_T_cells')
@@ -79,9 +210,9 @@ def train_destvi(
     adata_sp : sc.AnnData
         Spatial AnnData object. Must contain raw counts in
         adata_sp.layers['counts'] (preferred) or adata_sp.X.
-        Genes must overlap with the genes used to train scvi_model.
-    scvi_model : scvi.model.SCVI
-        A trained scVI model instance from the scvi-tools-scrna skill.
+        Genes must overlap with the genes used to train the CondSCVI model.
+    scvi_model : scvi.model.CondSCVI
+        A trained CondSCVI model instance. Train with train_condscvi() first.
         Must have been trained on a reference dataset that shares genes with
         adata_sp and contains the column cell_type_key in its .adata.obs.
     cell_type_key : str, optional
@@ -119,14 +250,14 @@ def train_destvi(
 
     Examples
     --------
-    >>> # Train scVI on reference first (scvi-tools-scrna skill)
-    >>> scvi.model.SCVI.setup_anndata(adata_ref, layer='counts')
-    >>> sc_model = scvi.model.SCVI(adata_ref)
-    >>> sc_model.train(max_epochs=400)
+    >>> # Train CondSCVI on reference first (prerequisite)
+    >>> adata_ref, condscvi_model = train_condscvi(
+    ...     adata_ref, labels_key='cell_type', max_epochs=400
+    ... )
     >>>
     >>> # Deconvolve spatial data with DestVI
     >>> adata_sp, destvi_model = train_destvi(
-    ...     adata_sp, sc_model, cell_type_key='cell_type', max_epochs=2500
+    ...     adata_sp, condscvi_model, cell_type_key='cell_type', max_epochs=2500
     ... )
     >>> # Visualize T cell proportions
     >>> sc.pl.spatial(adata_sp, color='destvi_prop_T_cells', spot_size=150)
@@ -163,22 +294,48 @@ def train_destvi(
         + ("adata.layers['counts']" if layer else "adata.X (no 'counts' layer found)")
     )
 
-    # --- Setup AnnData for DestVI ---
-    print("\nRegistering spatial AnnData with DestVI...")
-    scvi.model.DestVI.setup_anndata(adata_sp, layer=layer)
-    print("  Spatial AnnData registered with DestVI")
+    # --- Build DestVI from reference CondSCVI model ---
+    # Note: from_rna_model() calls setup_anndata internally using the
+    # CondSCVI registry. Do NOT call setup_anndata manually beforehand.
+    print("\nConstructing DestVI model from CondSCVI reference...")
+    # from_rna_model() propagates the CondSCVI registry (including layer)
+    # to setup_anndata internally — do NOT pass layer again.
+    #
+    # Workaround for scvi-tools 1.4.x bug: get_vamp_prior() returns numpy
+    # arrays but MRDeconv.register_buffer() expects tensors. We patch
+    # get_vamp_prior to return tensors.
+    import torch
 
-    # --- Build DestVI from reference scVI model ---
-    print("\nConstructing DestVI model from scVI reference...")
+    _original_get_vamp_prior = scvi_model.get_vamp_prior
+
+    def _patched_get_vamp_prior(*args, **kwargs):
+        result = _original_get_vamp_prior(*args, **kwargs)
+        return {
+            k: torch.as_tensor(v).float() if not isinstance(v, torch.Tensor) else v.float()
+            for k, v in result.items()
+        }
+
+    scvi_model.get_vamp_prior = _patched_get_vamp_prior
+
     model = scvi.model.DestVI.from_rna_model(
         adata_sp,
         scvi_model,
-        cell_type_key=cell_type_key,
+        vamp_prior_p=15,
     )
-    print("  DestVI model constructed (scVI reference encoder transferred)")
+
+    # Restore original method
+    scvi_model.get_vamp_prior = _original_get_vamp_prior
+    print("  DestVI model constructed (CondSCVI reference encoder transferred)")
 
     # --- Detect accelerator and train ---
     accelerator = detect_accelerator()
+
+    # DestVI uses float64 internally, which MPS does not support.
+    # Fall back to CPU when MPS is detected.
+    if accelerator == "mps":
+        print("\n  [INFO] DestVI requires float64 — MPS does not support this.")
+        print("  Falling back to CPU for DestVI training.")
+        accelerator = "cpu"
 
     print(f"\nTraining DestVI model...")
     print(f"  Max epochs: {max_epochs}")
