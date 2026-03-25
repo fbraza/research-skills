@@ -18,5 +18,13 @@ treg_all_tissues/
 .Rhistory
 Rplots.pdf
 
+# Data / model artifacts
+data/
+skills/scvi-tools-scrna/scripts/data/
+skills/scvi-tools-spatial/scripts/data/
+
+# Version manager
+mise.toml
+
 # Evaluation staging
 TO_EVALUATE/
