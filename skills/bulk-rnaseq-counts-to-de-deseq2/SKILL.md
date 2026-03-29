@@ -376,8 +376,9 @@ export_all(dds, res, res_shrunk, output_dir = "deseq2_results")
 **When:** Before creating PCA plots and heatmaps
 
 **Options:**
-- **vst()**: Use for >30 samples (fast, suitable for large datasets)
-- **rlog()**: Use for <30 samples (better for small samples, slower)
+- **vst()** (default for n > 30): Fast, variance-stabilized, suitable for large datasets
+- **rlog()** (default for n ≤ 30): Better stabilization for small samples, slower
+- **log2(normalized counts)**: Simple log2 of size-factor normalized counts. Use when replicating published analyses that used this method, or when zero-count genes should be excluded rather than shrunk. See [scripts/log2_normalization.R](scripts/log2_normalization.R) for functions and [references/decision-guide.md](references/decision-guide.md#option-c-log2normalized-counts) for the decision tree.
 
 **See [references/decision-guide.md#decision-point-1](references/decision-guide.md#decision-point-1-transformation-method) for detailed guidance.**
 

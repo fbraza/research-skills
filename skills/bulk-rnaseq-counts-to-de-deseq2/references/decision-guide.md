@@ -7,7 +7,7 @@ Decision trees for choosing between DESeq2 methods and approaches.
 ## Decision 1: Transformation Method
 
 **When:** After DESeq(), before PCA/heatmaps
-**Question:** vst() or rlog()?
+**Question:** Which transformation — vst(), rlog(), or log2(normalized counts)?
 
 ### Option A: VST (Variance Stabilizing Transformation)
 
@@ -31,17 +31,54 @@ vsd <- vst(dds, blind = FALSE)  # blind=FALSE uses design (recommended)
 rld <- rlog(dds, blind = FALSE)
 ```
 
+### Option C: log2(normalized counts)
+
+**Use when:** Replicating published analyses that used this method, when PCA should reflect absolute expression scale, or when zero-count genes should be excluded rather than shrunk.
+
+**Pros:** Simple, interpretable, preserves absolute magnitude, no complex shrinkage
+**Cons:** No variance stabilization (high-expression genes dominate PCA), genes with any zero in any sample are removed (can lose 50%+ of genes), sensitive to sequencing depth differences
+
+```r
+source("scripts/log2_normalization.R")
+result <- apply_log2_normalization(dds, zero_handling = "remove")
+log2_mat <- result$matrix  # genes x samples
+```
+
+**Zero handling options:**
+- `"remove"` (default, paper approach): Drop genes with any zero via `complete.cases()`
+- `"pseudocount"`: Add 0.5 before log2 — keeps all genes but distorts low counts
+- `"na"`: Set zeros to NA — useful for downstream methods that handle NA
+
+**Biological filter (optional):** When the number of cells per sample is known (e.g., FACS sorting), use `filter_transcripts_per_cell()` to apply a biologically motivated expression threshold before log2 transformation.
+
+```r
+source("scripts/log2_normalization.R")
+norm_counts <- counts(dds, normalized = TRUE)
+filtered <- filter_transcripts_per_cell(norm_counts, sample_groups,
+                                        cells_per_sample = 2000,
+                                        min_tpc = 0.01)
+```
+
+**How log2 relates to rlog and VST:** rlog is NOT the same as log2(normalized counts). rlog fits a GLM with shrinkage priors — for low-count genes, values are shrunken toward the intercept, stabilizing variance. For high-count genes, rlog approximates log2(normalized counts) because shrinkage is minimal. VST uses a different variance-stabilizing function but is also asymptotically log2 for large counts. DESeq2 also provides `normTransform(dds)` which computes `log2(normalized_counts + 1)` and returns a `DESeqTransform` object — use it when a pseudocount of 1 is acceptable. The functions in `log2_normalization.R` offer the "remove zeros" approach (no pseudocount) that `normTransform()` does not support.
+
+**Reference:** Burton et al. (2024) *Immunity* 57:1586-1602.e10 ([doi:10.1016/j.immuni.2024.05.023](https://doi.org/10.1016/j.immuni.2024.05.023)) used this approach for tissue Treg RNA-seq PCA (GitHub: AdrianListon/TissueTregs).
+
 ### Decision Tree
 
 ```
-n > 30 samples?
-├─ YES → vst() (fast, appropriate for large datasets)
-└─ NO → n < 10?
-        ├─ YES → rlog() (better stabilization for small samples)
-        └─ NO (10-30) → Either works (vst for speed, rlog for accuracy)
+What is the downstream task?
+├─ Differential expression → DO NOT transform (use raw counts with DESeq())
+└─ PCA / clustering / heatmap → Choose transformation:
+    ├─ Standard approach (recommended for most users):
+    │   ├─ n > 30 → vst()
+    │   └─ n ≤ 30 → rlog()
+    └─ Log2 normalized counts:
+        └─ When replicating a published analysis that used this method,
+           OR when you want PCA to reflect absolute expression scale,
+           OR when zero-count genes should be excluded (not shrunk)
 ```
 
-**When to use blind = TRUE:** Exploratory analysis without design, initial QC, want natural clustering
+**When to use blind = TRUE (VST/rlog only):** Exploratory analysis without design, initial QC, want natural clustering
 
 ---
 
@@ -297,7 +334,8 @@ sig <- subset(res, padj < 0.01 & abs(log2FoldChange) > 2)
 | Decision | Use This | When |
 |----------|----------|------|
 | **Transformation** | vst() | n > 30 samples |
-| | rlog() | n < 30 samples |
+| | rlog() | n ≤ 30 samples |
+| | log2(normalized) | Replicating published analyses, absolute scale PCA |
 | **LFC Shrinkage** | apeglm | Ranking/visualization |
 | | ashr | Need contrasts/speed |
 | **Design** | ~ condition | Simple, no batch |

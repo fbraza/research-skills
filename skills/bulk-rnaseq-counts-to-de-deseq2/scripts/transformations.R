@@ -3,6 +3,17 @@
 
 library(DESeq2)
 
+# Resolve script directory at source-time for sibling script loading.
+# Walk frames top-down to find the ofile of THIS source() call.
+.transformations_script_dir <- local({
+  for (i in sys.nframe():1L) {
+    ofile <- sys.frame(i)$ofile
+    if (!is.null(ofile))
+      return(normalizePath(dirname(ofile), mustWork = TRUE))
+  }
+  normalizePath(".", mustWork = TRUE)
+})
+
 #' Get normalized counts from DESeqDataSet
 #'
 #' @param dds DESeqDataSet object (after DESeq())
@@ -76,12 +87,19 @@ apply_rlog <- function(dds, blind = FALSE) {
 #' Choose and apply appropriate transformation
 #'
 #' @param dds DESeqDataSet object (after DESeq())
-#' @param method Transformation method: 'auto', 'vst', or 'rlog' (default: 'auto')
-#' @param blind Whether to estimate dispersions ignoring design (default: FALSE)
+#' @param method Transformation method: 'auto', 'vst', 'rlog', or 'log2'
+#'   (default: 'auto'). 'log2' uses log2(normalized counts) — see
+#'   scripts/log2_normalization.R for details and trade-offs.
+#' @param blind Whether to estimate dispersions ignoring design (default: FALSE).
+#'   Only applies to 'vst' and 'rlog' methods.
+#' @param zero_handling For method = "log2" only: how to handle zeros.
+#'   "remove" (default), "pseudocount", or "na". See apply_log2_normalization().
 #'
-#' @return DESeqTransform object
+#' @return DESeqTransform object (for vst/rlog) or list (for log2, see
+#'   apply_log2_normalization return value)
 #' @export
-transform_counts <- function(dds, method = "auto", blind = FALSE) {
+transform_counts <- function(dds, method = "auto", blind = FALSE,
+                             zero_handling = "remove") {
     n_samples <- ncol(dds)
 
     cat("=== Transforming Counts ===\n")
@@ -99,8 +117,12 @@ transform_counts <- function(dds, method = "auto", blind = FALSE) {
         return(apply_vst(dds, blind = blind))
     } else if (method == "rlog") {
         return(apply_rlog(dds, blind = blind))
+    } else if (method == "log2") {
+        source(file.path(.transformations_script_dir,
+                         "log2_normalization.R"), local = TRUE)
+        return(apply_log2_normalization(dds, zero_handling = zero_handling))
     } else {
-        stop("method must be 'auto', 'vst', or 'rlog'")
+        stop("method must be 'auto', 'vst', 'rlog', or 'log2'")
     }
 }
 
@@ -191,7 +213,19 @@ print_transformation_guide <- function() {
     cat("  • Cons: Slow for large datasets (>100 samples)\n")
     cat("  • Function: rlog(dds, blind = FALSE)\n\n")
 
-    cat("BLIND PARAMETER:\n")
+    cat("LOG2 NORMALIZED COUNTS:\n")
+    cat("  • Use when: Replicating analyses that used this method,\n")
+    cat("              or when PCA should reflect absolute expression scale\n")
+    cat("  • Pros: Simple, interpretable, preserves absolute magnitude\n")
+    cat("  • Cons: No variance stabilization, genes with zeros removed\n")
+    cat("  • Function: transform_counts(dds, method = 'log2')\n")
+    cat("  • See: scripts/log2_normalization.R for details\n")
+    cat("  • Note: DESeq2 also provides normTransform(dds) which computes\n")
+    cat("          log2(normalized + 1) and returns a DESeqTransform object.\n")
+    cat("          Use apply_log2_normalization() when you need the 'remove zeros'\n")
+    cat("          approach (no pseudocount) or other zero_handling modes.\n\n")
+
+    cat("BLIND PARAMETER (VST/rlog only):\n")
     cat("  • blind = FALSE: Use design formula (recommended)\n")
     cat("  • blind = TRUE: Ignore design (exploratory only)\n\n")
 }
