@@ -175,15 +175,20 @@ Split pipelines into **semantic modules** — one per data-processing domain, no
 - Prints status messages
 - All data flow is visible in one file
 
+The examples below are illustrative — actual steps and module names will vary by dataset and analysis type. The concept (explicit data flow, no logic in the orchestrator) is what matters.
+
 ```r
 # R orchestrator example
 cfg             <- get_config(script_dir)
 count_matrix    <- read_count_matrix(cfg$counts_path)
+soft_tbl        <- read_soft_table(cfg$soft_path)        # GEO SOFT metadata
 metadata        <- build_sample_metadata(colnames(count_matrix), soft_tbl, cfg)
 deseq_dataset   <- create_deseq_dataset(count_matrix, metadata)
 deseq_dataset   <- filter_zero_count_genes(deseq_dataset)
 deseq_dataset   <- compute_size_factors(deseq_dataset)
-norm_counts     <- filter_by_tpc(norm_counts, metadata_treg, cfg$cells, cfg$min_tpc)
+norm_counts     <- extract_normalized_counts(deseq_dataset)
+metadata_treg   <- filter_metadata_by_celltype(metadata, cfg$cells)
+norm_counts     <- filter_by_tpc(norm_counts, metadata_treg, cfg$min_tpc)
 log2_expression <- log2_transform(norm_counts)
 pca_result      <- compute_pca(log2_expression)
 ```
@@ -268,7 +273,7 @@ def filter_zero_count_genes(adata):
 1. **Pure functions by default.** Take input, return output, no side effects.
 2. **Side-effect functions signal it explicitly** — R: return `invisible(NULL)`, Python: annotate `-> None`.
 3. **Configuration passed as parameter** (`cfg`), never read from global state.
-4. **Composable stages** — each function takes one input, applies one transformation, returns one output. The orchestrator chains them.
+4. **Composable stages** — each function takes one primary data object, applies one transformation, and returns one output. Additional arguments (metadata, `cfg`, thresholds) are fine. The orchestrator chains them.
 5. **No hardcoded paths or magic numbers** inside functions — centralize in `config`.
 6. **Matrix dimension convention** documented in every function that accepts a matrix: state whether genes are rows or columns.
 7. **Metadata propagation** — every analysis step preserves sample annotations by joining results back to metadata.
