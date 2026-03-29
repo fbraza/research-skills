@@ -378,7 +378,7 @@ export_all(dds, res, res_shrunk, output_dir = "deseq2_results")
 **Options:**
 - **vst()** (default for n > 30): Fast, variance-stabilized, suitable for large datasets
 - **rlog()** (default for n ≤ 30): Better stabilization for small samples, slower
-- **log2(normalized counts)**: Simple log2 of size-factor normalized counts. Use when replicating published analyses that used this method, or when zero-count genes should be excluded rather than shrunk. See [scripts/log2_normalization.R](scripts/log2_normalization.R) for functions and [references/decision-guide.md](references/decision-guide.md#option-c-log2normalized-counts) for the decision tree.
+- **log2(normalized counts)** *(special cases only)*: Simple log2 of size-factor normalized counts. **Not recommended as a default** — provides no variance stabilization, so low-count gene noise dominates PCA/clustering. Use only when replicating a published analysis that used this exact method, or after aggressive pre-filtering that removed most low-count genes. See [scripts/log2_normalization.R](scripts/log2_normalization.R) for functions and [references/decision-guide.md](references/decision-guide.md#option-c-log2normalized-counts--special-cases-only) for the decision tree.
 
 **See [references/decision-guide.md#decision-point-1](references/decision-guide.md#decision-point-1-transformation-method) for detailed guidance.**
 

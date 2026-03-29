@@ -1,16 +1,23 @@
 # Log2 normalized counts transformation for DESeq2
-# Alternative to VST/rlog — used in published analyses (e.g., Burton et al. 2024)
+# Special-case alternative to VST/rlog — NOT a general replacement
+#
+# Used in some published analyses (e.g., Burton et al. 2024) where aggressive
+# pre-filtering (transcripts-per-cell) already removed most low-count genes.
+#
+# WARNING: For routine PCA, clustering, and heatmaps, use VST or rlog instead.
+# log2 provides NO variance stabilization — low-count genes with high Poisson
+# noise will dominate ordination, and the "remove zeros" approach can discard
+# 30-60% of genes, introducing survivorship bias.
 #
 # When to use:
-#   - Replicating published analyses that used log2(normalized counts)
-#   - When you want PCA to reflect absolute expression scale
-#   - When zero-count genes should be excluded (not shrunk like VST/rlog)
+#   - Replicating a published analysis that used this exact method
+#   - After aggressive pre-filtering removed most low-count genes
 #
 # Trade-offs vs VST/rlog:
 #   - Simpler and more interpretable
 #   - Preserves absolute magnitude differences
-#   - No variance stabilization → high-expression genes dominate PCA
-#   - Genes with zero counts in ANY sample are removed (can lose many genes)
+#   - No variance stabilization → low-count gene noise dominates PCA/clustering
+#   - Genes with zero counts in ANY sample are removed (can lose 30-60% of genes)
 
 library(DESeq2)
 

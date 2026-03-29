@@ -31,12 +31,16 @@ vsd <- vst(dds, blind = FALSE)  # blind=FALSE uses design (recommended)
 rld <- rlog(dds, blind = FALSE)
 ```
 
-### Option C: log2(normalized counts)
+### Option C: log2(normalized counts) — special cases only
 
-**Use when:** Replicating published analyses that used this method, when PCA should reflect absolute expression scale, or when zero-count genes should be excluded rather than shrunk.
+> **Not recommended as a default.** VST or rlog should be used for routine PCA, clustering, and heatmaps. log2(normalized counts) provides no variance stabilization — low-count genes with high Poisson noise will dominate ordination, and the "remove zeros" approach can discard 30-60% of genes, introducing survivorship bias. Use only for the specific scenarios listed below.
+
+**Use when:** Replicating a published analysis that used this exact method (e.g., Burton et al. 2024), or after aggressive pre-filtering (e.g., transcripts-per-cell) that already removed most low-count genes.
 
 **Pros:** Simple, interpretable, preserves absolute magnitude, no complex shrinkage
-**Cons:** No variance stabilization (high-expression genes dominate PCA), genes with any zero in any sample are removed (can lose 50%+ of genes), sensitive to sequencing depth differences
+**Cons:** No variance stabilization (low-count genes dominate PCA/clustering due to noise), genes with any zero in any sample are removed (can lose 30-60% of genes, introducing survivorship bias), sensitive to sequencing depth differences
+
+**Note:** Some training materials (e.g., Galaxy Project tutorials) use log2 + pseudocount as a pedagogical simplification. This is not incorrect for teaching, but the DESeq2 authors (Love et al. 2014) and the Bioconductor vignette explicitly recommend VST or rlog for downstream analyses that assume homoskedasticity.
 
 ```r
 source("scripts/log2_normalization.R")
@@ -72,10 +76,10 @@ What is the downstream task?
     ├─ Standard approach (recommended for most users):
     │   ├─ n > 30 → vst()
     │   └─ n ≤ 30 → rlog()
-    └─ Log2 normalized counts:
-        └─ When replicating a published analysis that used this method,
-           OR when you want PCA to reflect absolute expression scale,
-           OR when zero-count genes should be excluded (not shrunk)
+    └─ Log2 normalized counts (special cases only):
+        └─ ONLY when replicating a published analysis that used this method,
+           OR after aggressive pre-filtering removed most low-count genes
+           ⚠ No variance stabilization — low-count noise dominates PCA
 ```
 
 **When to use blind = TRUE (VST/rlog only):** Exploratory analysis without design, initial QC, want natural clustering
@@ -335,7 +339,7 @@ sig <- subset(res, padj < 0.01 & abs(log2FoldChange) > 2)
 |----------|----------|------|
 | **Transformation** | vst() | n > 30 samples |
 | | rlog() | n ≤ 30 samples |
-| | log2(normalized) | Replicating published analyses, absolute scale PCA |
+| | log2(normalized) | Special cases: replicating published analyses, after aggressive pre-filtering |
 | **LFC Shrinkage** | apeglm | Ranking/visualization |
 | | ashr | Need contrasts/speed |
 | **Design** | ~ condition | Simple, no batch |
