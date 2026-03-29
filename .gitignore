@@ -30,3 +30,4 @@ mise.toml
 
 # Evaluation staging
 TO_EVALUATE/
+test_plots/

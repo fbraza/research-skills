@@ -41,41 +41,103 @@ Before creating any figure, verify:
 
 ### Tool Selection
 
-| Figure type | Primary tool | Notes |
-|---|---|---|
-| Volcano plot | seaborn + matplotlib | Use adjustText for labels |
-| Heatmap | ComplexHeatmap (R) or seaborn | ComplexHeatmap for complex annotations |
-| UMAP / tSNE | scanpy.pl or seaborn | Include cluster labels |
-| Kaplan-Meier | survminer (R) or lifelines (Python) | At-risk table mandatory |
-| Forest plot (HR/OR) | ggplot2 (R) or matplotlib | Log-scale x-axis; reference line at 1.0 |
-| ROC curve | pROC (R) or sklearn + matplotlib | Start (0,0), end (1,1); AUC in legend |
-| Calibration curve | val.prob (R) or sklearn | Diagonal reference; Hosmer-Lemeshow p |
-| Enrichment dot plot | clusterProfiler / enrichplot (R) | Dot size = gene count |
-| Box/violin plot | ggplot2 + ggprism or seaborn | Include individual points |
-| PCA plot | matplotlib or ggplot2 | % variance on axes |
-| Network | igraph or networkx | Node size = degree or importance |
-| Multi-panel composite | matplotlib subplots or patchwork (R) | Label panels A, B, C... |
+| Figure type | Python tool | R tool | Reference |
+|---|---|---|---|
+| Volcano plot | ultraplot | ggplot2 | `references/volcano_plot.md` |
+| Heatmap | ultraplot | ComplexHeatmap | `references/heatmap.md` |
+| UMAP / tSNE | ultraplot | ggplot2 | `references/umap_tsne.md` |
+| PCA plot | ultraplot | ggplot2 | `references/pca_plot.md` |
+| Enrichment dot plot | ultraplot | ggplot2 / enrichplot | `references/enrichment_dotplot.md` |
+| Forest plot (HR/OR) | ultraplot | ggplot2 | `references/forest_plot.md` |
+| Box / violin plot | ultraplot | ggplot2 + ggprism | `references/box_violin_plot.md` |
+| Bar + error bars | ultraplot | ggplot2 | `references/histogram_error_bars.md` |
+| Jitter / grouped plots | ultraplot | ggplot2 | `references/grouped_plots.md` |
+| Kaplan-Meier | lifelines + ultraplot | survminer | — |
+| ROC curve | sklearn + ultraplot | pROC | — |
+| Calibration curve | sklearn + ultraplot | val.prob | — |
+| Network | networkx + ultraplot | igraph | — |
 
 ## Visualization Standards
 
-### Libraries (defaults)
-- **Python:** seaborn + matplotlib (primary), plotnine for grammar-of-graphics
+### Libraries
+
+**Publication figures:**
+- **Python:** ultraplot (primary) — a succinct matplotlib wrapper for publication-quality graphics
 - **R:** ggplot2 + ggprism theme (primary), ComplexHeatmap for heatmaps
-- **Heatmaps:** ComplexHeatmap (R) preferred for complex biological heatmaps
+
+**Exploratory analysis (EDA):** Built-in plotting from scanpy, Seurat, or seaborn is fine. For final publication figures, always use ultraplot (Python) or ggplot2 (R).
+
+**Style inspiration:** Before generating a figure, check `assets/` for user-provided reference images of preferred plot styles. Match the visual feel when possible.
+
+### UltraPlot Conventions (Python)
+
+UltraPlot is a matplotlib wrapper — the `ax` object inherits all matplotlib methods plus `ax.format()` for concise styling.
+
+```python
+import ultraplot as uplt
+import matplotlib as mpl
+
+# MANDATORY: preserve editable text in SVG (not individual glyphs)
+mpl.rcParams['svg.fonttype'] = 'none'
+
+# Publication RC defaults
+uplt.rc.update({
+    'font.family': 'sans-serif',
+    'font.sans-serif': ['Arial', 'Helvetica'],
+    'font.size': 8,
+    'axes.labelsize': 9,
+    'xtick.labelsize': 7,
+    'ytick.labelsize': 7,
+    'axes.titlesize': 9,
+})
+
+# Single figure (no multi-panel — compose in Illustrator)
+fig, ax = uplt.subplot(figsize=(3.5, 3))  # Nature single column
+
+# Style with format() — NOT raw matplotlib calls
+ax.format(
+    xlabel='PC1 (45.2% variance)',
+    ylabel='PC2 (12.1% variance)',
+    title='PCA — Treatment vs Control',
+)
+
+# Save both formats
+fig.savefig('./results/figure_name.svg', bbox_inches='tight')
+fig.savefig('./results/figure_name.png', dpi=300, bbox_inches='tight')
+```
+
+**Key rules:**
+- Always use `uplt.subplot()` for single figures — no `plt.subplots()` or gridspec
+- Always use `ax.format()` for axis labels, titles, limits — not `ax.set_xlabel()` etc.
+- Each plot is a standalone figure — no multi-panel composites (user assembles in Illustrator)
+- Read the reference file for each plot type before implementing (see Tool Selection table above)
 
 ### Color Standards
 
 **Always use colorblind-friendly palettes.** Never use red/green only. Never use rainbow/jet.
 
-**Recommended palettes:**
+**Categorical palettes:**
 ```python
-# Okabe-Ito (preferred for categorical data)
-okabe_ito = ['#E69F00', '#56B4E9', '#009E73', '#F0E442',
-             '#0072B2', '#D55E00', '#CC79A7', '#000000']
+# Publication palette (default for embeddings and multi-category plots)
+# Muted earthy tones — warm, distinguishable, Nature/Cell aesthetic
+PUBLICATION_PALETTE = [
+    '#3A5BA0', '#D4753C', '#5A8F5A', '#C44E52', '#8C6D31',
+    '#7B5EA7', '#E8A838', '#46878F', '#B07AA1', '#86714D',
+    '#4E9A9A', '#D98880', '#6B8E23', '#B8860B', '#708090',
+    '#9B59B6', '#2E86C1', '#D35400', '#1ABC9C', '#8B4513',
+]
 
-# Diverging (fold change, correlation): "RdBu_r" or "coolwarm"
-# Sequential (expression, p-value): "viridis", "magma", "plasma"
+# Okabe-Ito (fallback for accessibility-critical contexts)
+OKABE_ITO = ['#E69F00', '#56B4E9', '#009E73', '#F0E442',
+             '#0072B2', '#D55E00', '#CC79A7', '#000000']
 ```
+
+**Sequential colormaps:**
+- Gene expression / feature plots: `magma` (dark → orange → yellow)
+- Generic continuous metrics: `viridis`
+
+**Diverging colormaps:**
+- Fold change, correlation: `RdBu_r` or `coolwarm` — always symmetric around zero
 
 ```r
 # R categorical
@@ -86,9 +148,9 @@ palette <- brewer.pal(8, "Set2")
 scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
 ```
 
-- Maximum 12 distinct colors for categorical data — use grouping if more needed
+- Maximum 20 distinct colors for categorical data (publication palette) — use grouping if more needed
 - For diverging data: blue-white-red or similar, symmetric around zero
-- For sequential data: viridis family
+- For sequential data: magma (expression) or viridis (generic)
 
 ### Text and Labels
 - **No overlapping labels** — use `adjustText` (Python) or `ggrepel` (R)
@@ -108,6 +170,7 @@ scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
 
 ### Export Standards
 - **Default:** Save in both SVG (vector) and PNG (raster)
+- **SVG text preservation:** Always set `mpl.rcParams['svg.fonttype'] = 'none'` before saving. This ensures text is embedded as editable `<text>` elements in SVG — not converted to individual letter paths/glyphs. This is critical for downstream editing in Illustrator.
 - **Resolution:** Minimum 300 DPI for PNG; 600 DPI for publication
 - **Never use JPEG** for scientific data figures — lossy compression corrupts data
 - **Naming:** Descriptive filenames with version suffixes (`volcano_plot_v1.svg`)
@@ -124,35 +187,10 @@ scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
 When journal is unspecified: default to Nature sizing.
 
 ### Typography at Print Size
-```python
-import matplotlib as mpl
-mpl.rcParams.update({
-    'font.family': 'sans-serif',
-    'font.sans-serif': ['Arial', 'Helvetica'],
-    'font.size': 8,
-    'axes.labelsize': 9,
-    'xtick.labelsize': 7,
-    'ytick.labelsize': 7,
-    'axes.titlesize': 9,
-})
-```
+
+Typography is configured via `uplt.rc.update()` in the UltraPlot Conventions section above. Do not use raw `mpl.rcParams` for font settings — use ultraplot's RC system instead.
 
 Axis labels: sentence case with units — `"Time (hours)"` not `"TIME (HOURS)"`.
-
-### Multi-Panel Figures
-```python
-from string import ascii_uppercase
-import matplotlib.pyplot as plt
-
-fig = plt.figure(figsize=(7.2, 4))  # Nature double column
-gs = fig.add_gridspec(2, 2, hspace=0.4, wspace=0.35)
-axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
-
-for idx, ax in enumerate(axes):
-    ax.text(-0.15, 1.05, ascii_uppercase[idx],
-            transform=ax.transAxes, fontsize=10,
-            fontweight='bold', va='top', ha='right')
-```
 
 ## Figure Type Specifications
 
@@ -173,11 +211,15 @@ for idx, ax in enumerate(axes):
 - Row/column annotations if applicable
 - Scale bar present
 
-### UMAP / tSNE
-- Axes labeled (UMAP1, UMAP2 or tSNE1, tSNE2)
+### UMAP / tSNE / Embeddings
+- **L-shaped axis stubs** only (no full frame, no ticks, no tick numbers) — embedding coordinates are arbitrary
+- Point size auto-scales with cell count (more cells → smaller dots, fewer cells → larger dots)
+- **Fully opaque** (`alpha=1.0`) with darkened edge contours on every point
+- **Legend only** — no text labels on the plot, keep it clean
+- Publication palette (muted earthy tones) by default
+- Feature plots use `magma` colormap with "Min"/"Max" colorbar labels, gene name in *italics*
 - n_neighbors (UMAP) or perplexity (tSNE) stated in caption
-- Cluster labels on plot (not just in legend)
-- Colorblind-friendly categorical palette
+- See `references/umap_tsne.md` for full aesthetic rules and implementation
 
 ### Box / Violin Plot
 - Individual data points shown (jitter or strip)
@@ -244,8 +286,10 @@ Clinical figures have stricter requirements because they inform patient outcome 
 
 ### Step 1 — Save the figure
 ```python
-fig.savefig("./results/figure_name.png", dpi=300, bbox_inches="tight")
+import matplotlib as mpl
+mpl.rcParams['svg.fonttype'] = 'none'  # editable text in SVG
 fig.savefig("./results/figure_name.svg", bbox_inches="tight")
+fig.savefig("./results/figure_name.png", dpi=300, bbox_inches="tight")
 ```
 
 ### Step 2 — Verify figure quality
@@ -318,6 +362,7 @@ Create a markdown report (`./results/report_<title>.md`) ONLY when:
 - **Never use red/green only color encoding**
 - **Bubble chart area (not radius) must be proportional to the value**
 - **Log scales must be clearly labeled**
+- **Always set `mpl.rcParams['svg.fonttype'] = 'none'` before saving SVG — text must be editable, not individual letter paths**
 - **Always save figures in both SVG and PNG unless user specifies otherwise**
 - **Always save to `./results/`**
 - **Never deliver a figure that has not passed the quality check**
