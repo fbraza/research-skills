@@ -16,6 +16,8 @@ treg_all_tissues/
 # R session artifacts
 .RData
 .Rhistory
+.Rapp.history
+**/.Rapp.history
 Rplots.pdf
 
 # Data / model artifacts
