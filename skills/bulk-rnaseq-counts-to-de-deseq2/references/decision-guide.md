@@ -31,17 +31,52 @@ vsd <- vst(dds, blind = FALSE)  # blind=FALSE uses design (recommended)
 rld <- rlog(dds, blind = FALSE)
 ```
 
+### Option C: log2(normalized counts)
+
+**Use when:** Replicating published analyses that used this method, when PCA should reflect absolute expression scale, or when zero-count genes should be excluded rather than shrunk.
+
+**Pros:** Simple, interpretable, preserves absolute magnitude, no complex shrinkage
+**Cons:** No variance stabilization (high-expression genes dominate PCA), genes with any zero in any sample are removed (can lose 50%+ of genes), sensitive to sequencing depth differences
+
+```r
+source("scripts/log2_normalization.R")
+result <- apply_log2_normalization(dds, zero_handling = "remove")
+log2_mat <- result$matrix  # genes x samples
+```
+
+**Zero handling options:**
+- `"remove"` (default, paper approach): Drop genes with any zero via `complete.cases()`
+- `"pseudocount"`: Add 0.5 before log2 — keeps all genes but distorts low counts
+- `"na"`: Set zeros to NA — useful for downstream methods that handle NA
+
+**Biological filter (optional):** When the number of cells per sample is known (e.g., FACS sorting), use `filter_transcripts_per_cell()` to apply a biologically motivated expression threshold before log2 transformation.
+
+```r
+source("scripts/log2_normalization.R")
+norm_counts <- counts(dds, normalized = TRUE)
+filtered <- filter_transcripts_per_cell(norm_counts, sample_groups,
+                                        cells_per_sample = 2000,
+                                        min_tpc = 0.01)
+```
+
+**Reference:** Burton et al. (2024) *Immunity* 57:1586-1602 used this approach for tissue Treg RNA-seq PCA (GitHub: AdrianListon/TissueTregs).
+
 ### Decision Tree
 
 ```
-n > 30 samples?
-├─ YES → vst() (fast, appropriate for large datasets)
-└─ NO → n < 10?
-        ├─ YES → rlog() (better stabilization for small samples)
-        └─ NO (10-30) → Either works (vst for speed, rlog for accuracy)
+What is the downstream task?
+├─ Differential expression → DO NOT transform (use raw counts with DESeq())
+└─ PCA / clustering / heatmap → Choose transformation:
+    ├─ Standard approach (recommended for most users):
+    │   ├─ n > 30 → vst()
+    │   └─ n ≤ 30 → rlog()
+    └─ Log2 normalized counts:
+        └─ When replicating a published analysis that used this method,
+           OR when you want PCA to reflect absolute expression scale,
+           OR when zero-count genes should be excluded (not shrunk)
 ```
 
-**When to use blind = TRUE:** Exploratory analysis without design, initial QC, want natural clustering
+**When to use blind = TRUE (VST/rlog only):** Exploratory analysis without design, initial QC, want natural clustering
 
 ---
 
