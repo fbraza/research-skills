@@ -143,6 +143,138 @@ Guides are located in `skills/knowhows/`.
 
 ---
 
+## Code Engineering Standards
+
+Analytical code has two modes. Knowing which mode you are in determines the expected code quality.
+
+### Two Modes
+
+| Mode | Trigger | What to do |
+|------|---------|------------|
+| **Draft / EDA** | Default mode. Exploring data, testing hypotheses, iterating. | Write monolithic scripts freely. Inline code, quick plots, no modules needed. Prioritize speed and iteration. |
+| **Production** | User explicitly says "finalize", "clean up", "refactor", or "make it modular". | Refactor into semantic modules with an orchestrator, full docstrings, and configuration extraction. Preserve the original monolithic script as reference. |
+
+**Never proactively refactor.** Wait for the explicit signal. During EDA, a 500-line script that runs correctly is better than a premature module structure that slows iteration.
+
+### Production Code: Module Architecture
+
+Split pipelines into **semantic modules** — one per data-processing domain, not arbitrary file-size splits.
+
+| Module | Responsibility | Side effects |
+|--------|---------------|--------------|
+| `config` | Paths, thresholds, palettes, mappings. Returns a dict/list. | None |
+| `io` | Read/write files. Explicit paths as parameters. | Disk I/O |
+| `metadata` | Build, validate, filter annotation tables. | None |
+| `qc` | Diagnostic plots and metrics. | Saves figures |
+| `normalization` / `preprocessing` | Data transformation pipeline. Composable stages. | None |
+| `analysis` (PCA, DE, clustering...) | Core computation + publication figures. | Saves figures |
+
+**Orchestrator** (e.g., `01_analysis_main.R` or `01_analysis_main.py`):
+- Calls functions in sequence — no implementation logic
+- Passes results between steps explicitly
+- Prints status messages
+- All data flow is visible in one file
+
+```r
+# R orchestrator example
+cfg             <- get_config(script_dir)
+count_matrix    <- read_count_matrix(cfg$counts_path)
+metadata        <- build_sample_metadata(colnames(count_matrix), soft_tbl, cfg)
+deseq_dataset   <- create_deseq_dataset(count_matrix, metadata)
+deseq_dataset   <- filter_zero_count_genes(deseq_dataset)
+deseq_dataset   <- compute_size_factors(deseq_dataset)
+norm_counts     <- filter_by_tpc(norm_counts, metadata_treg, cfg$cells, cfg$min_tpc)
+log2_expression <- log2_transform(norm_counts)
+pca_result      <- compute_pca(log2_expression)
+```
+
+```python
+# Python orchestrator example
+cfg             = get_config(script_dir)
+adata           = read_h5ad(cfg["input_path"])
+adata           = filter_cells(adata, min_genes=cfg["min_genes"])
+adata           = filter_genes(adata, min_cells=cfg["min_cells"])
+adata           = normalize_total(adata, target_sum=cfg["target_sum"])
+adata           = log1p_transform(adata)
+adata           = select_highly_variable(adata, n_top_genes=cfg["n_hvg"])
+adata           = run_pca(adata, n_comps=cfg["n_pcs"])
+```
+
+### Naming Conventions
+
+**Functions:** `verb_noun` in snake_case — every name states what it does unambiguously.
+
+```
+read_count_matrix()       filter_zero_count_genes()
+compute_tissue_medians()  plot_treg_pca()
+build_sample_metadata()   save_results()
+```
+
+**Variables:** descriptive with type suffixes.
+
+```
+*_matrix, *_counts        — numeric matrices / arrays
+*_scores, *_data, *_df    — data frames / tibbles / DataFrames
+*_metadata                — annotation tables
+*_mask, *_filter          — logical vectors / boolean arrays
+n_genes_*, n_samples_*    — integer counts
+cfg                       — configuration dict / list
+```
+
+**Files:** lowercase, underscore-separated, domain-based.
+- Modules: `config.R`, `normalization.py`, `pca.R`
+- Orchestrator: `01_analysis_name_main.R` or `01_analysis_name_main.py`
+
+### Documentation
+
+Every function in production code gets a docstring. No exceptions.
+
+**R (roxygen2):**
+```r
+#' Filter genes with zero counts across all samples
+#'
+#' Removes genes where the total count across all samples is zero.
+#' Returns the filtered DESeqDataSet.
+#'
+#' @param deseq_dataset DESeqDataSet object
+#'
+#' @return Filtered DESeqDataSet with zero-count genes removed
+#'
+#' @examples
+#' dds <- filter_zero_count_genes(dds)
+```
+
+**Python (NumPy-style):**
+```python
+def filter_zero_count_genes(adata):
+    """Filter genes with zero counts across all cells.
+
+    Removes genes where the total count across all cells is zero.
+
+    Parameters
+    ----------
+    adata : anndata.AnnData
+        Annotated data matrix with genes in var.
+
+    Returns
+    -------
+    anndata.AnnData
+        Filtered AnnData with zero-count genes removed.
+    """
+```
+
+### Function Design Principles
+
+1. **Pure functions by default.** Take input, return output, no side effects.
+2. **Side-effect functions signal it explicitly** — R: return `invisible(NULL)`, Python: annotate `-> None`.
+3. **Configuration passed as parameter** (`cfg`), never read from global state.
+4. **Composable stages** — each function takes one input, applies one transformation, returns one output. The orchestrator chains them.
+5. **No hardcoded paths or magic numbers** inside functions — centralize in `config`.
+6. **Matrix dimension convention** documented in every function that accepts a matrix: state whether genes are rows or columns.
+7. **Metadata propagation** — every analysis step preserves sample annotations by joining results back to metadata.
+
+---
+
 ## Working Environment
 
 ```
