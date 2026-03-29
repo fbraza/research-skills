@@ -3,6 +3,17 @@
 
 library(DESeq2)
 
+# Resolve script directory at source-time for sibling script loading.
+# Walk frames top-down to find the ofile of THIS source() call.
+.transformations_script_dir <- local({
+  for (i in sys.nframe():1L) {
+    ofile <- sys.frame(i)$ofile
+    if (!is.null(ofile))
+      return(normalizePath(dirname(ofile), mustWork = TRUE))
+  }
+  normalizePath(".", mustWork = TRUE)
+})
+
 #' Get normalized counts from DESeqDataSet
 #'
 #' @param dds DESeqDataSet object (after DESeq())
@@ -107,7 +118,7 @@ transform_counts <- function(dds, method = "auto", blind = FALSE,
     } else if (method == "rlog") {
         return(apply_rlog(dds, blind = blind))
     } else if (method == "log2") {
-        source(file.path(dirname(sys.frame(1)$ofile %||% "scripts"),
+        source(file.path(.transformations_script_dir,
                          "log2_normalization.R"), local = TRUE)
         return(apply_log2_normalization(dds, zero_handling = zero_handling))
     } else {
@@ -208,7 +219,11 @@ print_transformation_guide <- function() {
     cat("  • Pros: Simple, interpretable, preserves absolute magnitude\n")
     cat("  • Cons: No variance stabilization, genes with zeros removed\n")
     cat("  • Function: transform_counts(dds, method = 'log2')\n")
-    cat("  • See: scripts/log2_normalization.R for details\n\n")
+    cat("  • See: scripts/log2_normalization.R for details\n")
+    cat("  • Note: DESeq2 also provides normTransform(dds) which computes\n")
+    cat("          log2(normalized + 1) and returns a DESeqTransform object.\n")
+    cat("          Use apply_log2_normalization() when you need the 'remove zeros'\n")
+    cat("          approach (no pseudocount) or other zero_handling modes.\n\n")
 
     cat("BLIND PARAMETER (VST/rlog only):\n")
     cat("  • blind = FALSE: Use design formula (recommended)\n")

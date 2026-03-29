@@ -7,7 +7,7 @@ Decision trees for choosing between DESeq2 methods and approaches.
 ## Decision 1: Transformation Method
 
 **When:** After DESeq(), before PCA/heatmaps
-**Question:** vst() or rlog()?
+**Question:** Which transformation — vst(), rlog(), or log2(normalized counts)?
 
 ### Option A: VST (Variance Stabilizing Transformation)
 
@@ -59,7 +59,9 @@ filtered <- filter_transcripts_per_cell(norm_counts, sample_groups,
                                         min_tpc = 0.01)
 ```
 
-**Reference:** Burton et al. (2024) *Immunity* 57:1586-1602 used this approach for tissue Treg RNA-seq PCA (GitHub: AdrianListon/TissueTregs).
+**How log2 relates to rlog and VST:** rlog is NOT the same as log2(normalized counts). rlog fits a GLM with shrinkage priors — for low-count genes, values are shrunken toward the intercept, stabilizing variance. For high-count genes, rlog approximates log2(normalized counts) because shrinkage is minimal. VST uses a different variance-stabilizing function but is also asymptotically log2 for large counts. DESeq2 also provides `normTransform(dds)` which computes `log2(normalized_counts + 1)` and returns a `DESeqTransform` object — use it when a pseudocount of 1 is acceptable. The functions in `log2_normalization.R` offer the "remove zeros" approach (no pseudocount) that `normTransform()` does not support.
+
+**Reference:** Burton et al. (2024) *Immunity* 57:1586-1602.e10 ([doi:10.1016/j.immuni.2024.05.023](https://doi.org/10.1016/j.immuni.2024.05.023)) used this approach for tissue Treg RNA-seq PCA (GitHub: AdrianListon/TissueTregs).
 
 ### Decision Tree
 
@@ -332,7 +334,8 @@ sig <- subset(res, padj < 0.01 & abs(log2FoldChange) > 2)
 | Decision | Use This | When |
 |----------|----------|------|
 | **Transformation** | vst() | n > 30 samples |
-| | rlog() | n < 30 samples |
+| | rlog() | n ≤ 30 samples |
+| | log2(normalized) | Replicating published analyses, absolute scale PCA |
 | **LFC Shrinkage** | apeglm | Ranking/visualization |
 | | ashr | Need contrasts/speed |
 | **Design** | ~ condition | Simple, no batch |
