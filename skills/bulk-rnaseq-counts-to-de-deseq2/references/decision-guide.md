@@ -42,28 +42,89 @@ rld <- rlog(dds, blind = FALSE)
 
 **Note:** Some training materials (e.g., Galaxy Project tutorials) use log2 + pseudocount as a pedagogical simplification. This is not incorrect for teaching, but the DESeq2 authors (Love et al. 2014) and the Bioconductor vignette explicitly recommend VST or rlog for downstream analyses that assume homoskedasticity.
 
+#### Correct Order (CRITICAL)
+
+The order of operations matters. Following Burton et al. (2024, Immunity):
+
+```
+1. Normalize     → DESeq2 size factors
+2. TPC filter    → Remove low-expression genes (biological threshold)
+3. Log2          → Transform to log scale
+4. Complete cases → Remove genes with any NA (zeros became NA in step 3)
+```
+
+**Why order matters:**
+- TPC filter must be applied to **normalized counts**, not raw counts
+- Log2 transform is applied **after** filtering to avoid log(0)
+- Complete cases removes genes that still have zeros after filtering
+
+#### Usage
+
+**Full workflow with TPC filter (recommended for sorted cell populations):**
+
+```r
+source("scripts/log2_normalization.R")
+
+# Create sample_groups mapping samples to condition groups
+sample_groups <- setNames(
+  gsub("_[0-9]+$", "", colnames(norm_counts)),  # Remove replicate number
+  colnames(norm_counts)
+)
+
+# Run complete workflow
+result <- log2_workflow(dds, sample_groups,
+                        cells_per_sample = 2000,  # Ask user if unknown
+                        min_tpc = 0.01,
+                        apply_tpc_filter = TRUE)
+
+log2_mat <- result$matrix
+```
+
+**Simple workflow without TPC filter:**
+
 ```r
 source("scripts/log2_normalization.R")
 result <- apply_log2_normalization(dds, zero_handling = "remove")
-log2_mat <- result$matrix  # genes x samples
+log2_mat <- result$matrix
 ```
 
+**Via transform_counts():**
+
+```r
+source("scripts/transformations.R")
+
+# With TPC filter
+result <- transform_counts(dds, method = "log2",
+                           sample_groups = sample_groups,
+                           cells_per_sample = 2000,
+                           apply_tpc_filter = TRUE)
+
+# Without TPC filter
+result <- transform_counts(dds, method = "log2",
+                           apply_tpc_filter = FALSE)
+```
+
+#### Parameters
+
 **Zero handling options:**
-- `"remove"` (default, paper approach): Drop genes with any zero via `complete.cases()`
+- `"remove"` (default): Drop genes with any zero via `complete.cases()`
 - `"pseudocount"`: Add 0.5 before log2 — keeps all genes but distorts low counts
 - `"na"`: Set zeros to NA — useful for downstream methods that handle NA
 
-**Biological filter (optional):** When the number of cells per sample is known (e.g., FACS sorting), use `filter_transcripts_per_cell()` to apply a biologically motivated expression threshold before log2 transformation.
+**Transcript-per-cell filter:**
+- `cells_per_sample`: Number of cells sorted per sample (default: 2000)
+  - **Ask user** for this value if not known
+  - Common values: 500-5000 for FACS-sorted populations
+- `min_tpc`: Minimum transcripts per cell threshold (default: 0.01)
+  - 0.01 = at least 20 counts per sample for 2000 cells
+  - Increase for stricter filtering (0.1, 1.0)
+- `sample_groups`: Named vector mapping samples to groups
+  - Required for TPC filter
+  - Genes must pass threshold in ALL replicates of at least ONE group
 
-```r
-source("scripts/log2_normalization.R")
-norm_counts <- counts(dds, normalized = TRUE)
-filtered <- filter_transcripts_per_cell(norm_counts, sample_groups,
-                                        cells_per_sample = 2000,
-                                        min_tpc = 0.01)
-```
+#### How log2 relates to rlog and VST
 
-**How log2 relates to rlog and VST:** rlog is NOT the same as log2(normalized counts). rlog fits a GLM with shrinkage priors — for low-count genes, values are shrunken toward the intercept, stabilizing variance. For high-count genes, rlog approximates log2(normalized counts) because shrinkage is minimal. VST uses a different variance-stabilizing function but is also asymptotically log2 for large counts. DESeq2 also provides `normTransform(dds)` which computes `log2(normalized_counts + 1)` and returns a `DESeqTransform` object — use it when a pseudocount of 1 is acceptable. The functions in `log2_normalization.R` offer the "remove zeros" approach (no pseudocount) that `normTransform()` does not support.
+rlog is NOT the same as log2(normalized counts). rlog fits a GLM with shrinkage priors — for low-count genes, values are shrunken toward the intercept, stabilizing variance. For high-count genes, rlog approximates log2(normalized counts) because shrinkage is minimal. VST uses a different variance-stabilizing function but is also asymptotically log2 for large counts. DESeq2 also provides `normTransform(dds)` which computes `log2(normalized_counts + 1)` and returns a `DESeqTransform` object — use it when a pseudocount of 1 is acceptable. The functions in `log2_normalization.R` offer the "remove zeros" approach (no pseudocount) that `normTransform()` does not support.
 
 **Reference:** Burton et al. (2024) *Immunity* 57:1586-1602.e10 ([doi:10.1016/j.immuni.2024.05.023](https://doi.org/10.1016/j.immuni.2024.05.023)) used this approach for tissue Treg RNA-seq PCA (GitHub: AdrianListon/TissueTregs).
 
@@ -80,9 +141,48 @@ What is the downstream task?
         └─ ONLY when replicating a published analysis that used this method,
            OR after aggressive pre-filtering removed most low-count genes
            ⚠ No variance stabilization — low-count noise dominates PCA
+
+        When using log2, decide on TPC filter:
+        ├─ Sorted cell population known (e.g., FACS) → Apply TPC filter
+        │   └─ Ask user for cells_per_sample if unknown (default: 2000)
+        └─ Bulk tissue or unknown cell count → Skip TPC filter
 ```
 
 **When to use blind = TRUE (VST/rlog only):** Exploratory analysis without design, initial QC, want natural clustering
+
+---
+
+## Decision 1b: Transcript-Per-Cell Filter
+
+**When:** Using log2(normalized counts) with sorted cell populations
+**Question:** Apply biological expression threshold?
+
+### When to Use TPC Filter
+
+Use when:
+- ✅ **Sorted cell populations** with known cell count (FACS, MACS)
+- ✅ Replicating Burton et al. (2024) tissue Treg analysis
+- ✅ Want biologically motivated expression threshold
+
+Don't use when:
+- ❌ **Bulk tissue** (unknown cell count per sample)
+- ❌ Standard bulk RNA-seq without cell sorting
+- ❌ Cell count per sample is unknown
+
+### Parameters to Ask User
+
+| Parameter | Default | Ask User When |
+|-----------|---------|---------------|
+| `cells_per_sample` | 2000 | Unknown — ask for approximate cell count |
+| `min_tpc` | 0.01 | Rarely needs adjustment |
+
+**Key question to ask:**
+> "How many cells were sorted per sample? (e.g., 2000 cells from FACS sorting)"
+
+If user doesn't know, suggest typical values:
+- FACS sorting: 500-5000 cells
+- 10x Genomics: 1000-10000 cells
+- Bulk tissue: Skip TPC filter (use simple log2 workflow)
 
 ---
 

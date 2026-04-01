@@ -147,10 +147,19 @@ Before starting, gather:
 5. **Significance Thresholds**:
    - Standard: padj < 0.05, |log2FC| ≥ 1 | Relaxed: padj < 0.1 | Stringent: padj < 0.01, |log2FC| ≥ 2
 
-6. **Analysis Goals**:
-   - Single pairwise comparison or multiple comparisons?
-   - Need visualizations (volcano, heatmap)? → Use de-results-to-plots skill after
-   - Need gene annotations? → Use de-results-to-gene-lists skill after
+ 6. **Analysis Goals**:
+    - Single pairwise comparison or multiple comparisons?
+    - Need visualizations (volcano, heatmap)? → Use de-results-to-plots skill after
+    - Need gene annotations? → Use de-results-to-gene-lists skill after
+
+ 7. **Log2 Transformation Parameters** (if using log2 normalized counts):
+    - **cells_per_sample**: How many cells were sorted per sample?
+      - Typical values: FACS (500-5000), 10x (1000-10000)
+      - If unknown, default is 2000 (Burton et al. 2024)
+      - **Ask user** if they have sorted cell populations
+    - **apply_tpc_filter**: Whether to apply transcript-per-cell biological filter
+      - Recommended: TRUE for sorted cell populations
+      - Set FALSE for bulk tissue or when skipping biological filter
 
 ## Typical Complete Workflow
 
@@ -379,6 +388,14 @@ export_all(dds, res, res_shrunk, output_dir = "deseq2_results")
 - **vst()** (default for n > 30): Fast, variance-stabilized, suitable for large datasets
 - **rlog()** (default for n ≤ 30): Better stabilization for small samples, slower
 - **log2(normalized counts)** *(special cases only)*: Simple log2 of size-factor normalized counts. **Not recommended as a default** — provides no variance stabilization, so low-count gene noise dominates PCA/clustering. Use only when replicating a published analysis that used this exact method, or after aggressive pre-filtering that removed most low-count genes. See [scripts/log2_normalization.R](scripts/log2_normalization.R) for functions and [references/decision-guide.md](references/decision-guide.md#option-c-log2normalized-counts--special-cases-only) for the decision tree.
+
+**Correct order for log2 workflow (CRITICAL):**
+```
+1. Normalize     → DESeq2 size factors
+2. TPC filter    → Remove low-expression genes (biological threshold)
+3. Log2          → Transform to log scale
+4. Complete cases → Remove genes with any NA
+```
 
 **See [references/decision-guide.md#decision-point-1](references/decision-guide.md#decision-point-1-transformation-method) for detailed guidance.**
 

@@ -93,13 +93,22 @@ apply_rlog <- function(dds, blind = FALSE) {
 #' @param blind Whether to estimate dispersions ignoring design (default: FALSE).
 #'   Only applies to 'vst' and 'rlog' methods.
 #' @param zero_handling For method = "log2" only: how to handle zeros.
-#'   "remove" (default), "pseudocount", or "na". See apply_log2_normalization().
+#'   "remove" (default), "pseudocount", or "na". See apply_log2_transform().
+#' @param sample_groups For method = "log2" with TPC filter: named vector mapping
+#'   samples to groups (e.g., c("Blood_T_1" = "Blood_T", ...)).
+#' @param cells_per_sample For method = "log2" with TPC filter: number of cells
+#'   per sample (default: 2000). Ask user for this value if unknown.
+#' @param apply_tpc_filter For method = "log2": whether to apply transcript-per-cell
+#'   filter before log2 (default: TRUE for biological filtering).
 #'
 #' @return DESeqTransform object (for vst/rlog) or list (for log2, see
-#'   apply_log2_normalization return value)
+#'   log2_workflow() return value)
 #' @export
 transform_counts <- function(dds, method = "auto", blind = FALSE,
-                             zero_handling = "remove") {
+                              zero_handling = "remove",
+                              sample_groups = NULL,
+                              cells_per_sample = 2000,
+                              apply_tpc_filter = TRUE) {
     n_samples <- ncol(dds)
 
     cat("=== Transforming Counts ===\n")
@@ -120,7 +129,20 @@ transform_counts <- function(dds, method = "auto", blind = FALSE,
     } else if (method == "log2") {
         source(file.path(.transformations_script_dir,
                          "log2_normalization.R"), local = TRUE)
-        return(apply_log2_normalization(dds, zero_handling = zero_handling))
+        
+        if (apply_tpc_filter) {
+            if (is.null(sample_groups)) {
+                stop("sample_groups required when apply_tpc_filter = TRUE.\n",
+                     "  Provide a named vector mapping samples to groups, e.g.:\n",
+                     "  sample_groups = c('Blood_T_1' = 'Blood_T', 'Blood_T_2' = 'Blood_T', ...)")
+            }
+            return(log2_workflow(dds, sample_groups,
+                                  cells_per_sample = cells_per_sample,
+                                  min_tpc = 0.01,
+                                  apply_tpc_filter = TRUE))
+        } else {
+            return(apply_log2_normalization(dds, zero_handling = zero_handling))
+        }
     } else {
         stop("method must be 'auto', 'vst', 'rlog', or 'log2'")
     }
@@ -222,11 +244,29 @@ print_transformation_guide <- function() {
     cat("  • Pros: Simple, interpretable, preserves absolute magnitude\n")
     cat("  • Cons: No variance stabilization, genes with zeros removed (30-60% loss)\n")
     cat("  • Function: transform_counts(dds, method = 'log2')\n")
-    cat("  • See: scripts/log2_normalization.R for details\n")
-    cat("  • Note: DESeq2 also provides normTransform(dds) which computes\n")
-    cat("          log2(normalized + 1) and returns a DESeqTransform object.\n")
-    cat("          Use apply_log2_normalization() when you need the 'remove zeros'\n")
-    cat("          approach (no pseudocount) or other zero_handling modes.\n\n")
+    cat("  • See: scripts/log2_normalization.R for details\n\n")
+    
+    cat("LOG2 WORKFLOW ORDER (CRITICAL):\n")
+    cat("  1. Normalize     → DESeq2 size factors\n")
+    cat("  2. TPC filter    → Remove low-expression genes (biological threshold)\n")
+    cat("  3. Log2          → Transform to log scale\n")
+    cat("  4. Complete cases → Remove genes with any NA\n\n")
+    
+    cat("LOG2 WITH TPC FILTER (sorted cell populations):\n")
+    cat("  • cells_per_sample: Number of cells sorted (default: 2000)\n")
+    cat("    → ASK USER if unknown (typical: FACS 500-5000, 10x 1000-10000)\n")
+    cat("  • min_tpc: Minimum transcripts per cell (default: 0.01)\n")
+    cat("  • sample_groups: Named vector mapping samples to groups (REQUIRED)\n")
+    cat("  • Example:\n")
+    cat("    sample_groups <- setNames(gsub('_[0-9]+$', '', colnames(counts)),\n")
+    cat("                             colnames(counts))\n")
+    cat("    result <- transform_counts(dds, method = 'log2',\n")
+    cat("                               sample_groups = sample_groups,\n")
+    cat("                               cells_per_sample = 2000)\n\n")
+    
+    cat("LOG2 WITHOUT TPC FILTER (bulk tissue):\n")
+    cat("  • result <- transform_counts(dds, method = 'log2',\n")
+    cat("                               apply_tpc_filter = FALSE)\n\n")
 
     cat("BLIND PARAMETER (VST/rlog only):\n")
     cat("  • blind = FALSE: Use design formula (recommended)\n")
