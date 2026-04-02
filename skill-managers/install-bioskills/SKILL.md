@@ -1,29 +1,27 @@
 ---
 name: install-bioskills
-description: "Install bio-skills (scientific analysis skills, CLAUDE.md, knowhows) from github.com/fbraza/bio-skills into the current project."
-argument-hint: "[--all | skill-name1 skill-name2 ...] or leave blank for interactive selection"
+description: "Install all bio-skills (skills + knowhows) from github.com/fbraza/bio-skills to ~/.claude/skills/ for global availability in any project."
 ---
 
 # Install Bio-Skills
 
-Install scientific analysis skills, CLAUDE.md, and knowhow guides from the **fbraza/bio-skills** GitHub repository into the current project.
+Install **all** scientific analysis skills and knowhow guides from the **fbraza/bio-skills** GitHub repository to `~/.claude/skills/`. Skills installed here are globally available in every Claude session and every project.
 
 **Source repository:** `https://github.com/fbraza/bio-skills`
+**Install target:** `~/.claude/skills/`
 
 ## How This Works
 
-1. Clone the bio-skills repo to a temporary directory (shallow clone for speed)
-2. Present available skills to the user (or install all with `--all`)
-3. Copy selected items into the current project:
-   - Skills → `.claude/skills/<skill-name>/` (each skill's full directory: SKILL.md + scripts/ + references/ + assets/)
-   - Knowhows → `.claude/skills/knowhows/`
-   - CLAUDE.md → project root `CLAUDE.md`
+1. Clone the bio-skills repo to a temporary directory (shallow clone)
+2. Copy all skills and knowhows into `~/.claude/skills/`
+3. Existing skills are overwritten silently (re-running = updating to latest)
+4. Clean up the temp directory
+
+No arguments needed — always installs everything.
 
 ## Instructions
 
 ### Step 1: Clone the repo
-
-Always use `gh repo clone` (never `git clone` with HTTPS, which requires interactive credentials):
 
 ```bash
 BIOSKILLS_TMP=$(mktemp -d)
@@ -35,79 +33,54 @@ Verify the clone worked:
 ls "$BIOSKILLS_TMP/bio-skills/skills/"
 ```
 
-### Step 2: Determine what to install
-
-**If `$ARGUMENTS` contains `--all`:**
-- Install ALL skills, knowhows, and CLAUDE.md. No prompting needed.
-
-**If `$ARGUMENTS` contains specific skill names (e.g., `scvi-tools-scrna spatial-transcriptomics`):**
-- Install only those named skills + knowhows + CLAUDE.md.
-- Validate each name exists in the repo. If a name doesn't match, warn and skip it.
-
-**If `$ARGUMENTS` is empty (interactive mode):**
-- List all available skills from the repo with a brief description (read each SKILL.md frontmatter `short-description` field).
-- Ask the user which skills they want to install. They can select individual skills or say "all".
-- Always include knowhows and CLAUDE.md in the installation.
-
-### Step 3: Install skills
-
-**Before installing, check what already exists:**
-
+If `gh` fails, fall back to:
 ```bash
-ls .claude/skills/ 2>/dev/null
+git clone --depth 1 https://github.com/fbraza/bio-skills.git "$BIOSKILLS_TMP/bio-skills"
 ```
 
-**The `.claude/skills/` directory may already contain previously installed skills or user-created skills. NEVER delete or overwrite existing content — only ADD new skills.**
+### Step 2: Ensure global skills directory exists
 
-For each selected skill:
+```bash
+mkdir -p ~/.claude/skills/
+```
 
-1. **Check if the skill already exists:**
-   ```bash
-   ls .claude/skills/<skill-name>/SKILL.md 2>/dev/null
-   ```
+### Step 3: Install all skills
 
-2. **If the skill does NOT exist** — install it:
-   ```bash
-   mkdir -p .claude/skills/<skill-name>
-   cp -R "$BIOSKILLS_TMP/bio-skills/skills/<skill-name>/." ".claude/skills/<skill-name>/"
-   ```
-   Print "✓ Installed <skill-name>"
+List all skill directories from the repo, excluding `knowhows/`:
 
-3. **If the skill ALREADY exists** — ask the user:
-   - "<skill-name> already exists in .claude/skills/. **Update** (overwrite this skill only) or **Skip**?"
-   - If Update: overwrite only that skill's directory, nothing else
-   - If Skip: leave it untouched
-   - Print "⟳ Updated <skill-name>" or "⏭ Skipped <skill-name>"
+```bash
+ls -d "$BIOSKILLS_TMP/bio-skills/skills/*/ | xargs -I{} basename {}
+```
 
-**Verify each installed/updated skill:**
-- `.claude/skills/<skill-name>/SKILL.md` must exist
-- If verification fails, warn and continue with remaining skills
+For each skill (excluding `knowhows`):
+
+```bash
+cp -R "$BIOSKILLS_TMP/bio-skills/skills/<skill-name>" ~/.claude/skills/
+```
+
+**Always overwrite** existing skills — this keeps the global installation in sync with the repo.
 
 ### Step 4: Install knowhows
 
-**Knowhows are always safe to update** (they are reference guides, not user-customized content):
-
 ```bash
-mkdir -p .claude/skills/knowhows
-cp -R "$BIOSKILLS_TMP/bio-skills/skills/knowhows/." ".claude/skills/knowhows/"
+mkdir -p ~/.claude/skills/knowhows
+cp -R "$BIOSKILLS_TMP/bio-skills/skills/knowhows/." ~/.claude/skills/knowhows/
 ```
 
-Print "✓ Installed knowhows (N guides)"
+### Step 5: Verify installation
 
-### Step 5: Handle CLAUDE.md
+```bash
+ls ~/.claude/skills/*/SKILL.md 2>/dev/null | wc -l
+```
 
-Check if a `CLAUDE.md` already exists at the project root.
+The count should match the number of skills in the repo (excluding knowhows).
 
-**If CLAUDE.md does NOT exist:**
-- Copy it directly: `cp "$BIOSKILLS_TMP/bio-skills/CLAUDE.md" ./CLAUDE.md`
-- Print "✓ Installed CLAUDE.md"
+Also verify knowhows were copied:
+```bash
+ls ~/.claude/skills/knowhows/ | wc -l
+```
 
-**If CLAUDE.md ALREADY exists:**
-- Ask the user: "A CLAUDE.md already exists in this project. How should I handle the bio-skills CLAUDE.md?"
-  - **Merge:** Append the bio-skills CLAUDE.md content under a `# Bio-Skills Configuration` header at the end of the existing file
-  - **Replace:** Overwrite the existing CLAUDE.md entirely
-  - **Skip:** Don't touch the existing CLAUDE.md
-- Do what the user chooses.
+If any SKILL.md is missing, warn the user and continue.
 
 ### Step 6: Cleanup and report
 
@@ -120,20 +93,19 @@ Print a summary:
 ============================================================
 Bio-Skills Installation Complete
 ============================================================
-  Skills installed: <count> (<comma-separated list>)
+  Skills installed: <count>
   Knowhows: <count> guides
-  CLAUDE.md: installed / merged / skipped
-  Location: .claude/skills/
+  Location: ~/.claude/skills/
+  Scope: global (available in all projects)
 ============================================================
 ```
 
 ## Important Notes
 
-- **Additive only:** Installation MUST only add new skills. Never delete, overwrite, or replace existing skills or files in `.claude/skills/` without explicit user confirmation per item.
-- **Requires `git` on the system.** If git is not available, tell the user to install it.
-- **Internet connection required** to clone from GitHub.
-- **Do NOT modify any existing project files** other than CLAUDE.md (when user chooses merge/replace).
-- **Do NOT delete existing skills** in `.claude/skills/` that are not part of bio-skills.
-- **Do NOT bulk-overwrite `.claude/skills/`** — always operate at the individual skill directory level.
-- **Shallow clone** (`--depth 1`) for speed — we don't need git history.
+- **No CLAUDE.md handling.** This skill only installs skills and knowhows. To set up a project with CLAUDE.md, use `/init-bioproject`.
+- **Always overwrites.** Re-running this skill updates all skills to the latest version from the repo. No prompting, no confirmation needed.
+- **Global scope.** Skills are installed to `~/.claude/skills/` and are available in every Claude session and project.
+- **Do NOT touch project-local files** (no `.claude/` in the current working directory, no `CLAUDE.md`).
+- **Requires `git`** and internet connection.
+- **Shallow clone** (`--depth 1`) for speed.
 - **Clean up** the temp directory after installation, even if errors occur.
