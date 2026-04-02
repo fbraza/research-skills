@@ -23,13 +23,10 @@ Install scientific analysis skills, CLAUDE.md, and knowhow guides from the **fbr
 
 ### Step 1: Clone the repo
 
+Always use `gh repo clone` (never `git clone` with HTTPS, which requires interactive credentials):
+
 ```bash
 BIOSKILLS_TMP=$(mktemp -d)
-git clone --depth 1 https://github.com/fbraza/bio-skills.git "$BIOSKILLS_TMP/bio-skills"
-```
-
-If `git clone` fails, try with `gh`:
-```bash
 gh repo clone fbraza/bio-skills "$BIOSKILLS_TMP/bio-skills" -- --depth 1
 ```
 
