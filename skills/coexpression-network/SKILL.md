@@ -2,7 +2,7 @@
 name: coexpression-network
 description: Performs weighted gene co-expression network analysis (WGCNA) to identify modules of coordinately expressed genes and hub genes within those modules. Takes normalized RNA-seq count matrices, constructs scale-free co-expression networks, detects modules using hierarchical clustering, correlates modules with sample traits, and identifies hub genes. Best for finding gene regulatory networks, identifying key genes driving biological processes, relating gene groups to phenotypes. Requires ≥15 samples (20+ recommended) and 5,000-15,000 most variable genes.
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
-starting-prompt: Build a co-expression network to identify gene modules and hub genes from my RNA-seq data . .
+starting-prompt: Build a co-expression network to identify gene modules and hub genes from my RNA-seq data.
 ---
 
 # Weighted Gene Co-expression Network Analysis (WGCNA)

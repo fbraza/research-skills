@@ -2,7 +2,7 @@
 name: experimental-design-statistics
 description: Guide statistical experimental design for genomics studies including power analysis, sample size estimation, batch-balanced layouts, and multiple testing correction. Use when planning new experiments, justifying sample sizes for grants, optimizing budget constraints (depth vs. replicates), or designing batch structures. Supports RNA-seq, ATAC-seq, scRNA-seq, ChIP-seq, methylation, and proteomics. Includes pilot data-based power estimation, optimal batch assignment algorithms, and modern multiple testing methods (IHW, adaptive shrinkage). Best for pre-experiment planning with 4+ samples per group.
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
-starting-prompt: Help me design a genomics experiment with power analysis and optimal batch assignment . .
+starting-prompt: Help me design a genomics experiment with power analysis and optimal batch assignment.
 ---
 
 # Experimental Design and Statistical Planning

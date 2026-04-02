@@ -2,7 +2,7 @@
 name: pcr-primer-design
 description: Design optimized primers for various PCR applications (standard PCR, qPCR, TaqMan, multiplex, sequencing, SNP genotyping) with comprehensive validation pipeline. Includes Tm calculation, dimer analysis, secondary structure prediction, and specificity checking. Generates MIQE-compliant reports and multi-format exports (CSV, Excel, IDT ordering format). Use when you need primers for molecular biology applications with rigorous quality validation. Best for qPCR assays requiring MIQE 2.0 compliance, or any PCR application needing publication-quality documentation.
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
-starting-prompt: Design qPCR primers for human GAPDH with MIQE compliance checking . .
+starting-prompt: Design qPCR primers for human GAPDH with MIQE compliance checking.
 ---
 
 # PCR Primer Design

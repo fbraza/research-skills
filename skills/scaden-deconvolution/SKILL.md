@@ -1,8 +1,8 @@
 ---
 name: scaden-deconvolution
-description: Estimate the cellular composition of bulk RNA-seq samples using Scaden, a deep neural network ensemble that learns to deconvolve tissue expression profiles. Scaden is trained on artificial bulk samples simulated from scRNA-seq data, making it reference-free (no GEP matrix required) and robust to batch effects and noise. The workflow covers four steps: scRNA-seq data simulation, data processing, model training, and prediction. Use when you have bulk RNA-seq data and a matching scRNA-seq reference dataset and want to estimate cell type fractions without constructing a gene expression profile (GEP) matrix. Outperforms CIBERSORT, MuSiC, and CIBERSORTx in precision and robustness across tissues, species, and data types.
+description: "Estimate the cellular composition of bulk RNA-seq samples using Scaden, a deep neural network ensemble that learns to deconvolve tissue expression profiles. Scaden is trained on artificial bulk samples simulated from scRNA-seq data, making it reference-free (no GEP matrix required) and robust to batch effects and noise. The workflow covers four steps: scRNA-seq data simulation, data processing, model training, and prediction. Use when you have bulk RNA-seq data and a matching scRNA-seq reference dataset and want to estimate cell type fractions without constructing a gene expression profile (GEP) matrix. Outperforms CIBERSORT, MuSiC, and CIBERSORTx in precision and robustness across tissues, species, and data types."
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
-starting-prompt: Deconvolve cell type composition from my bulk RNA-seq data using Scaden . .
+starting-prompt: Deconvolve cell type composition from my bulk RNA-seq data using Scaden.
 ---
 
 # Cell Type Deconvolution (Scaden)

@@ -2,7 +2,7 @@
 name: chip-atlas-peak-enrichment
 description: Analyze enrichment of ChIP-seq peaks from 433,000+ experiments via the official ChIP-Atlas Enrichment Analysis API. Submits gene lists for Fisher's exact test enrichment with Benjamini-Hochberg Q-values against all public ChIP-seq data. Generates 4-panel visualization. Supports 10 genomes - human (hg38, hg19), mouse (mm10, mm9), rat (rn6), fly (dm6, dm3), worm (ce11, ce10), yeast (sacCer3).
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
-starting-prompt: Find ChIP-seq peak enrichment near my genes using ChIP-Atlas database . .
+starting-prompt: Find ChIP-seq peak enrichment near my genes using ChIP-Atlas database.
 ---
 
 # ChIP-Atlas Peak Enrichment

@@ -2,7 +2,7 @@
 name: literature-review
 description: Systematic protocol for finding, evaluating, and synthesizing scientific evidence from published literature. Use when any biological claim needs a citation, when conducting a literature review on a gene/pathway/disease/drug, when checking whether a finding is novel or already published, or when searching for preclinical or clinical evidence for a hypothesis. Covers PubMed E-utilities API, bioRxiv/medRxiv API, Semantic Scholar API, and full-text PDF access. Includes retrieval protocol, verification protocol, evidence quality standards, search strategy guidelines, and literature-to-hypothesis synthesis.
 allowed-tools: Read, Write, WebFetch, WebSearch, mcp__claude_ai_PubMed__search_articles, mcp__claude_ai_PubMed__get_article_metadata, mcp__claude_ai_PubMed__get_full_text_article, mcp__claude_ai_PubMed__find_related_articles, mcp__claude_ai_PubMed__lookup_article_by_citation, mcp__claude_ai_PubMed__convert_article_ids
-starting-prompt: Conduct a literature review on my research topic with verified citations and evidence synthesis . .
+starting-prompt: Conduct a literature review on my research topic with verified citations and evidence synthesis.
 ---
 
 # Scientific Literature Review
