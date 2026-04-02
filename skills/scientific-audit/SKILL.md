@@ -1,9 +1,7 @@
 ---
-id: scientific-audit
-name: Scientific Audit Protocol
-category: quality_control
-short-description: Forensic audit of analytical outputs, code, figures, and results for errors, hallucinations, statistical mistakes, and LLM-specific failure modes.
-detailed-description: Systematic 359-check audit protocol across 10 categories for verifying scientific analysis outputs. Use after data loading, after each major analytical step (DEG, clustering, enrichment, modeling), and before presenting any final results. Covers numerical consistency, statistical integrity, biological plausibility, logical coherence, hallucination detection, reproducibility, data integrity, visualization integrity, ethical compliance, and LLM-specific failure modes. Returns a structured verdict (PASS / REVIEW / FAIL) with actionable findings.
+name: scientific-audit
+description: Systematic 359-check audit protocol across 10 categories for verifying scientific analysis outputs. Use after data loading, after each major analytical step (DEG, clustering, enrichment, modeling), and before presenting any final results. Covers numerical consistency, statistical integrity, biological plausibility, logical coherence, hallucination detection, reproducibility, data integrity, visualization integrity, ethical compliance, and LLM-specific failure modes. Returns a structured verdict (PASS / REVIEW / FAIL) with actionable findings.
+allowed-tools: Read, Glob, Grep
 starting-prompt: Audit the analysis results for errors, inconsistencies, and hallucinations before presenting to the user . .
 ---
 

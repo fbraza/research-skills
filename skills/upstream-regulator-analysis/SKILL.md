@@ -1,9 +1,7 @@
 ---
-id: upstream-regulator-analysis
-name: Upstream Regulator Analysis
-category: multi_omics
-short-description: "Integrate ChIP-Atlas TF binding data with RNA-seq differential expression to identify upstream regulators driving transcriptomic changes."
-detailed-description: "Identifies transcription factors driving differential expression by integrating ChIP-Atlas peak enrichment (433,000+ public ChIP-seq experiments) with RNA-seq DE results. Submits DE gene lists to ChIP-Atlas API, downloads target gene lists for top enriched TFs, computes Fisher's exact test for target-DE overlap, measures directional concordance (activator vs repressor), and ranks TFs by a combined regulatory score. Supports 10 genomes including human (hg38, hg19), mouse (mm10, mm9), rat (rn6), and model organisms."
+name: upstream-regulator-analysis
+description: Identifies transcription factors driving differential expression by integrating ChIP-Atlas peak enrichment (433,000+ public ChIP-seq experiments) with RNA-seq DE results. Submits DE gene lists to ChIP-Atlas API, downloads target gene lists for top enriched TFs, computes Fisher's exact test for target-DE overlap, measures directional concordance (activator vs repressor), and ranks TFs by a combined regulatory score. Supports 10 genomes including human (hg38, hg19), mouse (mm10, mm9), rat (rn6), and model organisms.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
 starting-prompt: Identify upstream regulators driving my differential expression results using ChIP-Atlas binding data . .
 ---
 

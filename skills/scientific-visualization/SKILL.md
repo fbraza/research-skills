@@ -1,9 +1,7 @@
 ---
-id: scientific-visualization
-name: Scientific Visualization & Reporting
-category: communication
-short-description: Create publication-ready figures, structured reports, and presentations with colorblind-friendly palettes, mandatory quality checks, and journal-specific formatting.
-detailed-description: Standards and protocols for scientific visualization and reporting. Covers figure type specifications (volcano, heatmap, UMAP, KM curve, forest plot, ROC, enrichment plots, etc.), color standards (Okabe-Ito palette, colorblind accessibility), export standards (SVG + PNG, 300+ DPI), clinical figure standards (at-risk tables, PH violation warnings, CV AUC reporting), publication figure sizing (Nature/Science/Cell column widths), multi-panel composites, mandatory quality checks, report structure, PowerPoint, and LaTeX Beamer slides.
+name: scientific-visualization
+description: Standards and protocols for scientific visualization and reporting. Covers figure type specifications (volcano, heatmap, UMAP, KM curve, forest plot, ROC, enrichment plots, etc.), color standards (Okabe-Ito palette, colorblind accessibility), export standards (SVG + PNG, 300+ DPI), clinical figure standards (at-risk tables, PH violation warnings, CV AUC reporting), publication figure sizing (Nature/Science/Cell column widths), multi-panel composites, mandatory quality checks, report structure, PowerPoint, and LaTeX Beamer slides.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: Create publication-ready visualizations of my analysis results with colorblind-friendly palettes . .
 ---
 

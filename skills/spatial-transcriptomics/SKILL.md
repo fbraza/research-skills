@@ -1,9 +1,7 @@
 ---
-id: spatial-transcriptomics
-name: Spatial Transcriptomics Visium Analysis
-category: transcriptomics
-short-description: "Analyze 10x Visium spatial transcriptomics data from QC through spatial domain analysis with clustering, spatially variable genes, and neighborhood enrichment."
-detailed-description: "Complete spatial transcriptomics analysis for 10x Visium data using Squidpy and Scanpy. Performs quality control, normalization, Leiden clustering, spatial neighbor graph construction, spatially variable gene identification via Moran's I, neighborhood enrichment analysis, and co-occurrence scoring. Produces publication-ready spatial tissue overlays, UMAP plots, enrichment heatmaps, and SVG bar charts. Supports Space Ranger output, H5AD files, or built-in 10x Genomics example datasets including V1_Human_Heart for cardiometabolic research."
+name: spatial-transcriptomics
+description: Complete spatial transcriptomics analysis for 10x Visium data using Squidpy and Scanpy. Performs quality control, normalization, Leiden clustering, spatial neighbor graph construction, spatially variable gene identification via Moran's I, neighborhood enrichment analysis, and co-occurrence scoring. Produces publication-ready spatial tissue overlays, UMAP plots, enrichment heatmaps, and SVG bar charts. Supports Space Ranger output, H5AD files, or built-in 10x Genomics example datasets including V1_Human_Heart for cardiometabolic research.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: Analyze spatial transcriptomics data from a 10x Visium experiment to identify spatially variable genes and tissue domains.
 ---
 

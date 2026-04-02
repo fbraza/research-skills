@@ -1,9 +1,7 @@
 ---
-id: scvi-tools-spatial
-name: Spatial Transcriptomics Deconvolution and Niche Analysis
-category: transcriptomics
-short-description: "Cell type deconvolution (Cell2location, DestVI, Tangram) and cell-environment modeling (scVIVA) for spatial transcriptomics data using deep generative models."
-detailed-description: "Estimate cell type compositions and analyze tissue microenvironments in spatial transcriptomics data. Cell2location provides robust Bayesian deconvolution with full posterior uncertainty. DestVI adds continuous within-type state variation for multi-resolution analysis. Tangram maps individual single cells to spatial coordinates and imputes unmeasured genes. scVIVA models how tissue niches shape cell states. Requires preprocessed spatial data from the spatial-transcriptomics skill and (for deconvolution) a labeled scRNA-seq reference from the scanpy or seurat skill. GPU recommended for Cell2location and DestVI."
+name: scvi-tools-spatial
+description: Estimate cell type compositions and analyze tissue microenvironments in spatial transcriptomics data. Cell2location provides robust Bayesian deconvolution with full posterior uncertainty. DestVI adds continuous within-type state variation for multi-resolution analysis. Tangram maps individual single cells to spatial coordinates and imputes unmeasured genes. scVIVA models how tissue niches shape cell states. Requires preprocessed spatial data from the spatial-transcriptomics skill and (for deconvolution) a labeled scRNA-seq reference from the scanpy or seurat skill. GPU recommended for Cell2location and DestVI.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: "Deconvolve spatial transcriptomics data to estimate cell type compositions using deep generative models."
 ---
 

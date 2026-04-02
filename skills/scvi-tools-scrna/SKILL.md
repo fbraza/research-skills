@@ -1,9 +1,7 @@
 ---
-id: scvi-tools-scrna
-name: scVI-tools for Single-Cell RNA-seq
-category: transcriptomics
-short-description: "Deep generative models (scVI, scANVI, LDVAE, CellAssign, VeloVI) for advanced scRNA-seq analysis: probabilistic batch integration, semi-supervised label transfer, interpretable gene programs, marker-based annotation, and RNA velocity with uncertainty."
-detailed-description: "Advanced single-cell RNA-seq modeling using scvi-tools deep generative models. Use after preprocessing with the Scanpy or Seurat skill. scVI provides probabilistic batch correction, normalized expression, and Bayesian DE. scANVI extends scVI with semi-supervised label transfer from partial annotations. LDVAE extracts interpretable gene programs via linear decoder. CellAssign performs probabilistic cell type assignment using marker gene panels. VeloVI adds RNA velocity with uncertainty quantification. All models use raw counts, produce latent representations in AnnData, and integrate with downstream Scanpy workflows. GPU recommended for datasets >10k cells."
+name: scvi-tools-scrna
+description: Advanced single-cell RNA-seq modeling using scvi-tools deep generative models. Use after preprocessing with the Scanpy or Seurat skill. scVI provides probabilistic batch correction, normalized expression, and Bayesian DE. scANVI extends scVI with semi-supervised label transfer from partial annotations. LDVAE extracts interpretable gene programs via linear decoder. CellAssign performs probabilistic cell type assignment using marker gene panels. VeloVI adds RNA velocity with uncertainty quantification. All models use raw counts, produce latent representations in AnnData, and integrate with downstream Scanpy workflows. GPU recommended for datasets >10k cells.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: "Apply deep generative modeling to preprocessed single-cell RNA-seq data using scvi-tools."
 ---
 

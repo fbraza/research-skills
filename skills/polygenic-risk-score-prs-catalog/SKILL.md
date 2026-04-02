@@ -1,9 +1,7 @@
 ---
-id: polygenic-risk-score-prs-catalog
-name: Polygenic Risk Score (PGS Catalog)
-category: genomics_genetics
-short-description: "Calculate polygenic risk scores using pre-computed weights from the PGS Catalog for single or multiple traits with population comparisons."
-detailed-description: "Apply pre-computed polygenic risk score (PRS) weights from the PGS Catalog to target genotypes. Supports multi-trait scoring (e.g., cardiometabolic risk panel), population-stratified comparisons across 5 super-populations using 1000 Genomes Phase 3, and combined risk dashboards with correlation matrices and composite risk rankings. No GWAS summary statistics or LD computation needed — uses peer-reviewed, published scoring weights from 5,000+ available traits."
+name: polygenic-risk-score-prs-catalog
+description: Apply pre-computed polygenic risk score (PRS) weights from the PGS Catalog to target genotypes. Supports multi-trait scoring (e.g., cardiometabolic risk panel), population-stratified comparisons across 5 super-populations using 1000 Genomes Phase 3, and combined risk dashboards with correlation matrices and composite risk rankings. No GWAS summary statistics or LD computation needed — uses peer-reviewed, published scoring weights from 5,000+ available traits.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
 starting-prompt: Calculate polygenic risk scores for cardiometabolic traits using the PGS Catalog with 1000 Genomes example data . .
 ---
 

@@ -1,9 +1,7 @@
 ---
-id: scientific-writing
-name: Scientific Writing & Interpretation
-category: communication
-short-description: Write and edit original research papers, literature reviews, and grant applications with rigorous prose and verified citations.
-detailed-description: Protocols for three core scientific document types — original research papers (Introduction, Methods, Results, Discussion, Abstract, rebuttals), literature reviews (narrative and thematic synthesis), and grant applications (Specific Aims, Significance, Innovation, Approach). Includes biological interpretation frameworks, scientific writing standards, and a two-stage outline-to-prose workflow. Every biological claim requires a verified citation.
+name: scientific-writing
+description: Protocols for three core scientific document types — original research papers (Introduction, Methods, Results, Discussion, Abstract, rebuttals), literature reviews (narrative and thematic synthesis), and grant applications (Specific Aims, Significance, Innovation, Approach). Includes biological interpretation frameworks, scientific writing standards, and a two-stage outline-to-prose workflow. Every biological claim requires a verified citation.
+allowed-tools: Read, Write, Edit, WebFetch, WebSearch, mcp__claude_ai_PubMed__search_articles, mcp__claude_ai_PubMed__get_article_metadata, mcp__claude_ai_PubMed__lookup_article_by_citation
 starting-prompt: Help me write a scientific document with rigorous prose and verified citations.
 ---
 

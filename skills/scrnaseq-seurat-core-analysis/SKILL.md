@@ -1,9 +1,7 @@
 ---
-id: scrnaseq-seurat-core-analysis
-name: Single-Cell RNA-seq Core Analysis (Seurat)
-category: transcriptomics
-short-description: Complete single-cell RNA-seq analysis using Seurat from raw data to cell type annotation with clustering and visualization.
-detailed-description: Complete single-cell RNA-seq analysis using Seurat v5 from raw data to cell type annotation. Use when you have 10X Chromium, Drop-seq, or other scRNA-seq data requiring QC, normalization, clustering, and visualization. Implements current best practices including ambient RNA correction (SoupX), batch-aware adaptive QC (MAD), doublet detection (DoubletFinder), SCTransform normalization, batch integration (Harmony/CCA), multi-resolution clustering, and pseudobulk differential expression for condition comparisons. Best for human or mouse data with 500+ cells per sample. Produces publication-ready plots and annotated Seurat objects.
+name: scrnaseq-seurat-core-analysis
+description: Complete single-cell RNA-seq analysis using Seurat v5 from raw data to cell type annotation. Use when you have 10X Chromium, Drop-seq, or other scRNA-seq data requiring QC, normalization, clustering, and visualization. Implements current best practices including ambient RNA correction (SoupX), batch-aware adaptive QC (MAD), doublet detection (DoubletFinder), SCTransform normalization, batch integration (Harmony/CCA), multi-resolution clustering, and pseudobulk differential expression for condition comparisons. Best for human or mouse data with 500+ cells per sample. Produces publication-ready plots and annotated Seurat objects.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: "Analyze my single-cell RNA-seq data using Seurat from QC through cell type annotation. Generate a PDF report with an intro, methods, results, conclusions and figures from all of the analyses you perform."
 ---
 

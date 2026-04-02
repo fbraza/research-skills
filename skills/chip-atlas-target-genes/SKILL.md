@@ -1,9 +1,7 @@
 ---
-id: chip-atlas-target-genes
-name: ChIP-Atlas Target Genes
-category: epigenomics
-short-description: "Retrieve pre-computed target genes for any transcription factor from ChIP-Atlas public ChIP-seq data."
-detailed-description: "Downloads binding score data across all public ChIP-seq experiments for a specified protein/TF, ranking genes by MACS2 scores with cell-type-specific filtering and STRING protein interaction integration. Supports 10 genomes - human (hg38, hg19), mouse (mm10, mm9), rat (rn6), fly (dm6, dm3), worm (ce11, ce10), yeast (sacCer3)."
+name: chip-atlas-target-genes
+description: Downloads binding score data across all public ChIP-seq experiments for a specified protein/TF, ranking genes by MACS2 scores with cell-type-specific filtering and STRING protein interaction integration. Supports 10 genomes - human (hg38, hg19), mouse (mm10, mm9), rat (rn6), fly (dm6, dm3), worm (ce11, ce10), yeast (sacCer3).
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
 starting-prompt: Find target genes for a transcription factor using ChIP-Atlas public ChIP-seq data . .
 ---
 

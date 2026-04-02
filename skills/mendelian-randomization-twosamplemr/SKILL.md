@@ -1,9 +1,7 @@
 ---
-id: mendelian-randomization-twosamplemr
-name: "Two-Sample Mendelian Randomization"
-category: genomics_genetics
-short-description: "Assess causal relationships between traits using GWAS summary statistics and genetic instruments."
-detailed-description: "Performs two-sample Mendelian Randomization (MR) analysis using genetic variants as instrumental variables to test causal effects of an exposure on an outcome. Supports OpenGWAS database access and user-provided GWAS summary statistics. Applies IVW, MR-Egger, weighted median, and weighted mode methods with comprehensive sensitivity analyses."
+name: mendelian-randomization-twosamplemr
+description: Performs two-sample Mendelian Randomization (MR) analysis using genetic variants as instrumental variables to test causal effects of an exposure on an outcome. Supports OpenGWAS database access and user-provided GWAS summary statistics. Applies IVW, MR-Egger, weighted median, and weighted mode methods with comprehensive sensitivity analyses.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
 starting-prompt: "I want to test whether LDL cholesterol has a causal effect on coronary heart disease using Mendelian Randomization."
 ---
 

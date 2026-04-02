@@ -1,17 +1,7 @@
 ---
-id: ananse-grn
-name: ANANSE Enhancer-Based GRN Inference (Bulk RNA + ATAC)
-category: transcriptomics
-short-description: Infer enhancer-driven gene regulatory networks and identify key transcription factors from paired bulk RNA-seq and ATAC-seq data.
-detailed-description: |
-  ANANSE (ANalysis Algorithm for Networks Specified by Enhancers) infers enhancer-based gene
-  regulatory networks (GRNs) from paired bulk ATAC-seq and RNA-seq data, and identifies key
-  transcription factors (TFs) driving transitions between two biological conditions. It predicts
-  TF binding from chromatin accessibility and motif scores, builds condition-specific GRNs, and
-  ranks TFs by their influence on the transcriptional difference between source and target states.
-  Use when you have paired bulk ATAC-seq + RNA-seq across 2+ conditions (treatment/control,
-  timepoints, cell types) and want to identify master regulatory TFs. Works natively on bulk data
-  with as few as 1 sample per condition. Requires ~16GB RAM for the network step. No GPU needed.
+name: ananse-grn
+description: ANANSE (ANalysis Algorithm for Networks Specified by Enhancers) infers enhancer-based gene regulatory networks (GRNs) from paired bulk ATAC-seq and RNA-seq data, and identifies key transcription factors (TFs) driving transitions between two biological conditions. It predicts TF binding from chromatin accessibility and motif scores, builds condition-specific GRNs, and ranks TFs by their influence on the transcriptional difference between source and target states. Use when you have paired bulk ATAC-seq + RNA-seq across 2+ conditions and want to identify master regulatory TFs. Works natively on bulk data with as few as 1 sample per condition. Requires ~16GB RAM for the network step. No GPU needed.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: Infer gene regulatory networks and identify key transcription factors from my paired bulk ATAC-seq and RNA-seq data . .
 ---
 

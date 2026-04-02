@@ -1,9 +1,7 @@
 ---
-id: pooled-crispr-screens
-name: Pooled CRISPR Screen Analysis
-category: transcriptomics
-short-description: "Analyze pooled CRISPR screens with single-cell RNA-seq readout (Perturb-seq/CROP-seq)."
-detailed-description: "Process 10X feature-barcode matrices for pooled CRISPR screens with scRNA-seq readout (Perturb-seq, CROP-seq, CRISPRi/a). Maps sgRNAs to cells, performs QC, runs tiered analysis (fast t-test screening, target validation, batch-corrected DE with glmGamPoi), and identifies perturbations with significant transcriptional effects. Handles multi-library experiments with batch correction."
+name: pooled-crispr-screens
+description: Process 10X feature-barcode matrices for pooled CRISPR screens with scRNA-seq readout (Perturb-seq, CROP-seq, CRISPRi/a). Maps sgRNAs to cells, performs QC, runs tiered analysis (fast t-test screening, target validation, batch-corrected DE with glmGamPoi), and identifies perturbations with significant transcriptional effects. Handles multi-library experiments with batch correction.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: Analyze my pooled CRISPR screen data with single-cell RNA-seq readout . .
 ---
 

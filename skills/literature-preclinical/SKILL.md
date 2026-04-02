@@ -1,9 +1,7 @@
 ---
-id: literature-preclinical
-name: Preclinical Literature Extraction
-category: literature
-short-description: "Search for preclinical studies on a target in a disease and extract structured in vitro and in vivo experiment details from each paper."
-detailed-description: "Search Consensus (consensus.app) for preclinical (non-clinical) studies on a specific molecular target in a disease context. For each paper, parse the abstract to extract structured details about in vitro experiments (cell lines, assays, findings) and in vivo experiments (animal models, dosing, endpoints, findings). Synthesize results across papers to identify the most common model systems, assays, and concordance between in vitro and in vivo findings."
+name: literature-preclinical
+description: Search Consensus (consensus.app) for preclinical (non-clinical) studies on a specific molecular target in a disease context. For each paper, parse the abstract to extract structured details about in vitro experiments (cell lines, assays, findings) and in vivo experiments (animal models, dosing, endpoints, findings). Synthesize results across papers to identify the most common model systems, assays, and concordance between in vitro and in vivo findings.
+allowed-tools: Read, Write, WebFetch, WebSearch, mcp__claude_ai_PubMed__search_articles, mcp__claude_ai_PubMed__get_article_metadata, mcp__claude_ai_PubMed__get_full_text_article, mcp__claude_ai_PubMed__find_related_articles
 starting-prompt: Search for recent preclinical studies on CDK4/6 inhibition in triple-negative breast cancer and extract the in vitro and in vivo experiments from each paper.
 ---
 

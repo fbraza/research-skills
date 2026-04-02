@@ -1,9 +1,7 @@
 ---
-id: bulk-omics-clustering
-name: Bulk Omics Clustering Analysis
-category: multi_omics
-short-description: Cluster samples or features from bulk transcriptomics, proteomics, or metabolomics data.
-detailed-description: Perform systematic clustering analysis on biological data matrices (samples or features) using multiple algorithms with rigorous validation and interpretation. Use when you need to identify natural groupings in expression data, discover biological subtypes, group genes by expression patterns, or compare clustering methods. Supports hierarchical, k-means, HDBSCAN, and Gaussian mixture models. Includes optimal cluster number determination, quality validation, stability testing, and comprehensive visualization. Best for bulk transcriptomics, proteomics, metabolomics, or any quantitative data matrix with 10+ samples/features.
+name: bulk-omics-clustering
+description: Perform systematic clustering analysis on biological data matrices (samples or features) using multiple algorithms with rigorous validation and interpretation. Use when you need to identify natural groupings in expression data, discover biological subtypes, group genes by expression patterns, or compare clustering methods. Supports hierarchical, k-means, HDBSCAN, and Gaussian mixture models. Includes optimal cluster number determination, quality validation, stability testing, and comprehensive visualization. Best for bulk transcriptomics, proteomics, metabolomics, or any quantitative data matrix with 10+ samples/features.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: Cluster my samples by gene expression to identify biological subtypes . .
 ---
 

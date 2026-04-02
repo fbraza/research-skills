@@ -1,9 +1,7 @@
 ---
-id: proteomics-diff-exp
-name: Proteomics Differential Expression (limma + DEqMS)
-category: proteomics_metabolomics
-short-description: "Differential protein expression analysis on mass spectrometry proteomics data using limma and DEqMS with PSM-aware variance estimation."
-detailed-description: "Analyze TMT or LFQ mass spectrometry proteomics data for differential protein expression. Uses limma linear models with DEqMS spectra-count-aware empirical Bayes variance estimation for improved statistical power. Supports MaxQuant, Proteome Discoverer, or generic protein intensity matrices. Includes missing value imputation (MinProb/kNN), normalization, QC visualization, and publication-quality plots."
+name: proteomics-diff-exp
+description: Analyze TMT or LFQ mass spectrometry proteomics data for differential protein expression. Uses limma linear models with DEqMS spectra-count-aware empirical Bayes variance estimation for improved statistical power. Supports MaxQuant, Proteome Discoverer, or generic protein intensity matrices. Includes missing value imputation (MinProb/kNN), normalization, QC visualization, and publication-quality plots.
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: Perform differential protein expression analysis on my proteomics mass spectrometry data.
 ---
 
