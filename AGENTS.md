@@ -109,6 +109,12 @@ Before any analysis, read the relevant know-how guides from `skills/knowhows/`. 
 - Check for duplicate IDs before merging datasets
 - Verify sample labels against metadata before analysis
 
+### Skill & Script Compliance (CRITICAL)
+- When a skill is loaded, READ every referenced script, template, and protocol file — do not skim or skip
+- NEVER write inline analysis code when a skill provides reference scripts — follow the scripts exactly as written
+- If a skill's SKILL.md says "use script X", use script X — do not substitute your own implementation
+- Violating a skill's prescribed workflow is treated the same as violating a hard rule
+
 ### Methodology
 - Never silently switch methodology when original fails — always ask first
 - Never proceed with assumptions on normalization, batch correction, or outlier handling
