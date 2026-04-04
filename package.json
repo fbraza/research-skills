@@ -4,7 +4,7 @@
   "description": "Pi extensions for academic workflows",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fbraza/bio-skills.git"
+    "url": "https://github.com/fbraza/research-skills.git"
   },
   "readme": "README.md",
   "type": "module",
