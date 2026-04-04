@@ -474,6 +474,19 @@ function formatPaperText(papers: PaperRecord[]): string {
 	return JSON.stringify(papers, null, 2);
 }
 
+function emitProgress(
+	onUpdate:
+		| ((update: { content: Array<{ type: "text"; text: string }>; details: Record<string, unknown> }) => void)
+		| undefined,
+	text: string,
+	details: Record<string, unknown> = {},
+): void {
+	onUpdate?.({
+		content: [{ type: "text", text }],
+		details,
+	});
+}
+
 export default function literatureToolsExtension(pi: ExtensionAPI) {
 	pi.registerTool({
 		name: "pubmed_search",
@@ -491,7 +504,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 			esearchUrl.searchParams.set("sort", params.sort ?? "relevance");
 			esearchUrl.searchParams.set("term", query);
 			if (apiKeyValue) esearchUrl.searchParams.set("api_key", apiKeyValue);
-			onUpdate?.(`Searching PubMed for: ${params.query}`);
+			emitProgress(onUpdate, `Searching PubMed for: ${params.query}`);
 			const esearch = await fetchJson<{ esearchresult?: { idlist?: string[]; count?: string } }>(esearchUrl.toString(), signal);
 			const ids = esearch.esearchresult?.idlist ?? [];
 			if (ids.length === 0) {
@@ -506,7 +519,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 			const papers: PaperRecord[] = [];
 			for (let start = 0; start < ids.length; start += batchSize) {
 				const batch = ids.slice(start, start + batchSize);
-				onUpdate?.(`Searching PubMed... found ${ids.length} PMIDs, fetching abstracts ${start + 1}-${Math.min(start + batch.length, ids.length)}...`);
+				emitProgress(onUpdate, `Searching PubMed... found ${ids.length} PMIDs, fetching abstracts ${start + 1}-${Math.min(start + batch.length, ids.length)}...`);
 				const efetchUrl = new URL("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
 				efetchUrl.searchParams.set("db", "pubmed");
 				efetchUrl.searchParams.set("retmode", "xml");
@@ -538,7 +551,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 			let page = 1;
 			const queryNeedles = params.query.toLowerCase().split(/\s+/).filter(Boolean);
 			while (filtered.length < maxResults) {
-				onUpdate?.(`Fetching ${server} page ${page}...`);
+				emitProgress(onUpdate, `Fetching ${server} page ${page}...`);
 				const url = `https://api.biorxiv.org/details/${server}/${startDate}/${endDate}/${cursor}`;
 				const payload = await fetchJson<{ collection?: any[]; messages?: Array<{ total?: string }> }>(url, signal);
 				const collection = payload.collection ?? [];
@@ -602,7 +615,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 				].join(","),
 			);
 			if (params.year_from) url.searchParams.set("year", `${params.year_from}-${params.year_to ?? ""}`);
-			onUpdate?.(`Searching Semantic Scholar for: ${params.query}`);
+			emitProgress(onUpdate, `Searching Semantic Scholar for: ${params.query}`);
 			const response = await fetchJson<{ data?: any[] }>(url.toString(), signal, process.env.SEMANTIC_SCHOLAR_API_KEY ? { "x-api-key": process.env.SEMANTIC_SCHOLAR_API_KEY } : undefined);
 			let papers: PaperRecord[] = (response.data ?? []).map((item) => ({
 				s2_id: item.paperId,
@@ -645,7 +658,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 			let pmid = params.pmid?.trim() || undefined;
 			let doi = normalizeDoi(params.doi);
 			if (!doi && pmid) {
-				onUpdate?.(`Resolving DOI from PubMed for PMID ${pmid}...`);
+				emitProgress(onUpdate, `Resolving DOI from PubMed for PMID ${pmid}...`);
 				const identifiers = await lookupPubmedIdentifiers(pmid, signal);
 				doi = identifiers.doi;
 			}
@@ -653,7 +666,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 			const attempts: Array<{ source: string; pdf_url?: string; access_note: string; is_preprint: boolean }> = [];
 
 			if (pmid) {
-				onUpdate?.(`Checking PubMed Central for PMID ${pmid}...`);
+				emitProgress(onUpdate, `Checking PubMed Central for PMID ${pmid}...`);
 				const pmc = await tryPubmedCentral(pmid, signal);
 				attempts.push(pmc);
 				if (pmc.source !== "not_found" && pmc.pdf_url) {
@@ -664,7 +677,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 			}
 
 			if (doi) {
-				onUpdate?.(`Checking publisher open-access routes for DOI ${doi}...`);
+				emitProgress(onUpdate, `Checking publisher open-access routes for DOI ${doi}...`);
 				const publisher = await tryPublisherOpenAccess(doi, signal);
 				attempts.push(publisher);
 				if (publisher.source !== "not_found" && publisher.pdf_url) {
@@ -673,7 +686,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 					return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], details: result };
 				}
 
-				onUpdate?.(`Checking Semantic Scholar open-access PDF metadata for DOI ${doi}...`);
+				emitProgress(onUpdate, `Checking Semantic Scholar open-access PDF metadata for DOI ${doi}...`);
 				const preprint = await trySemanticScholarOpenAccess(doi, signal);
 				attempts.push(preprint);
 				if (preprint.source !== "not_found" && preprint.pdf_url) {
@@ -682,7 +695,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 					return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], details: result };
 				}
 
-				onUpdate?.(`Trying Sci-Hub fallback for DOI ${doi}...`);
+				emitProgress(onUpdate, `Trying Sci-Hub fallback for DOI ${doi}...`);
 				const scihub = await trySciHub(doi, signal);
 				attempts.push(scihub);
 				if (scihub.source !== "not_found" && scihub.pdf_url) {
