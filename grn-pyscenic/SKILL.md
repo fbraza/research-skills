@@ -318,7 +318,7 @@ After completing pySCENIC analysis:
 - **scrnaseq-scanpy-core-analysis** - Upstream: Single-cell preprocessing and clustering
 - **scrnaseq-seurat-core-analysis** - Upstream: Alternative single-cell preprocessing (R)
 - **functional-enrichment-from-degs** - Related: Pathway analysis of regulon targets
-- **de-results-to-plots** - Related: Visualizing differential activity results
+- **scientific-visualization** - Related: visualizing differential activity results
 
 ## References
 

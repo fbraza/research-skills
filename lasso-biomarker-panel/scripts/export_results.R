@@ -945,7 +945,7 @@ export_all <- function(model_result, validation_result = NULL,
         "",
         "- **Pathway enrichment** of panel genes (functional-enrichment-from-degs)",
         "- **Co-expression context** for panel genes (coexpression-network)",
-        "- **Patient stratification** using panel scores (multiomics-patient-stratification)",
+        "- **Patient stratification** using panel scores (bulk-omics-clustering)",
         "- **Literature validation** of panel genes in disease context",
         "")
 

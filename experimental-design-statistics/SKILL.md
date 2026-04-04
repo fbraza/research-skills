@@ -375,11 +375,11 @@ After completing experimental design:
 **Downstream (after data collection):**
 - **bulk-rnaseq-counts-to-de-deseq2** - Differential expression analysis
 - **functional-enrichment-from-degs** - Pathway analysis
-- **de-results-to-plots** - Visualization
+- **scientific-visualization** - Visualization
 
 **Alternative/complementary:**
 - **bulk-omics-clustering** - Discover natural groupings post-hoc
-- **batch-correction-combat** - Computational batch correction if needed
+- Batch correction can be handled within the relevant downstream analysis workflow if needed
 
 ## References
 

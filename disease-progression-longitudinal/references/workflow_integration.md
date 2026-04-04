@@ -223,18 +223,15 @@ deg_format.to_csv("trajectory_features_for_enrichment.csv", index=False)
 
 ---
 
-### To Tissue Expression Analysis
+### To Tissue Context Review
 
-**Workflow:** [tissue-expression-from-degs](../../tissue-expression-from-degs/)
-
-Identify tissue specificity of trajectory-associated genes.
+Identify whether trajectory-associated genes are plausibly tissue-relevant by reviewing known tissue expression resources and literature.
 
 **Data flow:**
 ```
 disease-progression-longitudinal/
     └─> trajectory_features.csv (top trajectory-associated genes)
-        └─> tissue-expression-from-degs/
-            └─> Query ARCHS4, GTEx, CellxGene databases
+        └─> exported gene list for downstream tissue-context review
 ```
 
 **Integration code:**
@@ -246,13 +243,11 @@ top_genes = trajectory_features.nlargest(50, 'correlation')['feature'].tolist()
 # Export gene list
 with open("trajectory_genes.txt", "w") as f:
     f.write("\n".join(top_genes))
-
-# Use tissue-expression-from-degs workflow to query tissue databases
 ```
 
 **Use cases:**
-- Identify tissue-specific biomarkers for disease progression
-- Validate that trajectory genes are relevant to disease tissue
+- Identify tissue-relevant biomarkers for disease progression
+- Validate that trajectory genes are relevant to the disease tissue
 - Discover cell-type-specific progression markers
 
 ---

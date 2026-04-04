@@ -564,7 +564,7 @@ After completing core scRNA-seq analysis:
 
 **Alternative single-cell:** scrnaseq-scanpy-core-analysis (Python-based)
 
-**Downstream:** functional-enrichment-from-degs, de-results-to-plots, de-results-to-gene-lists
+**Downstream:** functional-enrichment-from-degs, scientific-visualization
 
 **Complementary:** bulk-omics-clustering (non-scRNA-seq), experimental-design-statistics (plan experiments), scvi-tools-scrna (Python-based deep generative models; requires h5ad export)
 

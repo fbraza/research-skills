@@ -239,7 +239,7 @@ After running this skill:
 1. **Pathway enrichment** → functional-enrichment skill with significant proteins
 2. **Biomarker panel** → lasso-biomarker-panel with DE proteins as features
 3. **Network analysis** → coexpression-network with protein matrix
-4. **Gene list processing** → de-results-to-gene-lists for annotation
+4. **Gene list processing** → Export significant proteins directly for annotation or downstream enrichment
 
 ## Related Skills
 

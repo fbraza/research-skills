@@ -314,7 +314,6 @@ After identifying modules and hub genes:
 ## Related Skills
 
 - **[bulk-rnaseq-counts-to-de-deseq2](../bulk-rnaseq-counts-to-de-deseq2/)** - Normalize counts and perform differential expression analysis (run before WGCNA)
-- **[de-results-to-gene-lists](../de-results-to-gene-lists/)** - Extract gene lists from DE results to overlay on network
 - **[functional-enrichment-from-degs](../functional-enrichment-from-degs/)** - Perform GO/KEGG enrichment on modules
 
 ---

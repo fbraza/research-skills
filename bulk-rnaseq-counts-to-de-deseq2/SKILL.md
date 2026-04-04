@@ -147,8 +147,8 @@ Before starting, gather:
 
  6. **Analysis Goals**:
     - Single pairwise comparison or multiple comparisons?
-    - Need visualizations (volcano, heatmap)? → Use de-results-to-plots skill after
-    - Need gene annotations? → Use de-results-to-gene-lists skill after
+    - Need additional custom visualizations (volcano, heatmap)? → Use scientific-visualization after
+    - Need gene annotations or exports? → Export directly from this skill output tables or annotate in your downstream analysis
 
  7. **Log2 Transformation Parameters** (if using log2 normalized counts):
     - **cells_per_sample**: How many cells were sorted per sample?
@@ -163,13 +163,11 @@ Before starting, gather:
 
 This skill performs **core differential expression analysis with QC plots**. For a complete RNA-seq workflow:
 
-1. **This skill**: Run DESeq2 → get `dds`, `res`, normalized counts, QC plots (PCA, MA, volcano, dispersion)
-2. **de-results-to-gene-lists**: Filter significant genes → add annotations → export
-3. **de-results-to-plots** (optional): Advanced visualizations (heatmaps, custom plots)
+1. **This skill**: Run DESeq2 → get `dds`, `res`, normalized counts, QC plots (PCA, MA, volcano, dispersion), and exportable result tables
+2. **Optional downstream interpretation**: Use `functional-enrichment-from-degs` for pathway analysis
+3. **Optional custom figures**: Use `scientific-visualization` for advanced visualizations (heatmaps, custom plots)
 
-**Quick start:** *"Run DESeq2 analysis and filter significant genes with annotations"*
-
-**Why separate skills?** Modular design works across DE methods (DESeq2, edgeR, limma). See [Suggested Next Steps](#suggested-next-steps) for details.
+**Quick start:** *"Run DESeq2 analysis and export significant genes with annotations"*
 
 ## Standard Workflow
 
@@ -461,22 +459,22 @@ export_all(dds, res, res_shrunk, output_dir = "deseq2_results")
 
 After completing DESeq2 analysis, you'll typically want to:
 
-### 1. Filter and Export Results (de-results-to-gene-lists skill)
+### 1. Filter and Export Results
 
-**RECOMMENDED NEXT STEP** - Use the de-results-to-gene-lists skill to:
-- Filter significant genes (padj < 0.05, |log2FC| > 1)
-- Add gene annotations (symbols, descriptions, IDs)
+**RECOMMENDED NEXT STEP** - Use the exported DESeq2 result tables from this skill to:
+- Filter significant genes (padj ≤ 0.05, |log2FC| ≥ 1)
+- Add gene annotations (symbols, descriptions, IDs) if needed
 - Export to CSV, Excel, or gene list formats
 - Create ranked gene lists for GSEA
 
 **Example prompt:**
-*"Filter the DESeq2 results to get significant genes with padj < 0.05 and |log2FC| > 1, add gene annotations, and export to CSV and Excel"*
+*"Filter the DESeq2 results to get significant genes with padj ≤ 0.05 and |log2FC| ≥ 1, add gene annotations, and export to CSV and Excel"*
 
 **Inputs needed:** The `res` and `dds` objects from this analysis
 
-### 2. Create Advanced Visualizations (de-results-to-plots skill)
+### 2. Create Advanced Visualizations
 
-**OPTIONAL** - This skill already generates basic QC plots (PCA, MA, volcano, dispersion). Use the de-results-to-plots skill for:
+**OPTIONAL** - This skill already generates basic QC plots (PCA, MA, volcano, dispersion). Use `scientific-visualization` for:
 - Publication-quality visualizations with advanced customization
 - Heatmaps of top differentially expressed genes
 - Sample distance matrices
@@ -489,7 +487,7 @@ After completing DESeq2 analysis, you'll typically want to:
 
 ### 3. Functional Enrichment Analysis
 
-After filtering significant genes (using de-results-to-gene-lists):
+After filtering significant genes:
 - **pathway-analysis** - GO/KEGG enrichment of gene lists
 - **gsea** - Gene set enrichment on ranked genes
 

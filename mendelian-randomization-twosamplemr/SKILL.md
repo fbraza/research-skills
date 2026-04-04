@@ -195,9 +195,7 @@ See [references/interpretation-guide.md](references/interpretation-guide.md) for
 
 ## Related Skills
 
-- `polygenic-risk-score` — Polygenic risk score computation (LDpred2)
 - `polygenic-risk-score-prs-catalog` — PRS from pre-computed PGS Catalog weights
-- `eqtl-colocalization-coloc` — eQTL colocalization analysis (MR follow-up)
 
 ## References
 

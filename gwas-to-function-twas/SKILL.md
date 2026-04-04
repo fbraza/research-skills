@@ -30,7 +30,7 @@ Don't use this skill when:
 - ❌ Only have significant loci (p < 5×10⁻⁸) without genome-wide data
 - ❌ Sample size < 5,000 (insufficient power for TWAS)
 - ❌ Need functional enrichment analysis → use [functional-enrichment-from-degs](../functional-enrichment-from-degs/)
-- ❌ Working with individual-level genotypes → run GWAS first with [gwas-genotype-qc](../gwas-genotype-qc/)
+- ❌ Working with individual-level genotypes → perform genotype QC and GWAS first before using this skill
 
 **Data requirements:** Genome-wide GWAS summary statistics with columns: SNP, CHR, BP, A1, A2, BETA/OR, SE, P, N
 
@@ -66,7 +66,7 @@ pip install pandas numpy scipy plotnine plotnine-prism seaborn statsmodels metax
 
 **Optional:**
 - **Trait information:** Type (disease/quantitative), directionality (higher = risk/protective)
-- **Tissue selection:** LDSC heritability enrichment results (from [gwas-heritability-ldsc](../gwas-heritability-ldsc/))
+- **Tissue selection:** LDSC heritability enrichment results if already available
 - **eQTL summary statistics:** For colocalization (GTEx v8 available via download)
 
 ## Outputs
@@ -97,7 +97,7 @@ Ask these questions before starting analysis:
    - Trait category: Cardiovascular, metabolic, neurological, immune, cancer, etc.?
 
 3. **Tissue Selection Strategy:**
-   - **Data-driven (LDSC):** Run LDSC partitioned heritability first (most rigorous, see [gwas-heritability-ldsc](../gwas-heritability-ldsc/))
+   - **Data-driven (LDSC):** Run LDSC partitioned heritability first if available (most rigorous)
    - **Biology-based:** Use known trait-tissue relationships (see [references/tissue_reference_guide.md](references/tissue_reference_guide.md))
    - **Comprehensive:** Test all 54 GTEx tissues via S-MultiXcan (discovery mode)
 
@@ -140,10 +140,10 @@ QC checks: Duplicate SNPs, allele harmonization, genomic inflation (λGC), LDSC 
 
 **Step 2: Select tissues for TWAS analysis**
 
-Option A - Data-driven (after running [gwas-heritability-ldsc](../gwas-heritability-ldsc/)):
+Option A - Data-driven (if you already have LDSC tissue enrichment results):
 ```bash
 python scripts/select_reference_panel.py \
-  --ldsc-results ../gwas-heritability-ldsc/twas_tissue_recommendations.csv \
+  --ldsc-results ldsc_tissue_recommendations.csv \
   --output selected_tissues.txt
 ```
 
@@ -352,8 +352,8 @@ After completing TWAS analysis:
 ## Related Skills
 
 **Prerequisites:**
-- [gwas-genotype-qc](../gwas-genotype-qc/) - Quality control for raw genotype data
-- [gwas-heritability-ldsc](../gwas-heritability-ldsc/) - Tissue enrichment analysis for tissue selection
+- Genome-wide GWAS summary statistics prepared from a validated upstream GWAS workflow
+- Optional LDSC tissue enrichment results for data-driven tissue selection
 
 **Downstream analyses:**
 - [functional-enrichment-from-degs](../functional-enrichment-from-degs/) - Pathway analysis for gene lists

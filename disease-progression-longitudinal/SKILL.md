@@ -299,23 +299,15 @@ For complete troubleshooting, see [troubleshooting_guide.md](references/troubles
 
 After trajectory analysis, consider these downstream analyses:
 
-1. **Functional enrichment** → Use `functional-enrichment-gprofiler` skill
+1. **Functional enrichment** → Use `functional-enrichment-from-degs` skill
    - Input: `trajectory_features.csv` (top up/down-regulated features)
    - Find pathways changing along disease trajectory
 
-2. **Tissue expression analysis** → Use `tissue-expression-from-degs` skill
-   - Input: `trajectory_features.csv`
-   - Identify tissue-specific trajectory markers
-
-3. **Transcription factor activity** → Use `tf-activity-dorothea` skill
-   - Input: `pseudotime_assignments.csv` + original expression data
-   - Find TFs driving disease progression
-
-4. **Survival analysis** → Built into clinical validation
+2. **Survival analysis** → Built into clinical validation
    - Input: `pseudotime_assignments.csv` + survival data
    - Stratify patients by pseudotime tertiles/quartiles
 
-5. **Project new samples** → Use `scripts/timeax_inference.py`
+3. **Project new samples** → Use `scripts/timeax_inference.py`
    - Load: `timeax_model.pkl`
    - Stage new patients on trained trajectory
 
@@ -323,18 +315,14 @@ After trajectory analysis, consider these downstream analyses:
 
 **Upstream (data generation):**
 - `bulk-rnaseq-counts-to-de-deseq2` - Generate expression data
-- `proteomics-differential-expression` - Proteomics quantification
-- `metabolomics-preprocessing` - Metabolite data
+- `proteomics-diff-exp` - Proteomics quantification
 
 **Downstream (interpretation):**
-- `functional-enrichment-gprofiler` - Pathway analysis of trajectory features
-- `tissue-expression-from-degs` - Tissue-specific markers
-- `tf-activity-dorothea` - Transcription factor drivers
+- `functional-enrichment-from-degs` - Pathway analysis of trajectory features
 - `grn-pyscenic` - Gene regulatory networks along trajectory
 
 **Alternative trajectory methods:**
-- `pseudotime-monocle` - For single-cell RNA-seq trajectories
-- `trajectory-inference-slingshot` - Branching trajectories
+- `scrna-trajectory-inference` - Single-cell pseudotime and branching trajectory inference
 
 ## References
 
