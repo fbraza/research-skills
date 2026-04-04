@@ -2,8 +2,6 @@
 
 This repository contains skills used for bioinformatics and agent-assisted analysis workflows.
 
-It is structured as a Pi package and includes reusable resources for [Pi](https://pi.dev).
-
 ## Skills
 
 * [`/ananse-grn`](./ananse-grn) - Infer gene regulatory programs with ANANSE-focused workflows.
