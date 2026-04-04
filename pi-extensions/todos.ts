@@ -270,6 +270,8 @@ class TodoSelectorComponent extends Container implements Focusable {
 		this.searchInput.focused = value;
 	}
 
+	private onQuickAction?: (todo: TodoFrontMatter, action: "work" | "refine") => void;
+
 	constructor(
 		tui: TUI,
 		theme: Theme,
@@ -279,7 +281,7 @@ class TodoSelectorComponent extends Container implements Focusable {
 		onCancel: () => void,
 		initialSearchInput?: string,
 		currentSessionId?: string,
-		private onQuickAction?: (todo: TodoFrontMatter, action: "work" | "refine") => void,
+		onQuickAction?: (todo: TodoFrontMatter, action: "work" | "refine") => void,
 	) {
 		super();
 		this.tui = tui;
@@ -288,6 +290,7 @@ class TodoSelectorComponent extends Container implements Focusable {
 		this.currentSessionId = currentSessionId;
 		this.allTodos = todos;
 		this.filteredTodos = todos;
+		this.onQuickAction = onQuickAction;
 		this.onSelectCallback = onSelect;
 		this.onCancelCallback = onCancel;
 

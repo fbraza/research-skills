@@ -364,15 +364,25 @@ class MultiSelectPrompt implements Focusable {
 	focused = false;
 	private selectedIndex = 0;
 	private readonly checked: boolean[];
+	private title: string;
+	private subtitle: string;
+	private items: string[];
+	private theme: ExtensionContext["ui"]["theme"];
+	private done: (value: number[] | null) => void;
 
 	constructor(
-		private title: string,
-		private subtitle: string,
-		private items: string[],
-		private theme: ExtensionContext["ui"]["theme"],
-		private done: (value: number[] | null) => void,
+		title: string,
+		subtitle: string,
+		items: string[],
+		theme: ExtensionContext["ui"]["theme"],
+		done: (value: number[] | null) => void,
 		defaultChecked = true,
 	) {
+		this.title = title;
+		this.subtitle = subtitle;
+		this.items = items;
+		this.theme = theme;
+		this.done = done;
 		this.checked = items.map(() => defaultChecked);
 	}
 

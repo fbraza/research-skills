@@ -20,7 +20,6 @@ import { BorderedLoader } from "@mariozechner/pi-coding-agent";
 import {
 	Key,
 	matchesKey,
-	sliceByColumn,
 	type Component,
 	type TUI,
 	truncateToWidth,
@@ -37,6 +36,63 @@ type CwdKey = string; // normalized cwd path
 type DowKey = string; // "Mon", "Tue", etc.
 type TodKey = string; // "after-midnight", "morning", "afternoon", "evening", "night"
 type BreakdownView = "model" | "cwd" | "dow" | "tod";
+
+/**
+ * Slice a string by visible column width (handling CJK/fullwidth characters).
+ * @param text   Source string
+ * @param start  Start column (in visible-width units)
+ * @param width  Maximum width to include
+ * @param fromRight  If true, take characters from the right side
+ */
+function sliceByColumn(text: string, start: number, width: number, fromRight = false): string {
+	let col = 0;
+	let resultStart = 0;
+	let resultEnd = 0;
+	let resultCol = 0;
+
+	for (let i = 0; i < text.length; ) {
+		const cp = text.codePointAt(i)!;
+		const char = String.fromCodePoint(cp);
+		const isWide = cp > 0xffff || (cp >= 0x1100 && cp <= 0x115f) || (cp >= 0x2329 && cp <= 0x232a) || (cp >= 0x2e80 && cp <= 0xa4cf && cp !== 0x303f) || (cp >= 0xac00 && cp <= 0xd7a3) || (cp >= 0xf900 && cp <= 0xfaff) || (cp >= 0xfe10 && cp <= 0xfe19) || (cp >= 0xfe30 && cp <= 0xfe6f) || (cp >= 0xff01 && cp <= 0xff60) || (cp >= 0xffe0 && cp <= 0xffe6) || (cp >= 0x1f300 && cp <= 0x1f9ff);
+		const charWidth = isWide ? 2 : 1;
+
+		if (!fromRight) {
+			if (col >= start && resultCol < width) {
+				if (resultCol === 0) resultStart = i;
+				resultEnd = i + char.length;
+				resultCol += charWidth;
+			}
+		}
+		col += charWidth;
+		i += char.length;
+	}
+
+	if (fromRight) {
+		let totalWidth = 0;
+		for (let i = 0; i < text.length; ) {
+			const cp = text.codePointAt(i)!;
+			const cw = cp > 0x7f ? 2 : 1;
+			totalWidth += cw;
+			i += String.fromCodePoint(cp).length;
+		}
+		let running = 0;
+		let started = false;
+		for (let i = 0; i < text.length; ) {
+			const cp = text.codePointAt(i)!;
+			const char = String.fromCodePoint(cp);
+			const cw = cp > 0x7f ? 2 : 1;
+			if (running + cw > totalWidth - width && !started) {
+				resultStart = i;
+				started = true;
+			}
+			running += cw;
+			if (started) resultEnd = i + char.length;
+			i += char.length;
+		}
+	}
+
+	return text.slice(resultStart, resultEnd);
+}
 
 const DOW_NAMES: DowKey[] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 

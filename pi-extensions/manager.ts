@@ -235,14 +235,25 @@ class SkillManagerOverlay {
 	private viewToken = 0;
 	private cachedWidth?: number;
 	private cachedLines?: string[];
+	private readonly tui: TUI;
+	private readonly theme: Theme;
+	private readonly ctx: ExtensionCommandContext;
+	private readonly exec: ExecFn;
+	private readonly finish: (result: OverlayResult) => void;
 
 	constructor(
-		private readonly tui: TUI,
-		private readonly theme: Theme,
-		private readonly ctx: ExtensionCommandContext,
-		private readonly exec: ExecFn,
-		private readonly finish: (result: OverlayResult) => void,
-	) {}
+		tui: TUI,
+		theme: Theme,
+		ctx: ExtensionCommandContext,
+		exec: ExecFn,
+		finish: (result: OverlayResult) => void,
+	) {
+		this.tui = tui;
+		this.theme = theme;
+		this.ctx = ctx;
+		this.exec = exec;
+		this.finish = finish;
+	}
 
 	invalidate(): void {
 		this.cachedWidth = undefined;
