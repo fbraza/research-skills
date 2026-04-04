@@ -1,0 +1,26 @@
+{
+  "name": "academic-pi-tools",
+  "version": "0.1.0",
+  "description": "Pi extensions for academic workflows",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fbraza/bio-skills.git"
+  },
+  "readme": "README.md",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "bioinformatics"
+  ],
+  "pi": {
+    "extensions": [
+      "./pi-extensions"
+    ]
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*"
+  }
+}
