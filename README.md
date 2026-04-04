@@ -9,25 +9,26 @@ This repository contains:
 The published Pi package currently exposes **extensions only** via [`package.json`](./package.json):
 
 - Pi loads flat TypeScript extension files matching `./pi-extensions/*.ts`
-- this branch adds the `literature-tools` extension for typed literature retrieval
-- `literature-tools` registers `pubmed_search`, `preprint_search`, `semantic_scholar_search`, and `fetch_fulltext`
 - the skill directories in this repository are **not** declared in the package manifest, so those skills are **not installed automatically** when the package is installed with Pi
 
 This is intentional: the package is meant to ship the Pi extensions without auto-installing the full skill library.
 
-## Included extension
+## Included extensions
 
-### literature-tools
-
-This branch adds a `literature-tools` Pi extension implemented as a flat file at [`pi-extensions/literature-tools.ts`](./pi-extensions/literature-tools.ts).
-
-It provides typed custom tools for literature workflows:
-- `pubmed_search`
-- `preprint_search`
-- `semantic_scholar_search`
-- `fetch_fulltext`
-
-These tools back the unified [`/literature`](./skills/literature) skill and are explicitly listed in that skill's `allowed-tools` frontmatter.
+| Extension | Purpose | Docs |
+|---|---|---|
+| `answer` | Extract questions from the last assistant message and collect answers in a TUI | [`docs/answer.md`](./docs/answer.md) |
+| `audit-enforcer` | Run scientific audits, parse findings, and sync them into todos | [`docs/audit-enforcer.md`](./docs/audit-enforcer.md) |
+| `context` | Show loaded extensions, skills, context files, and usage stats | [`docs/context.md`](./docs/context.md) |
+| `init-academic-agent` | Download or update project `AGENTS.md` from GitHub | [`docs/init-academic-agent.md`](./docs/init-academic-agent.md) |
+| `literature-tools` | Typed literature search and PDF retrieval tools | [`docs/literature-tools.md`](./docs/literature-tools.md) |
+| `manager` | Install, update, and remove skills from the repository cache | [`docs/manager.md`](./docs/manager.md) |
+| `multi-edit` | Enhanced replacement for the built-in `edit` tool | [`docs/multi-edit.md`](./docs/multi-edit.md) |
+| `notify` | Send desktop notifications when the agent finishes | [`docs/notify.md`](./docs/notify.md) |
+| `prompt-editor` | Manage reusable prompt modes and switch quickly | [`docs/prompt-editor.md`](./docs/prompt-editor.md) |
+| `session-breakdown` | Visualize recent Pi session activity, tokens, and cost | [`docs/session-breakdown.md`](./docs/session-breakdown.md) |
+| `todos` | File-based todo storage with a tool and TUI manager | [`docs/todos.md`](./docs/todos.md) |
+| `whimsical` | Random playful working messages during turns | [`docs/whimsical.md`](./docs/whimsical.md) |
 
 ## Install the Pi extension package
 
@@ -37,23 +38,14 @@ pi install git:github.com/fbraza/research-skills
 
 After installation, Pi will load the flat-file extensions declared in [`package.json`](./package.json).
 
-## Example literature workflow
+## Quick extension checks
 
-Once the package is loaded, the unified [`/literature`](./skills/literature) skill can use the typed extension tools directly.
+After reloading Pi, you can verify these extensions quickly:
+- run `/audit` and confirm Pi either queues a `scientific-audit` run immediately or offers to install the missing `scientific-audit` skill first
+- run `/audit-resolve` and confirm open audit todos can be selected and closed
+- run `/init-academic-agent` in a git repo and confirm it creates or updates `AGENTS.md`
 
-Example prompts:
-- `/literature Find recent papers on TEAD inhibition in mesothelioma and summarise the strongest evidence.`
-- `/literature Review preclinical evidence for KRAS G12D inhibition in pancreatic cancer.`
-- `/literature Retrieve full text for DOI 10.1038/s41586-023-12345-6 and note the access route used.`
-
-## Verification checklist for literature-tools
-
-After reloading Pi, verify the integration with this quick checklist:
-- run a `/literature ...` prompt
-- confirm the session shows calls to `pubmed_search`, `semantic_scholar_search`, `preprint_search`, or `fetch_fulltext`
-- confirm the model does not default to generic `WebSearch` / `WebFetch` when a typed literature tool is appropriate
-- confirm `fetch_fulltext` reports the access route (`pmc`, `publisher_oa`, `biorxiv`, `scihub`, or `not_found`)
-- if testing via package install, confirm `package.json` has loaded the flat-file extensions from `./pi-extensions/*.ts`
+For extension-specific usage, commands, tools, and examples, see the per-extension docs in [`docs/`](./docs).
 
 ## Skills in this repository
 
@@ -78,7 +70,6 @@ The following skills are present in [`skills/`](./skills) as source/reference co
 * [`/gwas-to-function-twas`](./skills/gwas-to-function-twas) - Connect GWAS signals to genes and function via TWAS-style workflows.
 * [`/knowhows`](./skills/knowhows) - Reusable methodological guidance and best-practice know-how references.
 * [`/lasso-biomarker-panel`](./skills/lasso-biomarker-panel) - Discover compact biomarker panels with LASSO/elastic-net style modeling.
-* [`/literature`](./skills/literature) - Unified scientific literature review, preclinical evidence extraction, citation verification, and full-text retrieval.
 * [`/mendelian-randomization-twosamplemr`](./skills/mendelian-randomization-twosamplemr) - Run two-sample Mendelian randomization analyses.
 * [`/multi-omics-integration`](./skills/multi-omics-integration) - Integrate multiple omics layers with method-selection guidance.
 * [`/pcr-primer-design`](./skills/pcr-primer-design) - Design and assess PCR primers with quality-control checks.
