@@ -1,7 +1,7 @@
 ---
 name: grn-pyscenic
 description: Discover gene regulatory networks (GRNs) de novo from single-cell RNA-seq using pySCENIC. Identifies transcription factor (TF) regulons through co-expression analysis (GRNBoost2), validates with motif enrichment (cisTarget), and calculates cell-level TF activity scores (AUCell). Use when you need to discover TF-target relationships directly from your data, identify cell-type-specific regulatory programs, or score individual cells for TF activity. Requires 500+ cells for robust inference. Not recommended for bulk RNA-seq (use functional enrichment or curated network approaches instead). Computationally intensive, requires reference databases and 16GB+ RAM.
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: Infer gene regulatory networks and TF activity from my single-cell RNA-seq data.
 ---
 
