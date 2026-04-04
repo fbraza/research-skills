@@ -210,12 +210,14 @@ export async function installManagedSkills(exec: ExecFn, cwd: string, names: str
 
 class SkillManagerOverlay {
 	private readonly modeItems = ["Install skills", "Update skills", "Remove skills"];
+	private static readonly LIST_VIEWPORT = 12;
 	private screen: Screen = "mode";
 	private modeCursor = 0;
 	private actionMode: ActionMode | null = null;
 	private listItems: string[] = [];
 	private selected = new Set<string>();
 	private cursor = 0;
+	private scrollOffset = 0;
 	private filter = "";
 	private filterFocused = false;
 	private installedCount = 0;
@@ -373,10 +375,19 @@ class SkillManagerOverlay {
 					: this.theme.fg("dim", "/  filter...");
 			body.push(filterText, "");
 		}
+		// Clamp scroll offset so it stays valid
+		const maxOffset = Math.max(0, rows.length - SkillManagerOverlay.LIST_VIEWPORT);
+		if (this.scrollOffset > maxOffset) this.scrollOffset = maxOffset;
+		if (this.scrollOffset < 0) this.scrollOffset = 0;
+
 		if (rows.length === 0) {
 			body.push(this.theme.fg("warning", "No skills match the current filter."));
 		} else {
-			for (let index = 0; index < rows.length; index++) {
+			const viewportEnd = Math.min(rows.length, this.scrollOffset + SkillManagerOverlay.LIST_VIEWPORT);
+			if (this.scrollOffset > 0) {
+				body.push(this.theme.fg("dim", `  ↑ ${this.scrollOffset} more above`));
+			}
+			for (let index = this.scrollOffset; index < viewportEnd; index++) {
 				const row = rows[index]!;
 				const isSelected = row.id === ALL_ID ? this.areAllSelected() : this.selected.has(row.id);
 				const allState = row.id === ALL_ID ? (this.areAllSelected() ? "all" : this.selected.size > 0 ? "partial" : "none") : null;
@@ -394,6 +405,10 @@ class SkillManagerOverlay {
 				if (this.actionMode === "update" && row.id === ALL_ID) {
 					body.push(this.theme.fg("dim", "  ───────────────────────────────"));
 				}
+			}
+			if (viewportEnd < rows.length) {
+				const remaining = rows.length - viewportEnd;
+				body.push(this.theme.fg("dim", `  ↓ ${remaining} more below`));
 			}
 		}
 		body.push("");
@@ -467,11 +482,13 @@ class SkillManagerOverlay {
 		const rows = this.getVisibleRows();
 		if (matchesKey(data, Key.up) && this.cursor > 0) {
 			this.cursor--;
+			this.clampScroll();
 			this.requestRender();
 			return;
 		}
 		if (matchesKey(data, Key.down) && this.cursor < rows.length - 1) {
 			this.cursor++;
+			this.clampScroll();
 			this.requestRender();
 			return;
 		}
@@ -508,6 +525,7 @@ class SkillManagerOverlay {
 			this.filter = "";
 			this.filterFocused = false;
 			this.cursor = 0;
+			this.scrollOffset = 0;
 			this.requestRender();
 			return;
 		}
@@ -519,12 +537,14 @@ class SkillManagerOverlay {
 		if (matchesKey(data, Key.backspace)) {
 			this.filter = this.filter.slice(0, -1);
 			this.cursor = 0;
+			this.scrollOffset = 0;
 			this.requestRender();
 			return;
 		}
 		if (data.length === 1 && data >= " ") {
 			this.filter += data;
 			this.cursor = 0;
+			this.scrollOffset = 0;
 			this.requestRender();
 		}
 	}
@@ -558,6 +578,16 @@ class SkillManagerOverlay {
 		return this.listItems.length > 0 && this.listItems.every((item) => this.selected.has(item));
 	}
 
+	private clampScroll(): void {
+		const rows = this.getVisibleRows();
+		const vp = SkillManagerOverlay.LIST_VIEWPORT;
+		if (this.cursor < this.scrollOffset) {
+			this.scrollOffset = this.cursor;
+		} else if (this.cursor >= this.scrollOffset + vp) {
+			this.scrollOffset = this.cursor - vp + 1;
+		}
+	}
+
 	private toggleCurrent(): void {
 		const row = this.getVisibleRows()[this.cursor];
 		if (!row) return;
@@ -582,6 +612,7 @@ class SkillManagerOverlay {
 		this.filterFocused = false;
 		this.selected.clear();
 		this.cursor = 0;
+		this.scrollOffset = 0;
 		this.requestRender();
 	}
 
@@ -610,6 +641,7 @@ class SkillManagerOverlay {
 			this.availableCount = remote.length;
 			this.selected.clear();
 			this.cursor = 0;
+			this.scrollOffset = 0;
 			this.filter = "";
 			this.filterFocused = false;
 			this.setSpinner(false);
@@ -627,6 +659,7 @@ class SkillManagerOverlay {
 			this.listItems = await listInstalledSkills(this.ctx.cwd);
 			this.selected.clear();
 			this.cursor = 0;
+			this.scrollOffset = 0;
 			if (this.listItems.length === 0) {
 				this.screen = "empty";
 				this.emptyMessage = "No skills installed yet. Use Install to add skills.";
@@ -645,6 +678,7 @@ class SkillManagerOverlay {
 			this.listItems = await listInstalledSkills(this.ctx.cwd);
 			this.selected.clear();
 			this.cursor = 0;
+			this.scrollOffset = 0;
 			if (this.listItems.length === 0) {
 				this.screen = "empty";
 				this.emptyMessage = "No skills installed yet. Use Install to add skills.";
@@ -718,7 +752,12 @@ export default function managerExtension(pi: ExtensionAPI) {
 			);
 
 			if (result?.changed) {
-				await ctx.reload();
+				try {
+					await ctx.reload();
+				} catch {
+					// reload may fail (e.g. extension re-load issue) — don't
+					// let an unhandled error leave the command unregistered
+				}
 				return;
 			}
 		},
