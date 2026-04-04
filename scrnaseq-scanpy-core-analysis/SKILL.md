@@ -269,7 +269,7 @@ Exports: H5AD, expression matrices (raw + normalized CSV), cell metadata, UMAP/P
 
 ## Related Skills
 
-**Alternative:** scrnaseq-seurat-core-analysis (R-based) | **Downstream:** functional-enrichment-from-degs, de-results-to-plots, de-results-to-gene-lists | **Complementary:** bulk-omics-clustering, experimental-design-statistics, scvi-tools-scrna (advanced deep generative models)
+**Alternative:** scrnaseq-seurat-core-analysis (R-based) | **Downstream:** functional-enrichment-from-degs, scientific-visualization | **Complementary:** bulk-omics-clustering, experimental-design-statistics, scvi-tools-scrna (advanced deep generative models)
 
 ## References
 

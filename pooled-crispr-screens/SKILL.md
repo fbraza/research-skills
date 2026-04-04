@@ -346,7 +346,7 @@ export_all_results(adata=adata, perturbation_summary=validated_hits,
 ## Related Skills
 
 - **functional-enrichment-from-degs** - Pathway enrichment on DE genes
-- **de-results-to-plots** - Advanced visualization (heatmaps, custom plots)
+- **scientific-visualization** - Advanced visualization (heatmaps, custom plots)
 - **coexpression-network** - Gene regulatory network inference
 - **bulk-omics-clustering** - Cluster samples/perturbations by expression
 

@@ -15,7 +15,7 @@ starting-prompt: Calculate polygenic risk scores for cardiometabolic traits usin
 - **No GWAS summary statistics needed** — uses pre-computed weights from PGS Catalog
 - **Quick PRS** — minutes per trait (download + score), no LD computation required
 
-**For de novo PRS from raw GWAS summary statistics**, use the `polygenic-risk-score` skill (LDpred2-auto) instead.
+**For de novo PRS from raw GWAS summary statistics**, use a dedicated LDpred2-based workflow outside this skill.
 
 ## Installation
 
@@ -176,13 +176,10 @@ source("scripts/score_traits.R")
 After completing multi-trait PRS:
 1. **Downstream analysis** — Load `prs_analysis.rds` for custom analyses
 2. **Additional traits** — Add more PGS scores to expand the risk panel
-3. **De novo PRS** — Use `polygenic-risk-score` skill for traits without PGS Catalog scores
+3. **De novo PRS** — Use a dedicated LDpred2-based workflow for traits without PGS Catalog scores
 4. **GWAS interpretation** — Pair with functional annotation skills
 
 ## Related Skills
-
-- `polygenic-risk-score` — De novo PRS using LDpred2-auto (requires GWAS summary statistics)
-- `eqtl-colocalization-coloc` — Colocalization of GWAS signals with eQTLs
 
 ## References
 

@@ -238,7 +238,7 @@ Run LDSC Intercept Test
 
 For rigorous tissue selection (recommended for Tier 2+ analyses), use LDSC partitioned heritability:
 
-**See [gwas-heritability-ldsc](../../gwas-heritability-ldsc/) workflow** for:
+Use an LDSC partitioned heritability workflow for:
 - Identifying tissues enriched for trait heritability
 - Statistical evidence for tissue relevance
 - Data-driven tissue recommendations for TWAS

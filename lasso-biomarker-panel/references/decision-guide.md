@@ -19,7 +19,7 @@
 | Predict binary outcome from omics | ✅ Yes | — |
 | Unsupervised patient clustering | ❌ No | `bulk-omics-clustering` |
 | Find differentially expressed genes | ❌ No | `bulk-rnaseq-counts-to-de-deseq2` |
-| Multi-omics factor analysis | ❌ No | `multiomics-patient-stratification` |
+| Multi-omics factor analysis | ❌ No | `bulk-omics-clustering` |
 | Pathway enrichment of results | After this skill | `functional-enrichment-from-degs` |
 | Co-expression context | Before or after | `coexpression-network` |
 

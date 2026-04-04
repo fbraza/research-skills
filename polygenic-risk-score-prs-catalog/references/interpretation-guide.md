@@ -52,4 +52,4 @@ PRS are **NOT diagnostic tests**:
 
 ## Further Reading
 
-See references/ in the polygenic-risk-score skill for detailed methods comparison and troubleshooting.
+See LDpred2 and PGS Catalog documentation for detailed methods comparison and troubleshooting.

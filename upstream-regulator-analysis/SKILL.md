@@ -210,7 +210,6 @@ After identifying upstream regulators:
 - `chip-atlas-peak-enrichment` - Component: TF binding enrichment analysis
 - `chip-atlas-target-genes` - Component: TF target gene retrieval
 - `bulk-rnaseq-counts-to-de-deseq2` - Upstream: generates DE results input
-- `de-results-to-gene-lists` - Upstream: generates filtered gene lists
 - `functional-enrichment-from-degs` - Complementary: pathway-level enrichment
 
 ## References

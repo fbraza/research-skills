@@ -445,7 +445,7 @@ After completing clustering:
 
 **Prerequisite:** bulk-rnaseq-counts-to-de-deseq2 (normalize RNA-seq data)
 **Alternatives:** scrnaseq-scanpy-core-analysis, scrnaseq-seurat-core-analysis (single-cell), coexpression-network
-**Downstream:** de-results-to-gene-lists, functional-enrichment-from-degs, de-results-to-plots
+**Downstream:** functional-enrichment-from-degs, scientific-visualization
 
 ## References
 

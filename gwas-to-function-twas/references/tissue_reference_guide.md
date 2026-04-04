@@ -109,7 +109,7 @@ Comprehensive guide for selecting appropriate tissues based on trait biology.
 
 For rigorous studies, use LDSC partitioned heritability to identify tissues statistically enriched for trait heritability.
 
-**See [gwas-heritability-ldsc](../../gwas-heritability-ldsc/) workflow** for:
+Use an LDSC tissue enrichment workflow for:
 - Running LDSC tissue enrichment analysis
 - Statistical evidence for tissue relevance
 - Unbiased tissue recommendations

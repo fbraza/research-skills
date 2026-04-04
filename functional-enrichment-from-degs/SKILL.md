@@ -348,10 +348,9 @@ Use CSV results for supplementary tables, SVG plots for figures (300+ DPI), and 
 
 **Prerequisites (run before this skill):**
 - **bulk-rnaseq-counts-to-de-deseq2** - DESeq2 differential expression analysis, generates required DE results
-- **de-results-to-gene-lists** - Filters and annotates DE results, prepares gene lists
 
 **Complementary (run alongside):**
-- **de-results-to-plots** - Visualize DE results before enrichment to understand expression patterns
+- **scientific-visualization** - Visualize DE results before enrichment to understand expression patterns
 
 **Downstream:**
 - Pathway visualization tools - Coming soon

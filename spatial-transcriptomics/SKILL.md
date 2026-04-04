@@ -240,7 +240,6 @@ When presenting results to the user, the agent should:
 |-------|-------------|
 | `scrnaseq-scanpy-core-analysis` | Companion scRNA-seq analysis (non-spatial) |
 | `functional-enrichment-from-degs` | Downstream: enrichment on SVG gene lists |
-| `de-results-to-gene-lists` | Downstream: gene list preparation from SVGs |
 | `grn-pyscenic` | Downstream: regulatory networks from spatial clusters |
 | `coexpression-network` | Downstream: co-expression on spatial domains |
 | `scvi-tools-spatial` | Downstream: cell type deconvolution and niche analysis |

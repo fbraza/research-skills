@@ -21,7 +21,7 @@ Use this skill when you need to:
 **Don't use this skill for:**
 - Unsupervised clustering (use `bulk-omics-clustering`)
 - Differential expression only (use `bulk-rnaseq-counts-to-de-deseq2`)
-- Multi-omics integration/factor discovery (use `multiomics-patient-stratification`)
+- Multi-omics integration/factor discovery (use `bulk-omics-clustering`)
 - Continuous outcomes — this skill is for binary classification
 
 ## Installation
@@ -88,7 +88,7 @@ install.packages('msigdbr')
 - `lasso_model.rds` — Complete model result for downstream use
   - Load with: `model <- readRDS('results/lasso_model.rds')`
   - Predict with: `source("scripts/lasso_workflow.R"); predict_biomarker_panel(model, new_X)`
-  - Required for: `multiomics-patient-stratification`, downstream prediction
+  - Required for: downstream prediction and optional patient stratification workflows
 
 **Plots (PNG + SVG at 300 DPI):**
 - `roc_curve.png/.svg` — ROC curve (discovery + validation overlay)
@@ -294,7 +294,7 @@ The reported CV AUC from this workflow is an **estimate within the discovery coh
 After building a biomarker panel:
 1. **[REQUIRED before biological interpretation] Pathway enrichment** of panel genes -> `functional-enrichment-from-degs`
 2. **Co-expression context** — which WGCNA modules contain panel genes -> `coexpression-network`
-3. **Patient stratification** using panel as input -> `multiomics-patient-stratification`
+3. **Patient stratification** using panel as input -> `bulk-omics-clustering`
 4. **Literature validation** — are panel genes known disease/therapy markers?
 5. **Independent cohort replication** on external validation datasets
 
@@ -306,7 +306,7 @@ After building a biomarker panel:
 | `coexpression-network` | **Upstream** — WGCNA hub genes as LASSO candidates (Paper 1 cascade) |
 | `functional-enrichment-from-degs` | **Downstream** — Pathway enrichment of panel genes |
 | `bulk-omics-clustering` | **Alternative** — Unsupervised patient stratification |
-| `multiomics-patient-stratification` | **Downstream** — Multi-omics integration + subtyping |
+| `bulk-omics-clustering` | **Downstream** — Patient stratification and subtype discovery |
 
 ## References
 
