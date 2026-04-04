@@ -15,7 +15,28 @@ The published Pi package currently exposes **extensions only** via [`package.jso
 
 This is intentional: the package is meant to ship the Pi extensions without auto-installing the full skill library.
 
-## Included extension
+## Included extensions
+
+### audit-enforcer
+
+The package includes [`pi-extensions/audit-enforcer.ts`](./pi-extensions/audit-enforcer.ts), a flat-file extension for scientific audit follow-up.
+
+It adds:
+- `/audit` — asks Pi to run the `scientific-audit` skill on the current analysis
+- `/audit-resolve` — marks selected audit todos as resolved
+- audit result parsing for `PASS`, `REVIEW`, and `FAIL`
+- sync of audit findings into the todo storage under `.pi/todos`
+- a footer status showing the latest audit state and open audit todo count
+
+### init-academic-agent
+
+The package includes [`pi-extensions/init-academic-agent.ts`](./pi-extensions/init-academic-agent.ts), a flat-file extension that downloads or updates a project `AGENTS.md` from GitHub.
+
+Examples:
+- `/init-academic-agent`
+- `/init-academic-agent fbraza/research-skills`
+- `/init-academic-agent fbraza/research-skills agent-context/AGENTS.md`
+- `/init-academic-agent --force`
 
 ### literature-tools
 
@@ -36,6 +57,13 @@ pi install git:github.com/fbraza/research-skills
 ```
 
 After installation, Pi will load the flat-file extensions declared in [`package.json`](./package.json).
+
+## Quick extension checks
+
+After reloading Pi, you can verify these extensions quickly:
+- run `/audit` and confirm Pi queues a `scientific-audit` run
+- run `/audit-resolve` and confirm open audit todos can be selected and closed
+- run `/init-academic-agent` in a git repo and confirm it creates or updates `AGENTS.md`
 
 ## Example literature workflow
 
