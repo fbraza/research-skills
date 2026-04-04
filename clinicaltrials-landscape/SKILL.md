@@ -1,7 +1,7 @@
 ---
 name: clinicaltrials-landscape
 description: Programmatically query the free ClinicalTrials.gov API v2 to pull all active clinical trials for a disease area, classify by therapeutic mechanism of action, and generate competitive landscape visualizations. Supports any disease with pre-built configs for IBD (Crohn's, UC). Generic mode classifies by intervention type when no disease config exists. Supports filtering by mechanism, phase, sponsor, and status. Exports structured CSVs, publication-quality plots, and pickle objects for downstream analysis. No API key required.
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 starting-prompt: Show me the current clinical trial landscape for IBD
 ---
 
