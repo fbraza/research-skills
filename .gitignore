@@ -31,3 +31,12 @@ mise.toml
 # Evaluation staging
 TO_EVALUATE/
 test_plots/
+
+# data
+data/
+
+# results
+results/
+
+# Local skill installs managed by the pi skill manager
+.agents/
