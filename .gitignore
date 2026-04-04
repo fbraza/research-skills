@@ -40,3 +40,8 @@ results/
 
 # Local skill installs managed by the pi skill manager
 .agents/
+
+# Node.js
+node_modules/
+package-lock.json
+*.mjs

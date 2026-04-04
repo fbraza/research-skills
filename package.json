@@ -22,5 +22,8 @@
     "@mariozechner/pi-ai": "*",
     "@mariozechner/pi-coding-agent": "*",
     "@mariozechner/pi-tui": "*"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.49"
   }
 }

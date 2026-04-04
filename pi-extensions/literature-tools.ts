@@ -70,9 +70,9 @@ type PaperRecord = {
 const USER_AGENT = "research-skills-literature-tools/0.1 (+https://github.com/fbraza/research-skills)";
 const SCIHUB_MIRRORS = ["https://sci-hub.st", "https://sci-hub.ru", "https://sci-hub.se"];
 const PDF_PATTERNS = [
-	/<meta[^>]+name=["']citation_pdf_url["'][^>]+content=["']([^"']+)["']/i,
-	/<meta[^>]+property=["']og:pdf["'][^>]+content=["']([^"']+)["']/i,
-	/<meta[^>]+name=["']dc\.identifier["'][^>]+content=["']([^"']*\.pdf[^"']*)["']/i,
+	/<meta[^>]+name=["']citation_pdf_url["'][^>]+content=["']([^"']+)["']/gi,
+	/<meta[^>]+property=["']og:pdf["'][^>]+content=["']([^"']+)["']/gi,
+	/<meta[^>]+name=["']dc\.identifier["'][^>]+content=["']([^"']*\.pdf[^"']*)["']/gi,
 	/<(?:iframe|embed|object)[^>]+(?:src|data)=["']([^"']+)["']/gi,
 	/<a[^>]+data-track-action=["'][^"']*pdf[^"']*["'][^>]+href=["']([^"']+)["']/gi,
 	/<a[^>]+aria-label=["'][^"']*pdf[^"']*["'][^>]+href=["']([^"']+)["']/gi,
