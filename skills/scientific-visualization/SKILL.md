@@ -22,7 +22,7 @@ Publication-ready figures, structured reports, and scientific presentations. How
 
 **Do not use for:**
 - ❌ Running statistical analyses — use appropriate analysis skills
-- ❌ Searching literature — use `literature-review`
+- ❌ Searching literature — use `literature`
 - ❌ Auditing outputs for errors — use `scientific-audit`
 
 **Key principle:** A misleading figure is a scientific integrity problem. A figure nobody can read is a result nobody will use.
@@ -386,7 +386,7 @@ Create a markdown report (`./results/report_<title>.md`) ONLY when:
 **Use alongside:**
 - `scientific-writing` — Write figure legends, methods sections, and reports
 - `scientific-audit` — Verify figure-table consistency and visualization integrity
-- `literature-review` — Add citations to reports and figure captions
+- `literature` — Add citations to reports and figure captions
 
 **Visualizes results from:**
 - All analysis skills that produce data requiring visualization

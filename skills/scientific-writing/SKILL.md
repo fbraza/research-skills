@@ -1,7 +1,7 @@
 ---
 name: scientific-writing
 description: Protocols for three core scientific document types — original research papers (Introduction, Methods, Results, Discussion, Abstract, rebuttals), literature reviews (narrative and thematic synthesis), and grant applications (Specific Aims, Significance, Innovation, Approach). Includes biological interpretation frameworks, scientific writing standards, and a two-stage outline-to-prose workflow. Every biological claim requires a verified citation.
-allowed-tools: Read, Write, Edit, WebFetch, WebSearch, mcp__claude_ai_PubMed__search_articles, mcp__claude_ai_PubMed__get_article_metadata, mcp__claude_ai_PubMed__lookup_article_by_citation
+allowed-tools: Read, Write, Edit, WebFetch, WebSearch, pubmed_search, preprint_search, semantic_scholar_search, fetch_fulltext
 starting-prompt: Help me write a scientific document with rigorous prose and verified citations.
 ---
 
@@ -24,9 +24,16 @@ Turn data into narrative and narrative into science. Protocols for original rese
 **Do not use for:**
 - ❌ Running computational analyses — use appropriate analysis skills
 - ❌ Generating figures — use `scientific-visualization`
-- ❌ Retrieving and searching citations — use `literature-review` (this skill synthesizes them)
+- ❌ Retrieving and searching citations as a standalone task — use `literature` (this skill synthesizes them)
 
 ---
+
+## Citation workflow
+
+When this skill needs citation support for writing tasks:
+- prefer the unified `literature` skill for dedicated literature review work
+- if citation lookup is needed inline during writing, prefer the typed literature tools: `pubmed_search`, `semantic_scholar_search`, `preprint_search`, and `fetch_fulltext`
+- do not rely on legacy PubMed MCP tools
 
 ## Document Type 1 — Original Research Paper
 
@@ -52,7 +59,7 @@ For each major conclusion:
 - Are there confounders that were not controlled?
 
 **Step 3 — Literature context: is this novel?**
-- Search for related work using the `literature-review` skill
+- Search for related work using the `literature` skill
 - Has this been shown before in the same system?
 - Does this confirm, extend, or contradict existing knowledge?
 - What is the most important prior work this paper builds on?
@@ -618,7 +625,7 @@ Fix the argument in stage 1; fix the language in stage 2.
 ## Related Skills
 
 **Use alongside:**
-- `literature-review` — Find and verify citations for all biological claims
+- `literature` — Find and verify citations for all biological claims
 - `scientific-visualization` — Create publication-ready figures
 - `scientific-audit` — Verify conclusions are supported by evidence
 

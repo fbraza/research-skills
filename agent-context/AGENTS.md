@@ -54,8 +54,8 @@ Before any analysis, read the relevant know-how guides from `skills/knowhows/`. 
 | GWAS → gene function | `gwas-to-function-twas` |
 | Proteomics DE | `proteomics-diff-exp` |
 | CRISPR screens | `pooled-crispr-screens` |
-| Preclinical lit search | `literature-preclinical` |
-| Any biological claim needing citation | `literature-review` |
+| Preclinical lit search | `literature` (preclinical mode) |
+| Any biological claim needing citation | `literature` |
 | Scientific writing (grants, papers, rebuttals) | `scientific-writing` |
 | Figures, reports, presentations | `scientific-visualization` |
 | Every 2-3 analytical steps | `scientific-audit` |

@@ -1,6 +1,6 @@
 # Experiment Extraction Guide
 
-**Workflow:** literature-preclinical  
+**Workflow:** literature
 **Purpose:** Keyword-based extraction approach, dictionaries, and limitations for classifying in vitro and in vivo experiments from paper abstracts.
 
 ---
@@ -29,14 +29,14 @@ IN_VITRO_KEYWORDS = [
     "cell line", "cell lines", "cancer cells", "tumor cells",
     "HeLa", "MCF-7", "A549", "HCT116", "PC-3", "LNCaP", "MDA-MB",
     "U87", "U251", "Jurkat", "THP-1", "RAW264", "HEK293",
-    
+
     # Assay types
     "in vitro", "cell viability", "cell proliferation", "MTT assay",
     "CCK-8", "colony formation", "clonogenic", "wound healing",
     "scratch assay", "transwell", "invasion assay", "migration assay",
     "flow cytometry", "apoptosis", "cell cycle", "western blot",
     "immunofluorescence", "ELISA", "qPCR", "RNA-seq", "ChIP",
-    
+
     # Culture conditions
     "cultured", "culture", "monolayer", "3D culture", "organoid",
     "spheroid", "primary cells", "iPSC", "stem cells"
@@ -54,13 +54,13 @@ IN_VIVO_KEYWORDS = [
     "xenograft", "syngeneic", "PDX", "patient-derived xenograft",
     "transgenic", "knockout mouse", "knock-in", "GEM", "GEMM",
     "orthotopic", "subcutaneous tumor", "allograft",
-    
+
     # Animal procedures
     "tumor volume", "tumor growth", "body weight", "survival",
     "tumor regression", "metastasis model", "lung metastasis",
     "liver metastasis", "intracranial", "intraperitoneal injection",
     "intravenous injection", "oral gavage", "dosing",
-    
+
     # Animal species
     "C57BL/6", "BALB/c", "nude mice", "SCID", "NOD-SCID",
     "NSG", "athymic", "immunodeficient", "Sprague-Dawley",
@@ -80,15 +80,15 @@ def classify_paper(abstract: str) -> dict:
                        cell_lines, animal_models, assays, endpoints, findings
     """
     abstract_lower = abstract.lower()
-    
+
     # Count keyword matches
     in_vitro_hits = [kw for kw in IN_VITRO_KEYWORDS if kw.lower() in abstract_lower]
     in_vivo_hits = [kw for kw in IN_VIVO_KEYWORDS if kw.lower() in abstract_lower]
-    
+
     # Classify
     has_vitro = len(in_vitro_hits) >= 1
     has_vivo = len(in_vivo_hits) >= 1
-    
+
     if has_vitro and has_vivo:
         experiment_type = "both"
     elif has_vitro:
@@ -97,7 +97,7 @@ def classify_paper(abstract: str) -> dict:
         experiment_type = "in_vivo"
     else:
         experiment_type = "unclassified"
-    
+
     return {
         "experiment_type": experiment_type,
         "in_vitro_signals": in_vitro_hits,

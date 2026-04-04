@@ -203,7 +203,7 @@ After identifying upstream regulators:
 - **Functional enrichment:** Use `functional-enrichment-from-degs` on TF-target gene subsets
 - **Co-expression:** Use `gene-correlation-archs4` to check if TF and targets co-express
 - **Network inference:** Use `grn-pyscenic` for single-cell GRN validation
-- **Literature review:** Use `literature-review` to validate TF-disease associations
+- **Literature review:** Use `literature` to validate TF-disease associations
 
 ## Related Skills
 
