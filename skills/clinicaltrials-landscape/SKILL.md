@@ -231,7 +231,7 @@ export_all(
 
 ## Suggested Next Steps
 
-1. **Deep-dive a mechanism** — Use `literature-preclinical` to review mechanism biology
+1. **Deep-dive a mechanism** — Use `literature` in preclinical mode to review mechanism biology
 2. **Track a sponsor's full pipeline** — Expand the search across trials, publications, and company communications within this workflow if broader pipeline context is needed
 3. **Biomarker analysis** — Use `lasso-biomarker-panel` to identify response biomarkers from trial data
 4. **Export to presentation** — Use landscape_report.md and plots for stakeholder review
@@ -240,7 +240,7 @@ export_all(
 
 ## Related Skills
 
-- `literature-preclinical` — Literature review for mechanism biology
+- `literature` — Literature review for mechanism biology
 - `lasso-biomarker-panel` — Biomarker discovery from expression data
 
 ---
