@@ -16,7 +16,7 @@ This is intentional: the package is meant to ship the Pi extensions without auto
 ## Install the Pi extension package
 
 ```bash
-pi install git:github.com/fbraza/bio-skills
+pi install git:github.com/fbraza/research-skills
 ```
 
 After installation, Pi will load the extensions declared in [`package.json`](./package.json).
