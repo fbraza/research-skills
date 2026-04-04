@@ -23,6 +23,7 @@ The package includes [`pi-extensions/audit-enforcer.ts`](./pi-extensions/audit-e
 
 It adds:
 - `/audit` — asks Pi to run the `scientific-audit` skill on the current analysis
+- auto-installs `scientific-audit` via the manager extension cache if the skill is missing locally
 - `/audit-resolve` — marks selected audit todos as resolved
 - audit result parsing for `PASS`, `REVIEW`, and `FAIL`
 - sync of audit findings into the todo storage under `.pi/todos`
@@ -61,7 +62,7 @@ After installation, Pi will load the flat-file extensions declared in [`package.
 ## Quick extension checks
 
 After reloading Pi, you can verify these extensions quickly:
-- run `/audit` and confirm Pi queues a `scientific-audit` run
+- run `/audit` and confirm Pi either queues a `scientific-audit` run immediately or offers to install the missing `scientific-audit` skill first
 - run `/audit-resolve` and confirm open audit todos can be selected and closed
 - run `/init-academic-agent` in a git repo and confirm it creates or updates `AGENTS.md`
 

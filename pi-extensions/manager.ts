@@ -6,7 +6,7 @@ import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const REMOTE_REPO = "fbraza/bio-skills";
+const REMOTE_REPO = "fbraza/research-skills";
 const REMOTE_SKILLS_PATH = "skills";
 const LOCAL_SKILLS_DIR = path.join(".agents", "skills");
 const CACHE_DIR = path.join(os.tmpdir(), "bio-skills-cache");
@@ -95,11 +95,11 @@ function renderPanel(
 	return lines.map((line) => truncateToWidth(line, panelWidth, ""));
 }
 
-function getLocalSkillsPath(cwd: string): string {
+export function getLocalSkillsPath(cwd: string): string {
 	return path.join(cwd, LOCAL_SKILLS_DIR);
 }
 
-async function pathExists(filePath: string): Promise<boolean> {
+export async function pathExists(filePath: string): Promise<boolean> {
 	try {
 		await fs.access(filePath);
 		return true;
@@ -108,7 +108,7 @@ async function pathExists(filePath: string): Promise<boolean> {
 	}
 }
 
-async function listInstalledSkills(cwd: string): Promise<string[]> {
+export async function listInstalledSkills(cwd: string): Promise<string[]> {
 	const skillsDir = getLocalSkillsPath(cwd);
 	if (!(await pathExists(skillsDir))) return [];
 
@@ -154,7 +154,7 @@ async function listRemoteSkills(exec: ExecFn): Promise<string[]> {
 		.sort((a, b) => a.localeCompare(b));
 }
 
-async function ensureCache(exec: ExecFn): Promise<void> {
+export async function ensureCache(exec: ExecFn): Promise<void> {
 	const gitDir = path.join(CACHE_DIR, ".git");
 	if (existsSync(gitDir)) {
 		const fetchResult = await exec("git", ["-C", CACHE_DIR, "fetch", "origin", "main", "--depth", "1"], { timeout: 60_000 });
@@ -178,13 +178,13 @@ async function ensureCache(exec: ExecFn): Promise<void> {
 	}
 }
 
-async function ensureLocalSkillsDir(cwd: string): Promise<string> {
+export async function ensureLocalSkillsDir(cwd: string): Promise<string> {
 	const skillsDir = getLocalSkillsPath(cwd);
 	await fs.mkdir(skillsDir, { recursive: true });
 	return skillsDir;
 }
 
-async function copySkillFromCache(name: string, cwd: string): Promise<void> {
+export async function copySkillFromCache(name: string, cwd: string): Promise<void> {
 	const targetDir = await ensureLocalSkillsDir(cwd);
 	const sourceDir = path.join(CACHE_DIR, REMOTE_SKILLS_PATH, name);
 	const destinationDir = path.join(targetDir, name);
@@ -195,9 +195,17 @@ async function copySkillFromCache(name: string, cwd: string): Promise<void> {
 	await fs.cp(sourceDir, destinationDir, { recursive: true });
 }
 
-async function removeLocalSkill(name: string, cwd: string): Promise<void> {
+export async function removeLocalSkill(name: string, cwd: string): Promise<void> {
 	const destinationDir = path.join(getLocalSkillsPath(cwd), name);
 	await fs.rm(destinationDir, { recursive: true, force: true });
+}
+
+export async function installManagedSkills(exec: ExecFn, cwd: string, names: string[]): Promise<void> {
+	if (names.length === 0) return;
+	await ensureCache(exec);
+	for (const name of names) {
+		await copySkillFromCache(name, cwd);
+	}
 }
 
 class SkillManagerOverlay {

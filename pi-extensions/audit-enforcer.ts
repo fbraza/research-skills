@@ -15,6 +15,7 @@ import path from "node:path";
 import * as fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import crypto from "node:crypto";
+import { installManagedSkills, listInstalledSkills } from "./manager.ts";
 
 type Verdict = "PASS" | "REVIEW" | "FAIL";
 
@@ -469,6 +470,27 @@ async function promptTodoResolution(ctx: ExtensionContext, todos: TodoRecord[]):
 	return selectedIndices.map((index) => todos[index]).filter(Boolean) as TodoRecord[];
 }
 
+async function ensureScientificAuditSkill(pi: ExtensionAPI, ctx: any, rerunCommand: string): Promise<boolean> {
+	const installed = await listInstalledSkills(ctx.cwd);
+	if (installed.includes("scientific-audit")) return true;
+
+	const confirmed = await ctx.ui.confirm(
+		"Install required skill?",
+		"The scientific-audit skill is not installed in this project. Install it now via the skills manager cache and continue with /audit?",
+	);
+	if (!confirmed) {
+		ctx.ui.notify("/audit cancelled: scientific-audit is not installed", "warning");
+		return false;
+	}
+
+	ctx.ui.notify("Installing scientific-audit...", "info");
+	await installManagedSkills(pi.exec.bind(pi), ctx.cwd, ["scientific-audit"]);
+	ctx.ui.notify("Installed scientific-audit. Reloading Pi and retrying /audit...", "success");
+	pi.sendUserMessage(rerunCommand, { deliverAs: "followUp" });
+	await ctx.reload();
+	return false;
+}
+
 export default function auditEnforcerExtension(pi: ExtensionAPI) {
 	const state = defaultState();
 
@@ -489,10 +511,14 @@ export default function auditEnforcerExtension(pi: ExtensionAPI) {
 	pi.registerCommand("audit", {
 		description: "Run scientific-audit on the current analysis and sync findings to todos",
 		handler: async (args, ctx) => {
+			const focus = args.trim();
+			const rerunCommand = focus ? `/audit ${focus}` : "/audit";
+			const ready = await ensureScientificAuditSkill(pi, ctx, rerunCommand);
+			if (!ready) return;
+
 			state.awaitingAuditResult = true;
 			persistState(pi, state);
 			ctx.ui.notify("Scientific audit requested", "info");
-			const focus = args.trim();
 			const prompt = [
 				"Run /skill:scientific-audit on the current analysis.",
 				focus ? `Focus area: ${focus}.` : "Run the full audit.",
