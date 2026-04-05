@@ -1,214 +1,26 @@
-import type { ExtensionAPI, ExtensionCommandContext, Theme } from "@mariozechner/pi-coding-agent";
+import type { ExtensionCommandContext, Theme } from "@mariozechner/pi-coding-agent";
 import type { TUI } from "@mariozechner/pi-tui";
-import { Key, matchesKey, truncateToWidth, visibleWidth, wrapTextWithAnsi } from "@mariozechner/pi-tui";
-import fs from "node:fs/promises";
-import { existsSync } from "node:fs";
-import os from "node:os";
-import path from "node:path";
+import { Key, matchesKey } from "@mariozechner/pi-tui";
+import {
+	ALL_ID,
+	SPINNER_FRAMES,
+	type ActionMode,
+	type ExecFn,
+	type ListRow,
+	type OverlayResult,
+	type ProgressItem,
+	type Screen,
+} from "./constants.ts";
+import { normalizeError, renderPanel, wrapLine } from "./rendering.ts";
+import {
+	copySkillFromCache,
+	ensureCache,
+	listInstalledSkills,
+	listRemoteSkills,
+	removeLocalSkill,
+} from "./data.ts";
 
-const REMOTE_REPO = "fbraza/research-skills";
-const REMOTE_SKILLS_PATH = "skills";
-const LOCAL_SKILLS_DIR = path.join(".agents", "skills");
-const CACHE_DIR = path.join(os.tmpdir(), "bio-skills-cache");
-const ALL_ID = "__all__";
-const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-
-interface ExecResult {
-	stdout: string;
-	stderr: string;
-	code: number;
-	killed?: boolean;
-}
-
-type ExecFn = (command: string, args: string[], options?: { timeout?: number; signal?: AbortSignal }) => Promise<ExecResult>;
-
-type Screen = "mode" | "loading" | "list" | "empty" | "error" | "progress";
-type ActionMode = "install" | "update" | "remove";
-type ProgressStatus = "waiting" | "running" | "done" | "failed";
-
-interface ProgressItem {
-	name: string;
-	status: ProgressStatus;
-	error?: string;
-}
-
-interface OverlayResult {
-	changed: boolean;
-}
-
-interface ListRow {
-	id: string;
-	label: string;
-	description?: string;
-}
-
-function normalizeError(error: unknown): string {
-	if (error instanceof Error && error.message) return error.message;
-	return String(error);
-}
-
-function padRight(text: string, width: number): string {
-	const diff = Math.max(0, width - visibleWidth(text));
-	return text + " ".repeat(diff);
-}
-
-function centerText(text: string, width: number): string {
-	const truncated = truncateToWidth(text, width, "");
-	const diff = Math.max(0, width - visibleWidth(truncated));
-	const left = Math.floor(diff / 2);
-	return " ".repeat(left) + truncated + " ".repeat(diff - left);
-}
-
-function boxedLine(content: string, innerWidth: number): string {
-	return `│ ${padRight(truncateToWidth(content, innerWidth, ""), innerWidth)} │`;
-}
-
-function wrapLine(line: string, width: number): string[] {
-	const wrapped = wrapTextWithAnsi(line, width);
-	return wrapped.length > 0 ? wrapped : [""];
-}
-
-function renderPanel(
-	width: number,
-	title: string,
-	bodyLines: string[],
-	footerLines: string[] = [],
-	subtitle?: string,
-): string[] {
-	const panelWidth = Math.max(24, width);
-	const innerWidth = Math.max(20, panelWidth - 4);
-	const lines: string[] = [];
-	lines.push(`╭${"─".repeat(panelWidth - 2)}╮`);
-	lines.push(boxedLine(centerText(title, innerWidth), innerWidth));
-	if (subtitle) lines.push(boxedLine(subtitle, innerWidth));
-	lines.push(`├${"─".repeat(panelWidth - 2)}┤`);
-	for (const line of bodyLines.length > 0 ? bodyLines : [""]) {
-		for (const wrapped of wrapLine(line, innerWidth)) lines.push(boxedLine(wrapped, innerWidth));
-	}
-	if (footerLines.length > 0) {
-		lines.push(`├${"─".repeat(panelWidth - 2)}┤`);
-		for (const line of footerLines) {
-			for (const wrapped of wrapLine(line, innerWidth)) lines.push(boxedLine(wrapped, innerWidth));
-		}
-	}
-	lines.push(`╰${"─".repeat(panelWidth - 2)}╯`);
-	return lines.map((line) => truncateToWidth(line, panelWidth, ""));
-}
-
-export function getLocalSkillsPath(cwd: string): string {
-	return path.join(cwd, LOCAL_SKILLS_DIR);
-}
-
-export async function pathExists(filePath: string): Promise<boolean> {
-	try {
-		await fs.access(filePath);
-		return true;
-	} catch {
-		return false;
-	}
-}
-
-export async function listInstalledSkills(cwd: string): Promise<string[]> {
-	const skillsDir = getLocalSkillsPath(cwd);
-	if (!(await pathExists(skillsDir))) return [];
-
-	const entries = await fs.readdir(skillsDir, { withFileTypes: true });
-	const installed: string[] = [];
-	for (const entry of entries) {
-		if (!entry.isDirectory()) continue;
-		const skillDir = path.join(skillsDir, entry.name);
-		const skillFile = path.join(skillDir, "SKILL.md");
-		if (await pathExists(skillFile)) installed.push(entry.name);
-	}
-	return installed.sort((a, b) => a.localeCompare(b));
-}
-
-async function ensureGhAuthenticated(exec: ExecFn): Promise<void> {
-	try {
-		const result = await exec("gh", ["auth", "status"], { timeout: 20_000 });
-		if (result.code !== 0) {
-			throw new Error("GitHub CLI (`gh`) is required. Run `gh auth login` first.");
-		}
-	} catch (error) {
-		throw new Error(`GitHub CLI (gh) is required and must be authenticated. ${normalizeError(error)}`);
-	}
-}
-
-async function listRemoteSkills(exec: ExecFn): Promise<string[]> {
-	await ensureGhAuthenticated(exec);
-	const result = await exec("gh", ["api", `repos/${REMOTE_REPO}/contents/${REMOTE_SKILLS_PATH}`], { timeout: 30_000 });
-	if (result.code !== 0) {
-		throw new Error(result.stderr.trim() || result.stdout.trim() || "Failed to fetch remote skill list.");
-	}
-
-	let payload: Array<{ name?: string; type?: string }> = [];
-	try {
-		payload = JSON.parse(result.stdout);
-	} catch (error) {
-		throw new Error(`Failed to parse GitHub API response: ${normalizeError(error)}`);
-	}
-
-	return payload
-		.filter((entry) => entry.type === "dir" && typeof entry.name === "string")
-		.map((entry) => entry.name as string)
-		.sort((a, b) => a.localeCompare(b));
-}
-
-export async function ensureCache(exec: ExecFn): Promise<void> {
-	const gitDir = path.join(CACHE_DIR, ".git");
-	if (existsSync(gitDir)) {
-		const fetchResult = await exec("git", ["-C", CACHE_DIR, "fetch", "origin", "main", "--depth", "1"], { timeout: 60_000 });
-		if (fetchResult.code !== 0) {
-			throw new Error(fetchResult.stderr.trim() || fetchResult.stdout.trim() || "Failed to refresh skill cache.");
-		}
-		const resetResult = await exec("git", ["-C", CACHE_DIR, "reset", "--hard", "origin/main"], { timeout: 60_000 });
-		if (resetResult.code !== 0) {
-			throw new Error(resetResult.stderr.trim() || resetResult.stdout.trim() || "Failed to reset skill cache.");
-		}
-		return;
-	}
-
-	const cloneResult = await exec(
-		"git",
-		["clone", "--depth", "1", `https://github.com/${REMOTE_REPO}.git`, CACHE_DIR],
-		{ timeout: 120_000 },
-	);
-	if (cloneResult.code !== 0) {
-		throw new Error(cloneResult.stderr.trim() || cloneResult.stdout.trim() || "Failed to clone skill repository.");
-	}
-}
-
-export async function ensureLocalSkillsDir(cwd: string): Promise<string> {
-	const skillsDir = getLocalSkillsPath(cwd);
-	await fs.mkdir(skillsDir, { recursive: true });
-	return skillsDir;
-}
-
-export async function copySkillFromCache(name: string, cwd: string): Promise<void> {
-	const targetDir = await ensureLocalSkillsDir(cwd);
-	const sourceDir = path.join(CACHE_DIR, REMOTE_SKILLS_PATH, name);
-	const destinationDir = path.join(targetDir, name);
-	if (!(await pathExists(sourceDir))) {
-		throw new Error(`Skill '${name}' was not found in the cache.`);
-	}
-	await fs.rm(destinationDir, { recursive: true, force: true });
-	await fs.cp(sourceDir, destinationDir, { recursive: true });
-}
-
-export async function removeLocalSkill(name: string, cwd: string): Promise<void> {
-	const destinationDir = path.join(getLocalSkillsPath(cwd), name);
-	await fs.rm(destinationDir, { recursive: true, force: true });
-}
-
-export async function installManagedSkills(exec: ExecFn, cwd: string, names: string[]): Promise<void> {
-	if (names.length === 0) return;
-	await ensureCache(exec);
-	for (const name of names) {
-		await copySkillFromCache(name, cwd);
-	}
-}
-
-class SkillManagerOverlay {
+export class SkillManagerOverlay {
 	private readonly modeItems = ["Install skills", "Update skills", "Remove skills"];
 	private static readonly LIST_VIEWPORT = 12;
 	private screen: Screen = "mode";
@@ -743,34 +555,4 @@ class SkillManagerOverlay {
 			this.requestRender();
 		}
 	}
-}
-
-export default function managerExtension(pi: ExtensionAPI) {
-	pi.registerCommand("skills", {
-		description: "Install, update, or remove skills from fbraza/bio-skills",
-		handler: async (_args, ctx) => {
-			const result = await ctx.ui.custom<OverlayResult>(
-				(tui, theme, _kb, done) => new SkillManagerOverlay(tui, theme, ctx, pi.exec.bind(pi), done),
-				{
-					overlay: true,
-					overlayOptions: {
-						width: "60%",
-						minWidth: 52,
-						maxHeight: "80%",
-						anchor: "center",
-					},
-				},
-			);
-
-			if (result?.changed) {
-				try {
-					await ctx.reload();
-				} catch {
-					// reload may fail (e.g. extension re-load issue) — don't
-					// let an unhandled error leave the command unregistered
-				}
-				return;
-			}
-		},
-	});
 }
