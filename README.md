@@ -4,32 +4,6 @@ This repository contains:
 - a Pi extension package in [`pi-extensions/`](./pi-extensions)
 - a library of academic/bioinformatics skills kept in this repo as source content
 
-## Pi package behavior
-
-The published Pi package currently exposes **extensions only** via [`package.json`](./package.json):
-
-- Pi loads flat TypeScript extension files matching `./pi-extensions/*.ts`
-- the skill directories in this repository are **not** declared in the package manifest, so those skills are **not installed automatically** when the package is installed with Pi
-
-This is intentional: the package is meant to ship the Pi extensions without auto-installing the full skill library.
-
-## Included extensions
-
-| Extension | Purpose | Docs |
-|---|---|---|
-| `answer` | Extract questions from the last assistant message and collect answers in a TUI | [`docs/answer.md`](./docs/answer.md) |
-| `audit-enforcer` | Run scientific audits, parse findings, and sync them into todos | [`docs/audit-enforcer.md`](./docs/audit-enforcer.md) |
-| `context` | Show loaded extensions, skills, context files, and usage stats | [`docs/context.md`](./docs/context.md) |
-| `init-academic-agent` | Download or update project `AGENTS.md` from GitHub | [`docs/init-academic-agent.md`](./docs/init-academic-agent.md) |
-| `literature-tools` | Typed literature search and PDF retrieval tools | [`docs/literature-tools.md`](./docs/literature-tools.md) |
-| `manager` | Install, update, and remove skills from the repository cache | [`docs/manager.md`](./docs/manager.md) |
-| `multi-edit` | Enhanced replacement for the built-in `edit` tool | [`docs/multi-edit.md`](./docs/multi-edit.md) |
-| `notify` | Send desktop notifications when the agent finishes | [`docs/notify.md`](./docs/notify.md) |
-| `prompt-editor` | Manage reusable prompt modes and switch quickly | [`docs/prompt-editor.md`](./docs/prompt-editor.md) |
-| `session-breakdown` | Visualize recent Pi session activity, tokens, and cost | [`docs/session-breakdown.md`](./docs/session-breakdown.md) |
-| `todos` | File-based todo storage with a tool and TUI manager | [`docs/todos.md`](./docs/todos.md) |
-| `whimsical` | Random playful working messages during turns | [`docs/whimsical.md`](./docs/whimsical.md) |
-
 ## Install the Pi extension package
 
 ```bash
@@ -38,14 +12,11 @@ pi install git:github.com/fbraza/research-skills
 
 After installation, Pi will load the flat-file extensions declared in [`package.json`](./package.json).
 
-## Quick extension checks
+## Update the Pi extension package
 
-After reloading Pi, you can verify these extensions quickly:
-- run `/audit` and confirm Pi either queues a `scientific-audit` run immediately or offers to install the missing `scientific-audit` skill first
-- run `/audit-resolve` and confirm open audit todos can be selected and closed
-- run `/init-academic-agent` in a git repo and confirm it creates or updates `AGENTS.md`
-
-For extension-specific usage, commands, tools, and examples, see the per-extension docs in [`docs/`](./docs).
+```bash
+pi update
+```
 
 ## Skills in this repository
 
@@ -89,11 +60,23 @@ The following skills are present in [`skills/`](./skills) as source/reference co
 * [`/survival-analysis-clinical`](./skills/survival-analysis-clinical) - Perform survival and clinical outcome analyses.
 * [`/upstream-regulator-analysis`](./skills/upstream-regulator-analysis) - Identify candidate upstream regulators driving observed signatures.
 
+## Extensions
+
+| Extension | Purpose | Docs |
+|---|---|---|
+| `answer` | Extract questions from the last assistant message and collect answers in a TUI | [`docs/answer.md`](./docs/answer.md) |
+| `audit-enforcer` | Run scientific audits, parse findings, and sync them into todos | [`docs/audit-enforcer.md`](./docs/audit-enforcer.md) |
+| `context` | Show loaded extensions, skills, context files, and usage stats | [`docs/context.md`](./docs/context.md) |
+| `init-academic-agent` | Download or update project `AGENTS.md` from GitHub | [`docs/init-academic-agent.md`](./docs/init-academic-agent.md) |
+| `literature-tools` | Typed literature search and PDF retrieval tools | [`docs/literature-tools.md`](./docs/literature-tools.md) |
+| `manager` | Install, update, and remove skills from the repository cache | [`docs/manager.md`](./docs/manager.md) |
+| `multi-edit` | Enhanced replacement for the built-in `edit` tool | [`docs/multi-edit.md`](./docs/multi-edit.md) |
+| `notify` | Send desktop notifications when the agent finishes | [`docs/notify.md`](./docs/notify.md) |
+| `prompt-editor` | Manage reusable prompt modes and switch quickly | [`docs/prompt-editor.md`](./docs/prompt-editor.md) |
+| `session-breakdown` | Visualize recent Pi session activity, tokens, and cost | [`docs/session-breakdown.md`](./docs/session-breakdown.md) |
+| `todos` | File-based todo storage with a tool and TUI manager | [`docs/todos.md`](./docs/todos.md) |
+| `whimsical` | Random playful working messages during turns | [`docs/whimsical.md`](./docs/whimsical.md) |
+
 ## Context
 
 * [`agent-context/AGENTS.md`](./agent-context/AGENTS.md) - Project rules, workflow policy, and scientific guardrails.
-
-## Notes
-
-- If you want Pi to auto-install the skill library as well, add a `skills` entry back to the `pi` manifest in [`package.json`](./package.json).
-- As currently configured, installing this package through Pi installs only the extension resources from [`pi-extensions/`](./pi-extensions).
