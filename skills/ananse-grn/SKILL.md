@@ -227,7 +227,7 @@ Adding H3K27ac BAMs improves binding prediction (PR AUC ~0.28 ATAC-only vs ~0.38
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE SHELL COMMANDS** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 — Set up and load data:**
 ```python
@@ -329,7 +329,6 @@ export_ananse_results(
 **✅ VERIFICATION:** You should see `"=== ANANSE Export Complete ==="` with list of output files.
 
 ⚠️ **CRITICAL — DO NOT:**
-- ❌ **Write inline `subprocess` calls to ananse commands** → Use the scripts
 - ❌ **Skip the binding step** and go directly to network → binding.h5 is required
 - ❌ **Use H3K27ac peaks as `--regions`** → Too broad; use ATAC peaks or ENCODE cCREs
 - ❌ **Swap source/target direction** → Verify log2FC sign in DESeq2 file before running

@@ -191,9 +191,9 @@ This skill performs **core Perturb-seq analysis: screening, validation, and hit 
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
-**This skill uses low-freedom script execution.** Pooled CRISPR screen analysis requires careful multi-step processing with QC checkpoints. Scripts handle:
+**Scripts are templates.** Copy them to your project working directory, then adapt to the study. Scripts handle:
 - Multi-library loading and concatenation
 - sgRNA doublet filtering
 - Cell-type specific QC thresholds
@@ -225,7 +225,7 @@ adata_filtered = [apply_qc_filters(ad, min_genes=2000, min_counts=8000, max_mito
                   for ad in adata_mapped]
 adata = concatenate_libraries(adata_filtered, batch_labels=["lib1", "lib2"])
 ```
-**DO NOT write inline loading/QC code. Use the functions above.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You should see `"✓ sgRNA mapping complete: [N] cells retained"` for each library, then `"✓ Libraries concatenated: [N] total cells"`
 
@@ -240,7 +240,7 @@ adata = correct_gene_names(adata, corrections={}, gene_col='gene')
 adata = filter_by_expression(adata, group_key='sgRNA', min_mean_expression=0.5)
 adata = normalize_only(adata, target_sum=1e6, exclude_highly_expressed=True)
 ```
-**DO NOT write inline preprocessing code. Use the functions above.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You should see `"✓ Gene name corrections applied"`, then `"✓ Expression filtering: [N] genes retained"`, then `"✓ Normalization complete"`
 
@@ -268,7 +268,7 @@ top_hits = validated_hits.head(50)
 glmgampoi_results = run_glmgampoi_batch(adata, perturbations=top_hits['perturbation'].tolist(),
                                          donor_col='batch', output_dir='results/glmgampoi/')
 ```
-**DO NOT write inline DE code. Use the functions above.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You should see `"✓ Screening complete: [N] perturbations tested"`, then `"Validated hits: [N]/[M]"`, then (if glmGamPoi runs) `"✓ glmGamPoi complete"`
 
@@ -285,16 +285,13 @@ for gene in top_hits['perturbation'].head(10):
 export_all_results(adata=adata, perturbation_summary=validated_hits,
                    de_results=de_results, output_dir='results/')
 ```
-**DO NOT write custom export code. Use export_all_results().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You should see `"✓ Volcano plots generated: [N] perturbations"`, then `"=== Export Complete ==="` with list of files saved
 
 **❌ IF YOU DON'T SEE VERIFICATION MESSAGES:** You wrote inline code instead of using the functions. Stop and use the provided functions.
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline data loading code** → **STOP: Use load_multiple_libraries() and map_sgrna_to_adata()**
-- ❌ **Write inline QC/filtering code** → **STOP: Use apply_qc_filters() and filter_by_expression()**
-- ❌ **Write inline DE screening code** → **STOP: Use screen_all_perturbations() and validate_target_effect()**
 - ❌ **Write custom export code** → **STOP: Use export_all_results()**
 
 **⚠️ IF SCRIPTS FAIL - Script Failure Hierarchy:**

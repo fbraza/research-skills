@@ -195,7 +195,7 @@ wget https://resources.aertslab.org/cistarget/tf_lists/allTFs_hg38.txt
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load data and run GRN inference:**
 ```python
@@ -218,7 +218,7 @@ results = run_complete_grn_workflow(
     output_dir="scenic_results"
 )
 ```
-**DO NOT write inline GRNBoost2, cisTarget, or AUCell code. Use the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You should see:
 - `"✓ Data loaded successfully: X cells, Y genes"`
@@ -250,7 +250,7 @@ generate_all_visualizations(
     output_dir="scenic_results/plots"
 )
 ```
-🚨 **DO NOT write inline plotting code (matplotlib, seaborn, etc.). Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback.**
 
@@ -267,14 +267,12 @@ export_all(
     output_dir="scenic_results"
 )
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** `"=== Export Complete ==="`
 **Note:** If reportlab is installed, a PDF report (`scenic_analysis_report.pdf`) is also generated.
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline GRNBoost2/cisTarget code** → **STOP: Use `run_complete_grn_workflow()`**
-- ❌ **Write inline plotting code** → **STOP: Use `generate_all_visualizations()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install system dependencies** → Script checks availability
 

@@ -81,7 +81,7 @@ remotes::install_github("privefl/bigsnpr")
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load reference genotypes and PGS weights:**
 ```r
@@ -91,20 +91,20 @@ ref_data <- load_reference_data()
 source("scripts/load_pgs_weights.R")
 trait_weights <- load_demo_weights()
 ```
-**DO NOT write custom download or parsing code. Use the scripts.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 2 - Score all traits:**
 ```r
 source("scripts/score_traits.R")
 ```
-**DO NOT write inline scoring code (big_prodVec, allele matching, etc.). Just source the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 3 - Generate visualizations:**
 ```r
 source("scripts/generate_plots.R")
 generate_all_plots(all_results, output_dir = "results")
 ```
-🚨 **DO NOT write inline plotting code (ggsave, ggplot, geom_tile, etc.). Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -113,7 +113,7 @@ generate_all_plots(all_results, output_dir = "results")
 source("scripts/export_results.R")
 export_all(all_results, output_dir = "results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION - You should see:**
 - After Step 1: `"✓ Reference data loaded successfully"` and `"✓ PGS Catalog weights loaded: 5/5 traits"`
@@ -124,8 +124,6 @@ export_all(all_results, output_dir = "results")
 **❌ IF YOU DON'T SEE THESE:** You wrote inline code. Stop and use source().
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline scoring code** → **STOP: Use `source("scripts/score_traits.R")`**
-- ❌ **Write inline plotting code (ggsave, ggplot, etc.)** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install svglite** → script handles SVG fallback automatically
 

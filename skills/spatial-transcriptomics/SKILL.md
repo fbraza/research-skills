@@ -100,7 +100,7 @@ pip install squidpy scanpy anndata scikit-misc plotnine plotnine-prism seaborn m
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN — DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 > **Note:** Run from the `spatial-transcriptomics/` directory, or add `scripts/` to `sys.path`:
 > ```python
@@ -112,7 +112,7 @@ pip install squidpy scanpy anndata scikit-misc plotnine plotnine-prism seaborn m
 from load_example_data import load_visium_heart
 adata = load_visium_heart()
 ```
-**DO NOT write inline data loading code. Just use the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"✓ Data loaded successfully!"`
 
@@ -123,7 +123,7 @@ adata = load_visium_heart()
 from spatial_workflow import run_spatial_analysis
 adata = run_spatial_analysis(adata, output_dir="visium_results")
 ```
-**DO NOT write inline analysis code. Just use the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"✓ Spatial analysis completed successfully!"`
 
@@ -138,7 +138,7 @@ generate_all_plots(adata, output_dir="visium_results")
 # For non-cardiac tissue, pass tissue-appropriate markers:
 # generate_all_plots(adata, output_dir="visium_results", marker_genes=["GENE1", "GENE2"])
 ```
-🚨 **DO NOT write inline plotting code (plt.savefig, ggplot, clustermap, etc.). Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG.**
 
@@ -151,7 +151,7 @@ generate_all_plots(adata, output_dir="visium_results")
 from export_results import export_all
 export_all(adata, output_dir="visium_results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see:
 ```
@@ -163,8 +163,6 @@ export_all(adata, output_dir="visium_results")
 ---
 
 ⚠️ **CRITICAL — DO NOT:**
-- ❌ **Write inline analysis code** → **STOP: Use `run_spatial_analysis()`**
-- ❌ **Write inline plotting code** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install system libraries** → scripts handle optional deps gracefully
 

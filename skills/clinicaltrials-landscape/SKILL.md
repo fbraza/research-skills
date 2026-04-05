@@ -113,7 +113,7 @@ pip install pandas requests numpy plotnine plotnine-prism seaborn matplotlib rep
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 — Load config and query ClinicalTrials.gov:**
 ```python
@@ -142,7 +142,7 @@ from scripts.compile_trials import compile_trials
 classified = classify_all(raw_trials, config=config)
 trials_df = compile_trials(classified, output_dir="landscape_results")
 ```
-**DO NOT write inline classification code. The script loads mechanism taxonomy from config.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** `"✓ Trial data compiled successfully!"`
 
@@ -158,7 +158,7 @@ generate_landscape_plots(
     config=config,
 )
 ```
-🚨 **DO NOT write inline plotting code. The script handles all 6 panels + PNG/SVG export.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **✅ VERIFICATION:** `"✓ All landscape visualizations generated successfully!"`
 
@@ -177,7 +177,7 @@ export_all(
     config=config,
 )
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** `"=== Export Complete ==="`
 
@@ -185,8 +185,6 @@ export_all(
 
 ## ⚠️ CRITICAL — DO NOT:
 
-- ❌ **Write inline classification code** → **STOP: Use `classify_all()` from scripts**
-- ❌ **Write inline plotting code (ggplot, plt, sns)** → **STOP: Use `generate_landscape_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to scrape ClinicalTrials.gov HTML** → **Use the API via `query_trials()`**
 

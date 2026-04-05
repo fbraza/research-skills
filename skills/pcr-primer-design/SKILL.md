@@ -299,7 +299,6 @@ products = in_silico_pcr(
 
 ⚠️ **CRITICAL - DO NOT:**
 - ❌ Use absolute paths → use relative paths `scripts/`
-- ❌ Write inline primer design code → use provided scripts
 - ❌ Skip dimer/structure checks → these catch common failures
 
 ### Step 4: Generate Reports and Export

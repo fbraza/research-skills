@@ -248,7 +248,7 @@ Before starting analysis, gather the following information:
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Note:** This skill requires decisions (algorithm, distance metric, k value) - adapt parameters to your data using guidance in [references/decision-guide.md](references/decision-guide.md).
 
@@ -281,7 +281,7 @@ data_list <- load_and_prepare_data("your_data.csv", normalize_method = "zscore")
 data <- data_list$data
 ```
 
-**DO NOT write custom data loading code. Use the provided functions.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 2 - Run clustering analysis:**
 
@@ -320,7 +320,7 @@ from scripts.cluster_validation import validate_clustering
 validation_results = validate_clustering(data, cluster_labels, metrics="all")
 print(f"Silhouette score: {validation_results['silhouette']:.3f}")
 ```
-**DO NOT write custom clustering code. Use one of the provided methods.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 3 - Generate visualizations:**
 
@@ -345,7 +345,7 @@ plot_all_results(
     output_dir="clustering_results"
 )
 ```
-🚨 **DO NOT write inline plotting code (matplotlib.pyplot.savefig, seaborn.clustermap, etc.). Use plot_all_results().** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for optional dependencies.**
 
@@ -365,7 +365,7 @@ export_all(
     output_dir="clustering_results"
 )
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION - You should see:**
 - After Step 1: `"✓ Data loaded successfully!"`
@@ -376,8 +376,6 @@ export_all(
 **❌ IF YOU DON'T SEE THESE:** You wrote inline code. Stop and use the scripts as shown.
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline clustering algorithms** → **STOP: Use provided clustering functions**
-- ❌ **Write inline plotting code (matplotlib.pyplot.savefig, seaborn.clustermap, etc.)** → **STOP: Use `plot_all_results()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install plotting dependencies manually** → scripts handle fallback automatically
 

@@ -141,7 +141,7 @@ install.packages('msigdbr')
 
 ## Standard Workflow
 
-**MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE**
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load data:**
 ```r
@@ -152,7 +152,7 @@ data <- load_sepsis_data(outcome = "endotype")  # 479 ICU patients, Mars1 endoty
 # OR: data <- load_imvigor210_data()   # 190 bladder cancer patients, atezolizumab
 # OR: data <- load_unifi_data()        # 542 UC patients, UNIFI ustekinumab trial
 ```
-**DO NOT write custom data loading code. Use the loader functions.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** You MUST see: `"✓ Sepsis endotype data loaded successfully!"` (or similar per dataset)
 
@@ -164,7 +164,7 @@ features <- prepare_feature_matrix(data$expression, data$metadata, data$outcome_
 source("scripts/lasso_workflow.R")
 model <- run_lasso_panel(features$X, features$y, alpha = 0.5)
 ```
-**DO NOT write inline LASSO code (glmnet, cv.glmnet, etc.). Just use the scripts.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** You MUST see: `"✓ LASSO panel selection completed successfully!"`
 
@@ -175,7 +175,7 @@ model <- run_lasso_panel(features$X, features$y, alpha = 0.5)
 source("scripts/biomarker_plots.R")
 generate_all_plots(model, X = features$X, y = features$y, output_dir = "results")
 ```
-**DO NOT write inline plotting code (ggsave, ggplot, etc.). Just use `generate_all_plots()`.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -186,7 +186,7 @@ generate_all_plots(model, X = features$X, y = features$y, output_dir = "results"
 source("scripts/export_results.R")
 export_all(model, output_dir = "results", data = data, features = features)
 ```
-**DO NOT write custom export code. Use `export_all()`.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Pass `data` and `features` for a comprehensive report with disease context and methods.**
 
@@ -220,8 +220,6 @@ export_all(model, validation_result = val_result, output_dir = "results",
 ```
 
 **CRITICAL - DO NOT:**
-- **Write inline LASSO code** -> **STOP: Use `source("scripts/lasso_workflow.R")`**
-- **Write inline plotting code** -> **STOP: Use `generate_all_plots()`**
 - **Write custom export code** -> **STOP: Use `export_all()`**
 - **Try to install svglite** -> script handles SVG fallback automatically
 

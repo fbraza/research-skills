@@ -115,7 +115,7 @@ results = run_enrichment_workflow(
     output_dir="chipatlas_results"
 )
 ```
-**DO NOT write inline API query code. Just use the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"Enrichment analysis completed successfully!"`
 
@@ -124,7 +124,7 @@ results = run_enrichment_workflow(
 from scripts.generate_all_plots import generate_all_plots
 generate_all_plots(results, output_dir="chipatlas_results", top_n=15)
 ```
-**DO NOT write inline plotting code. The script handles PNG + SVG with graceful fallback.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"All visualizations generated successfully!"`
 
@@ -133,7 +133,7 @@ generate_all_plots(results, output_dir="chipatlas_results", top_n=15)
 from scripts.export_all import export_all
 export_all(results, output_dir="chipatlas_results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"=== Export Complete ==="`
 

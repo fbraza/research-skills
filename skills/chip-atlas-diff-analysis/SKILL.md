@@ -92,7 +92,7 @@ pip install pandas requests numpy plotnine plotnine-prism
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load data:**
 ```python
@@ -123,7 +123,7 @@ results = run_diff_workflow(
     output_dir="diff_analysis_results"
 )
 ```
-**DO NOT write inline API query code. Just use the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"✓ Diff analysis completed successfully!"`
 
@@ -132,7 +132,7 @@ results = run_diff_workflow(
 from scripts.generate_all_plots import generate_all_plots
 generate_all_plots(results, output_dir="diff_analysis_results")
 ```
-**DO NOT write inline plotting code. The script handles PNG + SVG with graceful fallback.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"✓ All visualizations generated successfully!"`
 
@@ -141,7 +141,7 @@ generate_all_plots(results, output_dir="diff_analysis_results")
 from scripts.export_all import export_all
 export_all(results, output_dir="diff_analysis_results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"=== Export Complete ==="`
 

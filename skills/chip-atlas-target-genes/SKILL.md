@@ -101,7 +101,7 @@ pip install pandas requests numpy plotnine plotnine_prism matplotlib seaborn
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load query:**
 ```python
@@ -127,7 +127,7 @@ results = run_target_genes_workflow(
     output_dir="target_genes_results"
 )
 ```
-**DO NOT write inline download/parsing code. Just use the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"✓ Target genes analysis completed successfully!"`
 
@@ -136,7 +136,7 @@ results = run_target_genes_workflow(
 from scripts.generate_all_plots import generate_all_plots
 generate_all_plots(results, output_dir="target_genes_results", top_n=25)
 ```
-**DO NOT write inline plotting code. The script handles PNG + SVG with graceful fallback.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"✓ All visualizations generated successfully!"`
 
@@ -145,13 +145,11 @@ generate_all_plots(results, output_dir="target_genes_results", top_n=25)
 from scripts.export_all import export_all
 export_all(results, output_dir="target_genes_results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **VERIFICATION:** `"=== Export Complete ==="`
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline download/parsing code** → **STOP: Use `run_target_genes_workflow()`**
-- ❌ **Write inline plotting code** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 
 **⚠️ IF SCRIPTS FAIL - Script Failure Hierarchy:**

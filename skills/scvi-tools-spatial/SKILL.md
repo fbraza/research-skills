@@ -123,14 +123,14 @@ Estimate cell type compositions, map individual cells to spatial locations, impu
 
 ## Standard Workflow
 
-**MANDATORY: USE SCRIPTS EXACTLY AS SHOWN — DO NOT WRITE INLINE CODE**
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Detailed model comparison:** [references/spatial-model-guide.md](references/spatial-model-guide.md)
 
-**CRITICAL — DO NOT:**
-- Write inline deconvolution code → **STOP: Use the script functions**
-- Pass normalized data → **STOP: All models require raw counts**
-- Skip gene overlap validation → **STOP: Always check shared genes first**
+**CRITICAL — scripts are templates:**
+- Copy script functions to project → adapt parameters to your study
+- All models require raw counts (never pass normalized data)
+- Always check shared genes first (gene overlap validation)
 
 **IF SCRIPTS FAIL — Script Failure Hierarchy:**
 1. **Fix and Retry (90%)** — Install missing package, re-run script

@@ -198,7 +198,7 @@ Before starting, gather:
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **CRITICAL: Use relative paths (scripts/). DO NOT construct absolute paths.**
 
@@ -224,7 +224,7 @@ print(f"Total: {stats['total_variants']}, SNVs: {stats['snvs']}, Indels: {stats[
 
 **✅ VERIFICATION:** You MUST see: `"✓ Data loaded successfully"`
 
-**DO NOT write inline validation code. Use the scripts exactly as shown.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 ---
 
@@ -272,7 +272,7 @@ elif tool == 'snpeff':
 
 **✅ VERIFICATION:** You MUST see: `"✓ Annotation completed successfully!"`
 
-**DO NOT write inline annotation code. Use run_vep() or run_snpeff() as shown.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **⚠️ DO NOT fall back to VEP API mode** - API mode is 10-100x slower and less full-featured. Always install the tool if missing.
 
@@ -310,7 +310,7 @@ if gene_df is not None:
 
 **✅ VERIFICATION:** You MUST see: `"Saved: [filename].png"` and `"Saved: [filename].svg"` for each plot
 
-**DO NOT write inline plotting code. Use the plotting functions as shown.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 ---
 
@@ -331,12 +331,11 @@ export_all(
 
 **✅ VERIFICATION:** You MUST see: `"=== Export Complete ==="`
 
-**DO NOT write custom export code. Use export_all() as shown.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 ---
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline validation/annotation/plotting/export code** → **STOP: Use the scripts shown above**
 - ❌ **Fall back to VEP API mode when tools are missing** → **STOP: Use `install_tools.py` to install via conda**
 - ❌ Use absolute paths → use relative paths `scripts/`
 - ❌ Skip validation step → catches format errors early

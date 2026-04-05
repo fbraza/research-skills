@@ -215,7 +215,7 @@ scRNA-seq data can also be provided as `.h5ad` files where `adata.obs` contains 
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 ---
 
@@ -377,9 +377,6 @@ export_predictions(
 
 ⚠️ **CRITICAL — DO NOT:**
 - ❌ **Log-transform input data before running** → Scaden applies log2(x+1) internally in `scaden process`
-- ❌ **Write inline TensorFlow/Keras training code** → **STOP: Use `run_scaden_train()`**
-- ❌ **Write inline simulation code** → **STOP: Use `run_scaden_simulate()`**
-- ❌ **Write inline plotting code** → **STOP: Use `plot_deconvolution_results()`**
 - ❌ **Mix gene identifier types** → Ensure scRNA-seq and bulk data use the same gene naming convention
 
 **⚠️ IF SCRIPTS FAIL — Script Failure Hierarchy:**

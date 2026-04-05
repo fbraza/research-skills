@@ -122,7 +122,7 @@ Ask these questions before starting analysis:
 
 **CRITICAL: Use relative paths (scripts/, references/). DO NOT construct absolute paths.**
 
-**IMPORTANT: Call scripts via command line. DO NOT import and write inline Python code.**
+**IMPORTANT: Use scripts as templates — copy to project, adapt to your study.**
 
 ### Phase 1: Data Preparation
 
@@ -313,8 +313,6 @@ Creates publication-ready Excel workbook with executive summary, evidence layers
 **That's it! The scripts handle everything automatically.**
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ Write inline TWAS code → causes model mismatches, missing QC steps
-- ❌ Write inline colocalization code → incorrect PP.H4 calculations, wrong priors
 - ❌ Use absolute paths → use relative paths `scripts/` exactly as shown
 - ❌ Import script functions directly → use command-line interface for proper error handling and validation
 - ❌ Skip phases based on tier → breaks dependency chain (e.g., Phase 4 requires Phase 3 colocalization results)

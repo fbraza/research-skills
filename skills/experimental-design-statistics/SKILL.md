@@ -138,7 +138,7 @@ Before starting, gather the following information:
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 The experimental design workflow follows 4 steps: **Load** → **Calculate** → **Visualize** → **Export**
 
@@ -169,7 +169,7 @@ cv_db <- load_cv_database()
 
 ### **Step 2 - Calculate Design**
 
-🚨 **DO NOT write inline calculation code. Use the provided scripts.**
+🚨 **Use the script as a template — copy to project, adapt to your study.**
 
 **A. Power Analysis** - Calculate power for your proposed design
 ```r
@@ -182,7 +182,7 @@ power_result <- calc_power_rnaseq(
   alpha = 0.05
 )
 ```
-**DO NOT write inline power calculation code. Just source the script and call the function.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **B. Sample Size Determination** - Calculate required n from pilot data
 ```r
@@ -194,7 +194,7 @@ required_n <- samplesize_from_pilot(
   fdr = 0.05
 )
 ```
-**DO NOT write inline sample size code. Use the function from the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **C. Batch Assignment** - Generate balanced batch layout
 ```r
@@ -208,8 +208,6 @@ batch_design <- assign_samples_to_batches(
 **DO NOT manually create batch assignments. Use the OSAT-optimized function.**
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ Write inline power calculation code → **STOP: Use calc_power_rnaseq()**
-- ❌ Write inline plotting code (ggsave, ggplot, etc.) → **STOP: Use visualization scripts**
 - ❌ Manually assign samples to batches → **STOP: Use assign_samples_to_batches()**
 - ❌ Write custom balancing algorithms → **STOP: Script uses OSAT's optimal algorithms**
 - ❌ Try to install svglite → scripts handle SVG fallback automatically
@@ -260,7 +258,7 @@ visualize_batch_design(
 )
 ```
 
-🚨 **DO NOT write inline plotting code (ggsave, ggplot, etc.). Use the visualization scripts.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The scripts handle PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -280,7 +278,7 @@ source("scripts/export_design.R")
 export_complete_design(batch_design, design_params, output_dir = "design_results")
 ```
 
-**DO NOT write custom export code. Use export_complete_design().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"=== Export Complete ==="`
 

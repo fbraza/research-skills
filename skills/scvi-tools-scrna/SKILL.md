@@ -123,14 +123,14 @@ Advanced deep generative modeling for single-cell RNA-seq using scvi-tools. This
 
 ## Standard Workflow
 
-**MANDATORY: USE SCRIPTS EXACTLY AS SHOWN — DO NOT WRITE INLINE CODE**
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Detailed model guide:** [references/model-guide.md](references/model-guide.md)
 
-**CRITICAL — DO NOT:**
-- Write inline analysis code → **STOP: Use the script functions**
-- Pass log-normalized or scaled data → **STOP: All models require raw counts**
-- Skip convergence checks → **STOP: Always verify ELBO curves**
+**CRITICAL — scripts are templates:**
+- Copy script functions to project → adapt parameters to your study
+- All models require raw counts (never pass log-normalized or scaled data)
+- Always verify ELBO convergence curves
 
 **IF SCRIPTS FAIL — Script Failure Hierarchy:**
 1. **Fix and Retry (90%)** — Install missing package, re-run script
@@ -154,7 +154,7 @@ validate_anndata_for_scvi(adata, require_counts=True, require_hvg=True, batch_ke
 adata = register_anndata_scvi(adata, batch_key="batch", layer="counts")
 ```
 
-**DO NOT write inline validation code.** The validation function checks: raw counts present, no NaN/negatives, HVGs marked, batch key valid.
+**Use the script as a template — copy to project, adapt to your study.** The validation function checks: raw counts present, no NaN/negatives, HVGs marked, batch key valid.
 
 **VERIFICATION:** `"✓ Input validated"` message with diagnostic summary.
 
@@ -175,7 +175,7 @@ adata, scvi_model = train_scvi(
 adata = get_scvi_normalized_expression(scvi_model, adata)
 ```
 
-**DO NOT write inline scVI training code.** The script handles GPU detection, convergence checking, and metadata storage automatically.
+**Use the script as a template — copy to project, adapt to your study.** The script handles GPU detection, convergence checking, and metadata storage automatically.
 
 **VERIFICATION:**
 - Training curves plotted (ELBO converging)

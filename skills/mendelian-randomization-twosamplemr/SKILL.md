@@ -101,7 +101,7 @@ remotes::install_github("MRCIEU/TwoSampleMR")
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN — DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 — Load and harmonize data:**
 ```r
@@ -110,7 +110,7 @@ dat <- load_example_data()
 # OR: dat <- load_from_opengwas("ieu-a-300", "ieu-a-7")
 # OR: dat <- load_from_files("exposure.csv", "outcome.csv")
 ```
-**DO NOT write inline data loading or harmonization code. Use the functions above.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 ✅ **VERIFICATION:** You MUST see `"✓ Data loaded and harmonized successfully!"`
 
@@ -120,7 +120,7 @@ source("scripts/run_mr_analysis.R")
 mr_results <- run_mr(dat)
 sensitivity <- run_sensitivity(dat, mr_results)
 ```
-**DO NOT write inline MR code. Just source the script and call the functions.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 ✅ **VERIFICATION:** You MUST see `"✓ MR analysis completed successfully!"` AND `"✓ Sensitivity analyses completed successfully!"`
 
@@ -129,7 +129,7 @@ sensitivity <- run_sensitivity(dat, mr_results)
 source("scripts/mr_plots.R")
 generate_all_plots(mr_results, dat, sensitivity$singlesnp, sensitivity$leaveoneout, output_dir = "mr_results")
 ```
-🚨 **DO NOT write inline plotting code (ggsave, ggplot, etc.). Just use the function.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 ✅ **VERIFICATION:** You MUST see `"✓ All MR plots generated successfully!"`
 
@@ -138,15 +138,13 @@ generate_all_plots(mr_results, dat, sensitivity$singlesnp, sensitivity$leaveoneo
 source("scripts/export_results.R")
 export_all(mr_results, sensitivity, dat, output_dir = "mr_results")
 ```
-**DO NOT write custom export code. Use export_all(). It automatically generates the PDF report.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 ✅ **VERIFICATION:** You MUST see `"✓ Report generated successfully!"` AND `"=== Export Complete ==="`
 
 ❌ **IF YOU DON'T SEE VERIFICATION MESSAGES:** You wrote inline code. Stop and use the scripts.
 
 ⚠️ **CRITICAL — DO NOT:**
-- ❌ **Write inline MR analysis code** → **STOP: Use `run_mr()` and `run_sensitivity()`**
-- ❌ **Write inline plotting code** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Write custom report code** → **STOP: Use `generate_report()`**
 - ❌ **Try to install system dependencies** → Scripts handle package installation

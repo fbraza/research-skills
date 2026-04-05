@@ -97,7 +97,7 @@ pip install pandas numpy scipy requests matplotlib seaborn reportlab
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load data:**
 ```python
@@ -122,7 +122,7 @@ de_data = load_de_results("path/to/de_results.csv")
 from scripts.run_integration_workflow import run_integration_workflow
 results = run_integration_workflow(de_data, genome="hg38", output_dir="regulator_results")
 ```
-**DO NOT write inline API code or custom scoring. Just call the workflow function.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 ⏱️ **This step takes 15-25 minutes** (ChIP-Atlas API polling + target gene downloads).
 
@@ -133,7 +133,7 @@ results = run_integration_workflow(de_data, genome="hg38", output_dir="regulator
 from scripts.generate_all_plots import generate_all_plots
 generate_all_plots(results, output_dir="regulator_results")
 ```
-🚨 **DO NOT write inline plotting code (ggplot, ggsave, etc.). Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **✅ VERIFICATION:** `"✓ All visualizations generated successfully!"`
 
@@ -142,13 +142,11 @@ generate_all_plots(results, output_dir="regulator_results")
 from scripts.export_all import export_all
 export_all(results, output_dir="regulator_results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** `"=== Export Complete ==="`
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline API code** → **STOP: Use `run_integration_workflow()`**
-- ❌ **Write inline plotting code** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Write custom Fisher's test code** → **STOP: Built into `score_regulons()`**
 

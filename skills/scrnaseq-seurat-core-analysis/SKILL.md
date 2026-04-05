@@ -221,7 +221,7 @@ seurat_obj <- run_soupx_correction(raw_matrix_dir, filtered_matrix_dir)
 
 **When to use:** Raw matrices or high-soup tissues (brain, lung, tumor). See [references/ambient_rna_correction.md](references/ambient_rna_correction.md)
 
-⚠️ **DO NOT** write inline SoupX correction code → causes parameter mismatches and inconsistent results
+⚠️ **Template note:** SoupX correction has parameter interdependencies — adapt the script carefully, test parameter choices
 
 **Step 2: Load Data and Calculate QC**
 
@@ -242,7 +242,7 @@ seurat_obj <- batch_mad_outlier_detection(seurat_obj, batch_col = "batch", nmads
 
 **Decision:** MAD (adapts to batches) or fixed tissue thresholds. See [references/qc_guidelines.md](references/qc_guidelines.md)
 
-⚠️ **DO NOT** write inline QC calculation code → missing mitochondrial gene patterns, incorrect species handling
+⚠️ **Template note:** QC calculation requires species-aware mitochondrial gene patterns — adapt the script for your organism
 
 **Step 3: Doublet Detection and Filtering**
 
@@ -259,7 +259,7 @@ seurat_obj <- filter_by_mad_outliers(seurat_obj, remove_doublets = TRUE)
 
 **QC checkpoint:** Aim for >70% cell retention
 
-⚠️ **DO NOT** write inline doublet detection code → DoubletFinder has complex parameterization that requires batch-aware setup
+⚠️ **Template note:** DoubletFinder requires batch-aware parameterization — adapt the script to your experimental design
 
 ### Phase 2: Normalization and Dimensionality Reduction (Steps 4-5)
 
@@ -282,7 +282,7 @@ seurat_obj <- run_lognormalize(seurat_obj)
 
 **Decision:** SCTransform (UMI, batch effects) or LogNormalize (speed, non-UMI). See [references/seurat_best_practices.md](references/seurat_best_practices.md)
 
-⚠️ **DO NOT** write inline normalization code → SCTransform has complex variance stabilization; LogNormalize requires proper scaling
+⚠️ **Template note:** SCTransform variance stabilization and LogNormalize scaling are complex — adapt the script to your data characteristics
 
 **Step 5: PCA and Determine Dimensionality**
 
@@ -302,7 +302,7 @@ plot_elbow(seurat_obj, output_dir = "results/pca")
 
 **Decision:** Look for "elbow" in scree plot. **Standard: 20-30 PCs. NEVER use <15 PCs.** Use `suggest_n_pcs()` for data-driven recommendation.
 
-⚠️ **DO NOT** write inline PCA code → missing proper feature selection and scaling steps
+⚠️ **Template note:** PCA requires proper feature selection and scaling — adapt the script pipeline for your dataset
 
 ### Phase 3: Integration (Step 6 - Multi-Batch Only)
 
@@ -326,7 +326,7 @@ lisi_scores <- compute_lisi_scores(seurat_obj, batch_var = "batch", reduction = 
 
 **Success criteria:** Batch LISI ≈1 (good mixing), cell type LISI preserved. See [references/integration_methods.md](references/integration_methods.md)
 
-⚠️ **DO NOT** write inline Harmony/CCA integration code → complex parameter tuning and batch handling required
+⚠️ **Template note:** Integration methods require careful batch handling — adapt the script to your batch structure
 
 ### Phase 4: Clustering and Visualization (Steps 7-8)
 
@@ -349,7 +349,7 @@ seurat_obj <- run_umap_reduction(seurat_obj, dims = 1:30, reduction = reduction)
 
 **✅ VERIFICATION:** You should see: `"✓ Clustering completed at X resolutions"` and `"✓ UMAP completed successfully"`
 
-⚠️ **DO NOT** write inline clustering code → graph construction and Louvain algorithm have many hyperparameters
+⚠️ **Template note:** Clustering has many hyperparameters (graph construction, resolution) — adapt the script and validate with marker genes
 
 **Step 8: Find Markers and Visualize**
 
@@ -371,7 +371,7 @@ plot_top_markers_heatmap(seurat_obj, all_markers, n_top = 10)
 
 **Important:** Exploratory DE for characterizing clusters. For condition comparisons, use pseudobulk (Step 10).
 
-⚠️ **DO NOT** write inline marker finding or plotting code (ggsave, ggplot, DimPlot, FeaturePlot, etc.) → publication-quality plots require ggprism/ggrepel; marker tests need proper multiple testing correction. Scripts handle PNG + SVG export with graceful fallback.
+⚠️ **Template note:** Marker analysis and publication-quality plots (ggprism/ggrepel, PNG + SVG) are handled in the scripts — adapt visualization parameters to your study
 
 ### Phase 5: Annotation and Differential Expression (Steps 9-10)
 
@@ -413,7 +413,7 @@ de_results <- run_pseudobulk_deseq2(pseudobulk_data, formula = "~ batch + condit
 
 **Critical:** Exploratory (Step 8, Wilcoxon on cells) vs Inferential (Step 10, DESeq2 on pseudobulk). See [references/pseudobulk_de_guide.md](references/pseudobulk_de_guide.md)
 
-⚠️ **DO NOT** write inline pseudobulk aggregation or DESeq2 code → requires proper sample-level aggregation and statistical modeling
+⚠️ **Template note:** Pseudobulk DE requires sample-level aggregation and proper statistical modeling — adapt the script to your study design
 
 ### Phase 6: Export Results (Step 11)
 
@@ -426,7 +426,7 @@ de_results <- run_pseudobulk_deseq2(pseudobulk_data, formula = "~ batch + condit
 source("scripts/export_results.R")
 export_all(seurat_obj, output_dir = "results", all_markers = all_markers)
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"=== Export Complete ==="`
 
@@ -438,7 +438,7 @@ export_all(seurat_obj, output_dir = "results", all_markers = all_markers)
 - Marker gene tables (if all_markers provided)
 - Summary statistics
 
-⚠️ **DO NOT** write inline export code → missing RDS objects breaks downstream skills
+⚠️ **Template note:** Export must include RDS objects for downstream skills — adapt the script output paths to your project structure
 
 ---
 
@@ -458,8 +458,6 @@ export_all(seurat_obj, output_dir = "results", all_markers = all_markers)
 ⚠️ **CRITICAL ENFORCEMENT RULES:**
 
 **DO NOT:**
-- ❌ **Write inline plotting code (ggsave, DimPlot, FeaturePlot, etc.)** → Use plotting scripts
-- ❌ **Write inline analysis code** → Use provided workflow scripts
 - ❌ **Try to install svglite** → scripts handle SVG fallback automatically
 
 **⚠️ IF SCRIPTS FAIL - Script Failure Hierarchy:**

@@ -171,16 +171,14 @@ This skill performs **core differential expression analysis with QC plots**. For
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
-**This skill uses low-freedom script execution.** You must:
-- ✅ Source the scripts using the exact commands below
+**Scripts are templates.** Copy them to your project working directory, then adapt to the study:
+- ✅ Read the scripts to understand the pipeline (validate → DESeqDataSet → filter → model → extract → export)
+- ✅ Copy relevant functions into the project's `R/` or `scripts/` directory
+- ✅ Adapt parameters (thresholds, reference levels, design formula) to the study
 - ✅ Wait for confirmation messages after each step
-- ❌ NOT write inline DESeq2 code
-- ❌ NOT rewrite plotting code
-- ❌ NOT modify commands unless explicitly adapting for user-specific data
-
-**WHY USE SCRIPTS:** They handle package installation, data validation, sample ID fixes, and error checking automatically. Writing inline code wastes time, introduces errors, and violates the skill design.
+- ✅ Use illustrative examples (synthetic data, Option A blocks) as learning references only
 
 **Step 1 - Load example data:**
 ```r
@@ -194,14 +192,14 @@ coldata <- data$coldata
 ```r
 source("scripts/basic_workflow.R")
 ```
-**DO NOT expand this into inline code. DO NOT write the DESeq2 steps manually. Just source the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 3 - Generate QC plots:**
 ```r
 source("scripts/qc_plots.R")
 run_all_qc(dds, res, output_dir = "results")
 ```
-🚨 **DO NOT write inline plotting code (ggsave, plotMA, etc.). Just source the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -210,7 +208,7 @@ run_all_qc(dds, res, output_dir = "results")
 source("scripts/export_results.R")
 export_all(dds, res, resLFC, output_dir = "results")
 ```
-**DO NOT write custom export code. Use export_all() to save all standard outputs including RDS and transformed counts.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION - You should see these messages:**
 - After Step 1: `"✓ Pasilla dataset loaded successfully"` with dimensions
@@ -221,9 +219,6 @@ export_all(dds, res, resLFC, output_dir = "results")
 **❌ IF YOU DON'T SEE THESE MESSAGES:** You wrote inline code instead of using source(). Stop and use the commands above.
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline data loading code** → **STOP: This violates the skill design. Use `source("scripts/load_example_data.R")` instead.** Inline loading causes sample ID mismatches and missing validations.
-- ❌ **Write inline DESeq2 workflow code** → **STOP: This violates the skill design. Use `source("scripts/basic_workflow.R")` instead.** Inline workflow wastes time and introduces bugs.
-- ❌ **Write inline plotting code (ggsave, plotMA, etc.)** → **STOP: This violates the skill design. Use `source("scripts/qc_plots.R")` and `run_all_qc()` instead.** If scripts fail, fix the script, don't rewrite inline.
 - ❌ **Write custom export code** → **STOP: This violates the skill design. Use `source("scripts/export_results.R")` and `export_all()` instead.** Custom export code misses RDS objects and transformed counts needed downstream.
 - ❌ **Try to install svglite** → script handles SVG fallback automatically
 - ❌ **Use absolute paths for scripts** → Always use relative paths `scripts/file.R`
@@ -248,7 +243,7 @@ export_all(dds, res, resLFC, output_dir = "results")
 - **Result extraction** (specific contrasts): Read [references/comprehensive-reference.md#extracting-results](references/comprehensive-reference.md#extracting-results)
 - **Shrinkage methods** (ashr vs apeglm): Read [references/comprehensive-reference.md#log-fold-change-shrinkage](references/comprehensive-reference.md#log-fold-change-shrinkage)
 
-**❌ When NOT to write custom inline code:**
+**⚠️ When to adapt scripts vs. use as-is:**
 - Unless user explicitly says: "show me the complete inline workflow without using scripts"
 - The scripts already handle 95% of use cases - use them first, customize only if truly needed
 
@@ -285,7 +280,7 @@ export_all(dds, res, resLFC, output_dir = "results")
 - **Explain to user** why scripts couldn't be used
 - **Document the deviation** - Note what approach you're taking instead
 
-**⚠️ DO NOT skip straight to step 4** - Always attempt steps 1-3 first. Scripts are designed, tested, and documented. Inline code should be a last resort, not a first choice.
+**⚠️ Start from Step 1 — understand the full pipeline before adapting.** Scripts are designed and tested as coherent workflows. Adapt them as a whole, not piecemeal.
 
 **Example decision tree:**
 - Missing package? → **Step 1** (install and retry)
@@ -333,9 +328,9 @@ transformed <- transform_counts(dds, method = "auto")  # Auto-selects vst/rlog b
 
 ## Quality Control
 
-🚨 **REQUIRED: Use provided script (DO NOT write inline plotting code)**
+🚨 **REQUIRED: Use provided script as template — copy to project, adapt to your study** 🚨
 
-**CRITICAL: Source the script and call run_all_qc(). DO NOT reimplement plotting.**
+**Use run_all_qc() from the script as a template — copy and adapt to your study.**
 
 ```r
 source("scripts/qc_plots.R")
@@ -357,7 +352,7 @@ run_all_qc(dds, res, output_dir = "qc_plots")  # Auto-generates all QC plots
 - ✅ Auto-selects vst/rlog by sample size
 - ✅ Saves as SVG (vector) or PNG (raster) with 300 DPI
 
-⚠️ **DO NOT write inline plotting code** - scripts handle all visualization needs
+⚠️ **Use the script as a template — copy to project, adapt to your study.** - scripts handle all visualization needs
 
 **Script:** [scripts/qc_plots.R](scripts/qc_plots.R) - Complete QC plotting functions
 
@@ -443,7 +438,7 @@ export_all(dds, res, res_shrunk, output_dir = "deseq2_results")
 
 ## Best Practices
 
-1. 🚨 **CRITICAL: Use source() commands from Standard Workflow** - DO NOT write inline code
+1. 🚨 **CRITICAL: Use source() commands from Standard Workflow** - Use scripts as templates, copy to project, adapt to your study
    - Verify you see success messages: "✓ Pasilla dataset loaded successfully", "✓ Basic workflow completed successfully!"
    - Scripts handle all package installation, validation, and error checking automatically
 2. ✅ **REQUIRED: Validate sample IDs** match between counts and metadata (scripts do this automatically, or use `validate_input_data()`)

@@ -109,7 +109,7 @@ starting-prompt: Analyze cell-cell communication from my scRNA-seq data using Ce
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN — DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 — Load data:**
 ```r
@@ -123,21 +123,21 @@ seurat_obj <- load_cellchat_data()  # example PBMC data
 source("scripts/run_cellchat.R")
 cellchat <- run_cellchat_analysis(seurat_obj, species = "human", group.by = "celltype")
 ```
-**DO NOT write inline CellChat code. Just source the script and call the function.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 3 — Generate visualizations:**
 ```r
 source("scripts/cellchat_plots.R")
 generate_all_plots(cellchat, output_dir = "results")
 ```
-🚨 **DO NOT write inline plotting code. Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **Step 4 — Export results:**
 ```r
 source("scripts/export_results.R")
 export_all(cellchat, seurat_obj = seurat_obj, output_dir = "results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION — You should see:**
 - After Step 1: `"✓ Data loaded successfully! [N] cells, [M] cell types"`
@@ -148,8 +148,6 @@ export_all(cellchat, seurat_obj = seurat_obj, output_dir = "results")
 **❌ IF YOU DON'T SEE THESE:** You wrote inline code. Stop and use source().
 
 ⚠️ **CRITICAL — DO NOT:**
-- ❌ **Write inline CellChat code** → **STOP: Use `source("scripts/run_cellchat.R")`**
-- ❌ **Write inline plotting code** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install system-level dependencies** → CellChat handles its own deps
 

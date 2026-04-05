@@ -126,14 +126,14 @@ pip install scanpy anndata scvelo cellrank numpy pandas matplotlib seaborn scipy
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN — DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 — Load data:**
 ```python
 from scripts.load_example_data import load_example_data
 adata = load_example_data()
 ```
-**DO NOT write inline data loading code. Just use the script.**
+Use the script as a template — copy to project, adapt data loading to your dataset.
 
 **✅ VERIFICATION:** You MUST see: `"✓ Data loaded successfully!"`
 
@@ -142,7 +142,7 @@ adata = load_example_data()
 from scripts.run_trajectory_analysis import run_trajectory
 results = run_trajectory(adata, root_cell_type="Ductal", cluster_key="clusters")
 ```
-**DO NOT write inline trajectory code. Just use the script.**
+Use the script as a template — copy to project, adapt parameters to your dataset.
 
 **✅ VERIFICATION:** You MUST see: `"✓ Trajectory analysis completed successfully!"`
 
@@ -151,7 +151,7 @@ results = run_trajectory(adata, root_cell_type="Ductal", cluster_key="clusters")
 from scripts.generate_all_plots import generate_all_plots
 generate_all_plots(adata, results, output_dir="trajectory_results", cluster_key="clusters")
 ```
-🚨 **DO NOT write inline plotting code. Just use the script.** 🚨
+Use the script as a template — copy to project, adapt plots to your study.
 
 **✅ VERIFICATION:** You MUST see: `"✓ All plots generated successfully!"`
 
@@ -160,16 +160,13 @@ generate_all_plots(adata, results, output_dir="trajectory_results", cluster_key=
 from scripts.export_results import export_all
 export_all(adata, results, output_dir="trajectory_results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"=== Export Complete ==="`
 
 ---
 
 ⚠️ **CRITICAL — DO NOT:**
-- ❌ **Write inline data loading code** → **STOP: Use `load_example_data()` or `load_user_data()`**
-- ❌ **Write inline PAGA/DPT/scVelo code** → **STOP: Use `run_trajectory()`**
-- ❌ **Write inline plotting code (plt.savefig, sc.pl, etc.)** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 
 **⚠️ IF SCRIPTS FAIL — Script Failure Hierarchy:**

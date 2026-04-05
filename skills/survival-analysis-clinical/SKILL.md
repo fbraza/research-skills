@@ -133,7 +133,7 @@ BiocManager::install('RTCGA.clinical')
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load data:**
 ```r
@@ -142,7 +142,7 @@ data <- load_example_data(dataset = "tcga_brca")
 # OR: data <- load_example_data(dataset = "lung")
 # OR: data <- load_user_data("path/to/clinical.csv", time_col = "time", event_col = "status")
 ```
-**DO NOT write custom data loading code. Use the loader functions.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"✓ TCGA BRCA data loaded successfully!"` (or similar)
 
@@ -153,7 +153,7 @@ result <- run_survival_analysis(data)
 # Optional: result <- run_survival_analysis(data, risk_strata_method = "tertiles")
 # Optional: result <- run_survival_analysis(data, covariates = c("age", "stage"))
 ```
-**DO NOT write inline Cox/KM code (coxph, survfit, etc.). Just source and call.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"✓ Survival analysis completed successfully!"`
 
@@ -164,7 +164,7 @@ result <- run_survival_analysis(data)
 source("scripts/survival_plots.R")
 generate_all_plots(result, output_dir = "results")
 ```
-🚨 **DO NOT write inline plotting code (ggsave, ggplot, ggsurvplot, etc.). Just use `generate_all_plots()`.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -175,14 +175,12 @@ generate_all_plots(result, output_dir = "results")
 source("scripts/export_results.R")
 export_all(result, output_dir = "results")
 ```
-**DO NOT write custom export code. Use `export_all()` to save all outputs including RDS.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see:
 - `"=== Export Complete ==="`
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline Cox/KM code (coxph, survfit)** → **STOP: Use `source("scripts/basic_workflow.R")`**
-- ❌ **Write inline plotting code (ggsave, ggplot, ggsurvplot)** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install svglite** → script handles SVG fallback automatically
 

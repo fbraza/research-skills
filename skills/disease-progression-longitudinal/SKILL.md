@@ -146,7 +146,7 @@ For detailed installation and troubleshooting, see [troubleshooting_guide.md](re
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load and preprocess data:**
 
@@ -183,7 +183,7 @@ data, metadata, preprocessing_stats = load_and_preprocess_data(
     min_timepoints=3
 )
 ```
-**DO NOT write inline data loading or preprocessing code. Just use the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"✓ Data loaded and preprocessed successfully!"`
 
@@ -201,7 +201,7 @@ results = run_trajectory_analysis(
 )
 # Extract: pseudotime, trajectory_features, model, robustness_score
 ```
-**DO NOT write inline TimeAx or trajectory code. Just use the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"✓ Trajectory analysis completed successfully!"`
 
@@ -217,7 +217,7 @@ generate_all_plots(
     output_dir='trajectory_results'
 )
 ```
-🚨 **DO NOT write inline plotting code (plt.savefig, seaborn, etc.). Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -235,16 +235,13 @@ export_all(
     output_dir='trajectory_results'
 )
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** You MUST see: `"=== Export Complete ==="`
 
 ---
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline data loading code** → **STOP: Use `load_and_preprocess_data()`**
-- ❌ **Write inline TimeAx/trajectory code** → **STOP: Use `run_trajectory_analysis()`**
-- ❌ **Write inline plotting code** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 
 **⚠️ IF SCRIPTS FAIL - Script Failure Hierarchy:**

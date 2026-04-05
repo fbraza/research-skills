@@ -167,7 +167,7 @@ install.packages(c("msigdbr", "ggplot2", "ggrepel", "dplyr"))
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **CRITICAL: Use relative paths (scripts/). DO NOT construct absolute paths.**
 
@@ -190,19 +190,19 @@ de_results <- load_de_results("your_de_results.csv")  # Replace with your file p
 ranked_genes <- create_ranked_list(de_results)
 term2gene <- get_msigdb_genesets("human", c("H", "C2:CP:KEGG"))
 ```
-**DO NOT write inline data loading code. Just use the scripts.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 2 - Run analysis:**
 ```r
 gsea_result <- run_gsea(ranked_genes, term2gene)
 ```
-**DO NOT write inline GSEA code. Just use run_gsea().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 3 - Generate visualizations:**
 ```r
 generate_all_plots(gsea_result)
 ```
-🚨 **DO NOT write inline plotting code (ggsave, dotplot, etc.). Just use generate_all_plots().** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -210,7 +210,7 @@ generate_all_plots(gsea_result)
 ```r
 export_all(gsea_result, ranked_genes, output_prefix = "enrichment")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION - You should see:**
 - After Step 1: `"✓ Data loaded successfully"`
@@ -221,8 +221,6 @@ export_all(gsea_result, ranked_genes, output_prefix = "enrichment")
 **❌ IF YOU DON'T SEE THESE:** You wrote inline code. Stop and use the scripts.
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline enrichment code** → **STOP: Use `run_gsea()`**
-- ❌ **Write inline plotting code (ggsave, dotplot, gseaplot2, etc.)** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Use absolute paths** → use relative paths `scripts/`
 - ❌ **Skip the background parameter in ORA** → causes inflated p-values

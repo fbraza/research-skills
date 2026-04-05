@@ -174,7 +174,7 @@ BiocManager::install(c("clusterProfiler", "org.Hs.eg.db"))  # Human
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load data:**
 ```r
@@ -203,14 +203,14 @@ results <- run_wgcna_analysis(
   organism = "mouse"  # or "human", "rat", or NULL to skip enrichment
 )
 ```
-**DO NOT write inline WGCNA code. Just source the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 3 - Generate visualizations:**
 ```r
 source("scripts/plot_all_wgcna.R")
 plot_all_wgcna(results, output_dir = "wgcna_results")
 ```
-🚨 **DO NOT write inline plotting code (png, svg, plotDendroAndColors, etc.). Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -219,7 +219,7 @@ plot_all_wgcna(results, output_dir = "wgcna_results")
 source("scripts/export_wgcna_results.R")
 export_all(results, output_dir = "wgcna_results")
 ```
-**DO NOT write custom export code. Use export_all().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION - You should see:**
 - After Step 1: `"✓ Successfully loaded female mouse liver dataset"`
@@ -228,8 +228,6 @@ export_all(results, output_dir = "wgcna_results")
 - After Step 4: `"=== Export Complete ==="`
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline WGCNA code** → **STOP: Use `source("scripts/wgcna_workflow.R")`**
-- ❌ **Write inline plotting code (png, svg, plotDendroAndColors, etc.)** → **STOP: Use `plot_all_wgcna()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install svglite** → script handles SVG fallback automatically
 - ❌ Use absolute paths → use relative paths `scripts/`

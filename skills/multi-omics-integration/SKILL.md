@@ -111,7 +111,7 @@ install.packages(c("ggprism", "circlize", "reshape2", "RColorBrewer"))
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load data:**
 ```r
@@ -140,7 +140,7 @@ model <- run_mofa_analysis(
     output_dir = "mofa_results"
 )
 ```
-**DO NOT write inline MOFA code. Just call `run_mofa_analysis()`.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 ⏱️ **Takes ~2-5 min** (+ ~1-3 min extra on first run for Python environment setup via basilisk).
 
@@ -153,7 +153,7 @@ model <- run_mofa_analysis(
 source("scripts/mofa_plots.R")
 generate_all_plots(model, output_dir = "mofa_results")
 ```
-🚨 **DO NOT write inline plotting code (ggsave, ggplot, Heatmap, etc.). Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **The script handles PNG + SVG export with graceful fallback for SVG dependencies.**
 
@@ -166,15 +166,13 @@ generate_all_plots(model, output_dir = "mofa_results")
 source("scripts/export_results.R")
 export_all(model, output_dir = "mofa_results")
 ```
-**DO NOT write custom export code. Use `export_all()`.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION:** `"=== Export Complete ==="` with file list
 
 ---
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline MOFA code** → **STOP: Use `run_mofa_analysis()`**
-- ❌ **Write inline plotting code (ggsave, ggplot, Heatmap, etc.)** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install basilisk/reticulate manually** → MOFA2 handles Python automatically
 

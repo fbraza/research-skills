@@ -140,7 +140,7 @@ BiocManager::install(c('impute', 'vsn'))          # kNN imputation, VSN normaliz
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Step 1 - Load data:**
 ```r
@@ -155,7 +155,7 @@ metadata <- data$metadata
 ```r
 source("scripts/basic_workflow.R")
 ```
-**DO NOT expand this into inline code. DO NOT write limma/DEqMS steps manually. Just source the script.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **Step 3 - Generate plots:**
 ```r
@@ -163,7 +163,7 @@ source("scripts/qc_plots.R")
 generate_all_plots(fit_deqms, deqms_results, protein_matrix,
                     metadata, output_dir = "results", raw_matrix = raw_matrix)
 ```
-🚨 **DO NOT write inline plotting code (ggsave, ggplot, Heatmap, etc.). Just use the script.** 🚨
+🚨 **Use the script as a template — copy to project, adapt to your study.** 🚨
 
 **Step 4 - Export results:**
 ```r
@@ -171,7 +171,7 @@ source("scripts/export_results.R")
 export_all(fit_deqms, deqms_results, protein_matrix, metadata,
             output_dir = "results")
 ```
-**DO NOT write custom export code. Use export_all() to save all outputs including RDS.**
+**Use the script as a template — copy to project, adapt to your study.**
 
 **✅ VERIFICATION - You should see:**
 - After Step 1: `"✓ Example data loaded successfully"` with PSM/protein counts
@@ -182,8 +182,6 @@ export_all(fit_deqms, deqms_results, protein_matrix, metadata,
 **❌ IF YOU DON'T SEE THESE MESSAGES:** You wrote inline code. Stop and use source().
 
 ⚠️ **CRITICAL - DO NOT:**
-- ❌ **Write inline limma/DEqMS code** → **STOP: Use `source("scripts/basic_workflow.R")`**
-- ❌ **Write inline plotting code** → **STOP: Use `generate_all_plots()`**
 - ❌ **Write custom export code** → **STOP: Use `export_all()`**
 - ❌ **Try to install svglite** → scripts handle SVG fallback automatically
 - ❌ **Use absolute paths** → Always use `scripts/file.R`

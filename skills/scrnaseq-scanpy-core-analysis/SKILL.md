@@ -104,16 +104,16 @@ Complete workflow for single-cell RNA-seq analysis using Scanpy and the scverse 
 
 ## Standard Workflow
 
-🚨 **MANDATORY: USE SCRIPTS EXACTLY AS SHOWN - DO NOT WRITE INLINE CODE** 🚨
+🚨 **MANDATORY: SCRIPTS ARE TEMPLATES — COPY TO PROJECT WORKING DIRECTORY, THEN ADAPT TO STUDY** 🚨
 
 **Detailed step-by-step code:** [references/workflow-details.md](references/workflow-details.md)
 
-**CRITICAL - DO NOT:**
-- Write inline analysis code → **STOP: Use the script functions**
-- Write custom export code → **STOP: Use `export_anndata_results()`**
-- Skip verification messages → **STOP: Check for "✓" messages after each step**
+**CRITICAL — scripts are templates:**
+- Copy script functions to project → adapt parameters to your study
+- All models require raw counts (never pass log-normalized or scaled data)
+- Always verify "✓" confirmation messages after each step
 
-**IF SCRIPTS FAIL - Script Failure Hierarchy:**
+**IF SCRIPTS FAIL — Script Failure Hierarchy:**
 1. **Fix and Retry (90%)** - Install missing package, re-run script
 2. **Modify Script (5%)** - Edit the script file itself, document changes
 3. **Use as Reference (4%)** - Read script, adapt approach, cite source
@@ -139,7 +139,7 @@ adata = run_scrublet_detection(adata, batch_key="batch")
 adata = filter_by_mad_outliers(adata, remove_doublets=True)
 ```
 
-**DO NOT write inline QC code.** Doublet rate auto-scales per batch (~0.8% per 1,000 cells). Aim for >70% cell retention. For raw data, prepend ambient RNA correction: [references/ambient_rna_correction.md](references/ambient_rna_correction.md)
+**Use the script as a template — copy to project, adapt to your study.** Doublet rate auto-scales per batch (~0.8% per 1,000 cells). Aim for >70% cell retention. For raw data, prepend ambient RNA correction: [references/ambient_rna_correction.md](references/ambient_rna_correction.md)
 
 **✅ VERIFICATION:** `"✓ Data loaded successfully!"` → QC metrics added → filtering summary with retention %.
 
@@ -161,7 +161,7 @@ adata = run_scvi_integration(adata, batch_key="batch", condition_key="condition"
 lisi = compute_lisi_scores(adata, batch_key="batch", use_rep="X_scVI")
 ```
 
-**DO NOT write inline normalization or integration code.** The integration script auto-detects batch-condition confounding. [Details →](references/integration_methods.md)
+**Use the script as a template — copy to project, adapt to your study.** The integration script auto-detects batch-condition confounding. [Details →](references/integration_methods.md)
 
 **✅ VERIFICATION:**
 - Normalization: `"✓ Normalization complete"`
@@ -190,7 +190,7 @@ annotations = {"0": "CD4 T cells", "1": "CD14+ Monocytes", ...}
 adata = annotate_clusters_manual(adata, annotations, cluster_key="leiden_0.8")
 ```
 
-**DO NOT write inline clustering or annotation code.** CellTypist validates labels post-hoc (flags suspect ILC/HSC, contamination, low-complexity). [Markers →](references/marker_gene_database.md)
+**Use the script as a template — copy to project, adapt to your study.** CellTypist validates labels post-hoc (flags suspect ILC/HSC, contamination, low-complexity). [Markers →](references/marker_gene_database.md)
 
 **⚠️ n_pcs for neighbor graph:** Default is 30 PCs (standard). Using <15 PCs risks collapsing distinct populations. If you used `suggest_n_pcs()` in Step 2, pass that value here.
 
@@ -208,7 +208,7 @@ from export_results import export_anndata_results
 export_anndata_results(adata, output_dir="results", cluster_key="cell_type")
 ```
 
-**DO NOT write custom export code. Use export_anndata_results().**
+**Use the script as a template — copy to project, adapt to your study.**
 
 Exports: H5AD, expression matrices (raw + normalized CSV), cell metadata, UMAP/PCA coordinates, text summary.
 
