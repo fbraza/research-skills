@@ -2,6 +2,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { emitProgress, errorResult, textResult } from "../tool-output.ts";
 
 const PUBMED_SEARCH_PARAMS = Type.Object({
 	query: Type.String({ description: "PubMed query string (supports field tags like [tiab], [mh], [pt])" }),
@@ -474,19 +475,6 @@ function formatPaperText(papers: PaperRecord[]): string {
 	return JSON.stringify(papers, null, 2);
 }
 
-function emitProgress(
-	onUpdate:
-		| ((update: { content: Array<{ type: "text"; text: string }>; details: Record<string, unknown> }) => void)
-		| undefined,
-	text: string,
-	details: Record<string, unknown> = {},
-): void {
-	onUpdate?.({
-		content: [{ type: "text", text }],
-		details,
-	});
-}
-
 export default function literatureToolsExtension(pi: ExtensionAPI) {
 	pi.registerTool({
 		name: "pubmed_search",
@@ -508,11 +496,11 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 			const esearch = await fetchJson<{ esearchresult?: { idlist?: string[]; count?: string } }>(esearchUrl.toString(), signal);
 			const ids = esearch.esearchresult?.idlist ?? [];
 			if (ids.length === 0) {
-				return { content: [{ type: "text", text: "[]" }], details: { count: 0, papers: [] } };
+				return textResult("[]", { count: 0, papers: [] });
 			}
 			if (params.fetch_abstracts === false) {
 				const papers = ids.map((pmid) => ({ pmid, title: "PubMed record", source: "pubmed" }));
-				return { content: [{ type: "text", text: formatPaperText(papers) }], details: { count: papers.length, papers } };
+				return textResult(formatPaperText(papers), { count: papers.length, papers });
 			}
 			const rateLimitMs = apiKeyValue ? 120 : 350;
 			const batchSize = 50;
@@ -529,10 +517,12 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 				papers.push(...parsePubmedArticles(xml));
 				if (start + batchSize < ids.length) await sleep(rateLimitMs, signal);
 			}
-			return {
-				content: [{ type: "text", text: formatPaperText(papers) }],
-				details: { count: papers.length, papers, query, total: Number(esearch.esearchresult?.count ?? papers.length) },
-			};
+			return textResult(formatPaperText(papers), {
+				count: papers.length,
+				papers,
+				query,
+				total: Number(esearch.esearchresult?.count ?? papers.length),
+			});
 		},
 	});
 
@@ -581,10 +571,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 				const total = Number(payload.messages?.[0]?.total ?? 0);
 				if (cursor >= total && total > 0) break;
 			}
-			return {
-				content: [{ type: "text", text: formatPaperText(filtered) }],
-				details: { count: filtered.length, preprints: filtered, server },
-			};
+			return textResult(formatPaperText(filtered), { count: filtered.length, preprints: filtered, server });
 		},
 	});
 
@@ -642,7 +629,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 			if (params.open_access_only) papers = papers.filter((paper) => !!paper.open_access_pdf);
 			if (params.year_from !== undefined) papers = papers.filter((paper) => (paper.year ?? 0) >= params.year_from!);
 			if (params.year_to !== undefined) papers = papers.filter((paper) => (paper.year ?? 9999) <= params.year_to!);
-			return { content: [{ type: "text", text: formatPaperText(papers) }], details: { count: papers.length, papers } };
+			return textResult(formatPaperText(papers), { count: papers.length, papers });
 		},
 	});
 
@@ -653,7 +640,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 		parameters: FETCH_FULLTEXT_PARAMS,
 		async execute(_toolCallId, params, signal, onUpdate) {
 			if (!params.pmid && !params.doi) {
-				throw new Error("Provide at least one of `pmid` or `doi`.");
+				return errorResult("Provide at least one of `pmid` or `doi`.");
 			}
 			let pmid = params.pmid?.trim() || undefined;
 			let doi = normalizeDoi(params.doi);
@@ -672,7 +659,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 				if (pmc.source !== "not_found" && pmc.pdf_url) {
 					const result: any = { ...pmc };
 					if (params.output_dir) result.pdf_path = await savePdf(pmc.pdf_url, params.output_dir, pmid ?? doi ?? "paper", signal);
-					return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], details: result };
+					return textResult(JSON.stringify(result, null, 2), result);
 				}
 			}
 
@@ -683,7 +670,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 				if (publisher.source !== "not_found" && publisher.pdf_url) {
 					const result: any = { ...publisher };
 					if (params.output_dir) result.pdf_path = await savePdf(publisher.pdf_url, params.output_dir, doi, signal);
-					return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], details: result };
+					return textResult(JSON.stringify(result, null, 2), result);
 				}
 
 				emitProgress(onUpdate, `Checking Semantic Scholar open-access PDF metadata for DOI ${doi}...`);
@@ -692,7 +679,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 				if (preprint.source !== "not_found" && preprint.pdf_url) {
 					const result: any = { ...preprint };
 					if (params.output_dir) result.pdf_path = await savePdf(preprint.pdf_url, params.output_dir, doi, signal);
-					return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], details: result };
+					return textResult(JSON.stringify(result, null, 2), result);
 				}
 
 				emitProgress(onUpdate, `Trying Sci-Hub fallback for DOI ${doi}...`);
@@ -701,7 +688,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 				if (scihub.source !== "not_found" && scihub.pdf_url) {
 					const result: any = { ...scihub };
 					if (params.output_dir) result.pdf_path = await savePdf(scihub.pdf_url, params.output_dir, doi, signal);
-					return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], details: result };
+					return textResult(JSON.stringify(result, null, 2), result);
 				}
 			}
 
@@ -711,7 +698,7 @@ export default function literatureToolsExtension(pi: ExtensionAPI) {
 				access_note: "No full-text PDF found via PMC, publisher OA, Semantic Scholar OA, or Sci-Hub",
 				attempts,
 			};
-			return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }], details: result };
+			return textResult(JSON.stringify(result, null, 2), result);
 		},
 	});
 }
