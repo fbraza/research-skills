@@ -5,6 +5,14 @@ import { CACHE_DIR, LOCAL_SKILLS_DIR, REMOTE_REPO, REMOTE_SKILLS_PATH } from "./
 import type { ExecFn } from "./constants.ts";
 import { normalizeError } from "./rendering.ts";
 
+const RECOVERABLE_CACHE_ERROR_PATTERN =
+	/not a git repository|this operation must be run in a work tree|bad object|index file corrupt|corrupt|reference broken|could not parse object|unable to read tree/i;
+
+export interface CacheEnsureResult {
+	rebuilt: boolean;
+	message?: string;
+}
+
 export function getLocalSkillsPath(cwd: string): string {
 	return path.join(cwd, LOCAL_SKILLS_DIR);
 }
@@ -64,27 +72,84 @@ export async function listRemoteSkills(exec: ExecFn): Promise<string[]> {
 		.sort((a, b) => a.localeCompare(b));
 }
 
-export async function ensureCache(exec: ExecFn): Promise<void> {
-	const gitDir = path.join(CACHE_DIR, ".git");
-	if (existsSync(gitDir)) {
-		const fetchResult = await exec("git", ["-C", CACHE_DIR, "fetch", "origin", "main", "--depth", "1"], { timeout: 60_000 });
-		if (fetchResult.code !== 0) {
-			throw new Error(fetchResult.stderr.trim() || fetchResult.stdout.trim() || "Failed to refresh skill cache.");
-		}
-		const resetResult = await exec("git", ["-C", CACHE_DIR, "reset", "--hard", "origin/main"], { timeout: 60_000 });
-		if (resetResult.code !== 0) {
-			throw new Error(resetResult.stderr.trim() || resetResult.stdout.trim() || "Failed to reset skill cache.");
-		}
-		return;
-	}
+function formatGitFailure(output: string, fallback: string): string {
+	const detail = output.trim();
+	return detail ? `${fallback}: ${detail}` : fallback;
+}
 
+function isRecoverableCacheError(error: unknown): boolean {
+	return RECOVERABLE_CACHE_ERROR_PATTERN.test(normalizeError(error));
+}
+
+async function isValidGitCache(exec: ExecFn, cacheDir: string): Promise<boolean> {
+	if (!existsSync(cacheDir)) return false;
+
+	const validateResult = await exec("git", ["-C", cacheDir, "rev-parse", "--is-inside-work-tree"], { timeout: 20_000 });
+	if (validateResult.code !== 0) return false;
+	return validateResult.stdout.trim() === "true";
+}
+
+async function removeCacheDir(cacheDir: string): Promise<void> {
+	await fs.rm(cacheDir, { recursive: true, force: true });
+}
+
+async function cloneCache(exec: ExecFn, cacheDir: string): Promise<void> {
 	const cloneResult = await exec(
 		"git",
-		["clone", "--depth", "1", `https://github.com/${REMOTE_REPO}.git`, CACHE_DIR],
+		["clone", "--depth", "1", `https://github.com/${REMOTE_REPO}.git`, cacheDir],
 		{ timeout: 120_000 },
 	);
 	if (cloneResult.code !== 0) {
-		throw new Error(cloneResult.stderr.trim() || cloneResult.stdout.trim() || "Failed to clone skill repository.");
+		throw new Error(formatGitFailure(cloneResult.stderr || cloneResult.stdout, "Failed to clone skill repository"));
+	}
+}
+
+async function refreshCache(exec: ExecFn, cacheDir: string): Promise<void> {
+	const fetchResult = await exec("git", ["-C", cacheDir, "fetch", "origin", "main", "--depth", "1"], { timeout: 60_000 });
+	if (fetchResult.code !== 0) {
+		throw new Error(formatGitFailure(fetchResult.stderr || fetchResult.stdout, "Failed to refresh skill cache"));
+	}
+
+	const resetResult = await exec("git", ["-C", cacheDir, "reset", "--hard", "origin/main"], { timeout: 60_000 });
+	if (resetResult.code !== 0) {
+		throw new Error(formatGitFailure(resetResult.stderr || resetResult.stdout, "Failed to reset skill cache"));
+	}
+}
+
+async function rebuildCache(exec: ExecFn, cacheDir: string, reason: string): Promise<void> {
+	await removeCacheDir(cacheDir);
+	try {
+		await cloneCache(exec, cacheDir);
+	} catch (error) {
+		throw new Error(`${reason} Tried to rebuild the cache, but cloning failed. ${normalizeError(error)}`);
+	}
+}
+
+export async function ensureCache(exec: ExecFn, cacheDir = CACHE_DIR): Promise<CacheEnsureResult> {
+	if (!(await pathExists(cacheDir))) {
+		await cloneCache(exec, cacheDir);
+		return { rebuilt: false };
+	}
+
+	const validCache = await isValidGitCache(exec, cacheDir);
+	if (!validCache) {
+		await rebuildCache(exec, cacheDir, `Detected an invalid skill cache at ${cacheDir}.`);
+		return {
+			rebuilt: true,
+			message: "Detected an invalid local skill cache and rebuilt it automatically.",
+		};
+	}
+
+	try {
+		await refreshCache(exec, cacheDir);
+		return { rebuilt: false };
+	} catch (error) {
+		if (!isRecoverableCacheError(error)) throw error;
+		await rebuildCache(exec, cacheDir, `Detected a broken skill cache at ${cacheDir}. ${normalizeError(error)}`);
+		return {
+			rebuilt: true,
+			message: "Detected a broken local skill cache and rebuilt it automatically.",
+		};
 	}
 }
 

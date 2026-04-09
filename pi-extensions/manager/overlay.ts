@@ -42,6 +42,7 @@ export class SkillManagerOverlay {
 	private retryAction: (() => void) | null = null;
 	private emptyMessage = "";
 	private progressItems: ProgressItem[] = [];
+	private progressNotice = "";
 	private progressDone = false;
 	private cancelRequested = false;
 	private viewToken = 0;
@@ -261,6 +262,10 @@ export class SkillManagerOverlay {
 			if (item.status === "failed") icon = this.theme.fg("error", "✗");
 			body.push(` ${icon}  ${item.name}`);
 			if (item.error) body.push(`    ${this.theme.fg("error", item.error)}`);
+		}
+		if (this.progressNotice) {
+			body.push(this.theme.fg("warning", this.progressNotice));
+			body.push("");
 		}
 		body.push("");
 		if (this.progressDone) {
@@ -517,6 +522,7 @@ export class SkillManagerOverlay {
 	private startProgress(): void {
 		const names = Array.from(this.selected).sort((a, b) => a.localeCompare(b));
 		this.progressItems = names.map((name) => ({ name, status: "waiting" }));
+		this.progressNotice = "";
 		this.progressDone = false;
 		this.cancelRequested = false;
 		this.screen = "progress";
@@ -528,7 +534,9 @@ export class SkillManagerOverlay {
 	private async runProgress(names: string[]): Promise<void> {
 		try {
 			if (this.actionMode === "install" || this.actionMode === "update") {
-				await ensureCache(this.exec);
+				const cacheResult = await ensureCache(this.exec);
+				this.progressNotice = cacheResult.message ?? "";
+				this.requestRender();
 			}
 
 			for (let index = 0; index < names.length; index++) {
