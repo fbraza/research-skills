@@ -119,10 +119,15 @@ fig.savefig('./results/figure_name.png', dpi=300, bbox_inches='tight')
 # Publication palette (default for embeddings and multi-category plots)
 # Muted earthy tones — warm, distinguishable, Nature/Cell aesthetic
 PUBLICATION_PALETTE = [
-    '#3A5BA0', '#D4753C', '#5A8F5A', '#C44E52', '#8C6D31',
-    '#7B5EA7', '#E8A838', '#46878F', '#B07AA1', '#86714D',
-    '#4E9A9A', '#D98880', '#6B8E23', '#B8860B', '#708090',
-    '#9B59B6', '#2E86C1', '#D35400', '#1ABC9C', '#8B4513',
+    '#3A5BA0', '#D4753C', '#5A8F5A', '#C44E52', '#7B5EA7',
+    '#E8A838', '#46878F', '#B07AA1', '#2E86C1', '#8C6D31',
+    '#4E9A9A', '#D98880', '#6B8E23', '#9B59B6', '#1ABC9C',
+    '#86714D', '#8EC9EB', '#6E2F84', '#F5A623', '#7BC657',
+    '#708090', '#8B4513', '#C5A9D8', '#D35400', '#B8860B',
+    '#E2DBA4', '#C0D0CB', '#E46571', '#90141A', '#2E5111',
+    '#203161', '#40569A', '#64B024', '#BDD2CB', '#931419',
+    '#C04736', '#EBA5AB', '#BEACAE', '#5C6C6B', '#F09F2E',
+    '#D83746', '#DA5E28', '#DDDDDB', '#97767A', '#C24935',
 ]
 
 # Okabe-Ito (fallback for accessibility-critical contexts)
@@ -149,6 +154,37 @@ scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0)
 - Maximum 20 distinct colors for categorical data (publication palette) — use grouping if more needed
 - For diverging data: blue-white-red or similar, symmetric around zero
 - For sequential data: magma (expression) or viridis (generic)
+
+### General Color Selection Principles
+
+Color is not decorative. It must improve reading, interpretation, and consistency.
+
+**Core rules:**
+- Prefer `PUBLICATION_PALETTE` by default.
+- Choose colors based on the structure of the data and the message of the figure.
+- Favor readability over maximum color variety.
+- Keep color meaning consistent across related panels and figures.
+
+**By plot type:**
+- **Categorical groups (few groups):** use clearly distinct hues with strong separation.
+- **Categorical groups (many groups):** simplify; if color no longer improves readability, use fewer repeated colors plus labels.
+- **Binary comparisons:** use two clearly contrasting colors.
+- **Ordered / progressive categories:** use a sequential light-to-dark progression within one hue family.
+- **Continuous values:** use perceptually ordered colormaps such as `magma` or `viridis`.
+- **Diverging values around a reference (e.g. 0):** use a diverging colormap centered on that reference.
+- **Highlighting one group:** use one accent color and mute the rest in gray or lighter tones.
+
+**Readability rules:**
+- Avoid adjacent colors with very similar hue and lightness.
+- Avoid overly bright yellow on white backgrounds unless it has a darker edge or is used sparingly.
+- Avoid red/green-only contrasts when another pairing can communicate the same message.
+- In dense plots, use fewer colors and reduce visual noise.
+- If labels, ordering, or position already identify groups clearly, do not force unnecessary color variation.
+
+**Consistency rules:**
+- Reuse the same color for the same biological group / condition across figures whenever possible.
+- If a color convention is already established in the project, preserve it unless readability clearly improves with a change.
+- When a reference image is provided by the user, match its color logic before introducing new palette choices.
 
 ### Text and Labels
 - **No overlapping labels** — use `adjustText` (Python) or `ggrepel` (R)
