@@ -45,3 +45,5 @@ results/
 node_modules/
 package-lock.json
 *.mjs
+
+.memory/branches/*/log.md
