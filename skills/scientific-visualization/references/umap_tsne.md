@@ -43,22 +43,32 @@ PUBLICATION_PALETTE = [
     "#D4753C",  # burnt orange
     "#5A8F5A",  # forest green
     "#C44E52",  # brick red
-    "#8C6D31",  # olive/khaki
     "#7B5EA7",  # dusty purple
     "#E8A838",  # warm gold
     "#46878F",  # teal
     "#B07AA1",  # mauve
-    "#86714D",  # warm brown
+    "#2E86C1",  # steel blue
+    "#8C6D31",  # olive/khaki
     "#4E9A9A",  # sage teal
     "#D98880",  # dusty rose
     "#6B8E23",  # olive drab
-    "#B8860B",  # dark goldenrod
-    "#708090",  # slate grey
     "#9B59B6",  # muted violet
-    "#2E86C1",  # steel blue
-    "#D35400",  # pumpkin
     "#1ABC9C",  # muted aquamarine
+    "#86714D",  # warm brown
+    "#8EC9EB",  # light sky blue
+    "#6E2F84",  # deep plum
+    "#F5A623",  # bright amber / saffron
+    "#7BC657",  # fresh leaf green
+    "#708090",  # slate grey
     "#8B4513",  # saddle brown
+    "#C5A9D8",  # soft lavender
+    "#D35400",  # pumpkin
+    "#B8860B",  # dark goldenrod
+    "#E2DBA4",  # pale sand
+    "#C0D0CB",  # pale sage
+    "#E46571",  # coral pink
+    "#90141A",  # oxblood
+    "#2E5111",  # deep olive green
 ]
 
 # Fallback for accessibility-critical contexts
@@ -147,10 +157,12 @@ import ultraplot as uplt
 # ── Palettes ─────────────────────────────────────────────────────────
 
 PUBLICATION_PALETTE = [
-    "#3A5BA0", "#D4753C", "#5A8F5A", "#C44E52", "#8C6D31",
-    "#7B5EA7", "#E8A838", "#46878F", "#B07AA1", "#86714D",
-    "#4E9A9A", "#D98880", "#6B8E23", "#B8860B", "#708090",
-    "#9B59B6", "#2E86C1", "#D35400", "#1ABC9C", "#8B4513",
+    "#3A5BA0", "#D4753C", "#5A8F5A", "#C44E52", "#7B5EA7",
+    "#E8A838", "#46878F", "#B07AA1", "#2E86C1", "#8C6D31",
+    "#4E9A9A", "#D98880", "#6B8E23", "#9B59B6", "#1ABC9C",
+    "#86714D", "#8EC9EB", "#6E2F84", "#F5A623", "#7BC657",
+    "#708090", "#8B4513", "#C5A9D8", "#D35400", "#B8860B",
+    "#E2DBA4", "#C0D0CB", "#E46571", "#90141A", "#2E5111",
 ]
 
 OKABE_ITO = [

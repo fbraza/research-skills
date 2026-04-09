@@ -89,10 +89,12 @@ import ultraplot as uplt
 
 # Publication palette (muted earthy tones — default)
 PUBLICATION_PALETTE = [
-    "#3A5BA0", "#D4753C", "#5A8F5A", "#C44E52", "#8C6D31",
-    "#7B5EA7", "#E8A838", "#46878F", "#B07AA1", "#86714D",
-    "#4E9A9A", "#D98880", "#6B8E23", "#B8860B", "#708090",
-    "#9B59B6", "#2E86C1", "#D35400", "#1ABC9C", "#8B4513",
+    "#3A5BA0", "#D4753C", "#5A8F5A", "#C44E52", "#7B5EA7",
+    "#E8A838", "#46878F", "#B07AA1", "#2E86C1", "#8C6D31",
+    "#4E9A9A", "#D98880", "#6B8E23", "#9B59B6", "#1ABC9C",
+    "#86714D", "#8EC9EB", "#6E2F84", "#F5A623", "#7BC657",
+    "#708090", "#8B4513", "#C5A9D8", "#D35400", "#B8860B",
+    "#E2DBA4", "#C0D0CB", "#E46571", "#90141A", "#2E5111",
 ]
 
 # Okabe-Ito (colorblind-safe fallback)

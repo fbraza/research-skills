@@ -32,6 +32,9 @@ mise.toml
 TO_EVALUATE/
 test_plots/
 
+# Scientific visualization generated scripts/plots
+skills/scientific-visualization/assets/scripts/
+
 # data
 data/
 
