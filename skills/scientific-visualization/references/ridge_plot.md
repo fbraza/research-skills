@@ -1,25 +1,34 @@
 # Ridge Plot
 
-Publication-ready ridge plots for showing the distribution of expression, concentration, score, or QC metrics across groups.
+Publication-ready ridge plots for comparing the distribution of one continuous feature across multiple groups. Use when you want stacked density curves with in-panel group labels and a compact publication-style layout.
 
 ## When to Use
 
-- Comparing the full distribution of one continuous feature across multiple groups
-- Showing how a gene, score, concentration, or QC metric shifts between conditions or cell subsets
-- Displaying many related group distributions in a compact stacked layout
-- Replacing boxplots/violins when the visual goal is smooth distribution shape rather than summary statistics
+- Comparing the full distribution of one continuous variable across groups
+- Showing how gene expression, pathway scores, concentrations, or QC metrics shift between conditions
+- Displaying multiple related distributions in a compact stacked layout
+- Replacing boxplots or violins when the main visual message is the density shape
+
+## Core Principle
+
+`pubplot` keeps plotting separate from data extraction.
+
+- **Plotting functions expect a pandas DataFrame**
+- **AnnData / Seurat examples below are only for preparing that DataFrame**
+- The plotting API operates on long-format grouped data, independent of source object type
 
 ## Input Data
 
-Expected input: a DataFrame in long format with these columns:
+The plotting function in `pubplot/ridge.py` expects a **long-format pandas DataFrame**.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `group` | str | Categorical grouping variable (e.g., `Healthy`, `Severe`, `CD8 T cells`) |
-| `value` | float | Continuous feature to visualize (expression, score, concentration, QC metric) |
+Required inputs:
+- one categorical grouping column
+- one numeric value column
+- one explicit `feature_name` string used as the title above the frame
 
-Example CSV:
-```csv
+Example:
+
+```text
 group,value
 Healthy,0.42
 Healthy,0.55
@@ -29,17 +38,39 @@ Moderate,1.44
 Severe,1.85
 ```
 
+Typical grouping columns:
+- `cell_type`
+- `condition`
+- `cluster`
+- `batch`
+- `sample_group`
+
+Typical value columns:
+- gene expression
+- module score
+- pathway score
+- QC metric
+- concentration / abundance / intensity
+
 ## Data Extraction
 
-### Python (AnnData / scanpy)
+These examples show how to prepare the DataFrame. They are **not** part of the plotting library itself.
+
+### Python (AnnData)
+
+General principle:
+- group labels usually come from `adata.obs[...]`
+- values come from either `adata.obs[...]` or the expression matrix
+- the result should be a long-format DataFrame with at least a group column and a value column
+
+#### Gene expression by metadata group
 
 ```python
 import numpy as np
 import pandas as pd
 
-# Gene expression
-feature = "CCL5"
-values = adata[:, feature].X
+gene = "CCL5"
+values = adata[:, gene].X
 values = values.A1 if hasattr(values, "A1") else np.asarray(values).ravel()
 
 ridge_df = pd.DataFrame(
@@ -50,7 +81,7 @@ ridge_df = pd.DataFrame(
 )
 ```
 
-### Python (AnnData obs-level score / QC metric)
+#### Score or QC metric from `obs`
 
 ```python
 import numpy as np
@@ -58,105 +89,76 @@ import pandas as pd
 
 ridge_df = pd.DataFrame(
     {
-        "group": adata.obs["cell_type"].astype(str).values,
-        "value": adata.obs["pct_counts_mt"].astype(float).values,
+        "group": adata.obs["condition"].astype(str).values,
+        "value": adata.obs["module_score"].astype(float).values,
     }
 )
 
-# Example for total counts on a more compact scale
+# Example: log-transform a highly skewed metric before plotting
 ridge_df["value"] = np.log1p(adata.obs["total_counts"].astype(float).values)
 ```
 
-### R (Seurat) — export to CSV
+### R (Seurat) → CSV → pandas
+
+General principle:
+- extract the grouping variable from Seurat metadata
+- extract the continuous value from metadata or expression matrix
+- write a CSV in R
+- load the CSV in pandas
+- pass the DataFrame to `pubplot`
+
+#### Gene expression export from Seurat
 
 ```r
 library(Seurat)
+
 obj <- readRDS("seurat_processed.rds")
 
-# Gene expression
 ridge_df <- data.frame(
   group = obj$celltype,
   value = FetchData(obj, vars = "CCL5")[, 1]
 )
-write.csv(ridge_df, "ridge_data.csv", row.names = FALSE)
 
-# QC metric / score
-ridge_qc_df <- data.frame(
-  group = obj$celltype,
-  value = log1p(obj$nCount_RNA)
-)
-write.csv(ridge_qc_df, "ridge_qc_data.csv", row.names = FALSE)
+write.csv(ridge_df, "ridge_data.csv", row.names = FALSE)
 ```
 
-## Python Implementation
+#### QC metric or score export from Seurat
 
-```python
-from pathlib import Path
+```r
+library(Seurat)
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from scipy.stats import gaussian_kde
-from matplotlib.ticker import MultipleLocator, NullLocator
+obj <- readRDS("seurat_processed.rds")
 
-mpl.rcParams["svg.fonttype"] = "none"
-mpl.rcParams.update(
-    {
-        "font.family": "sans-serif",
-        "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
-        "font.size": 8,
-        "axes.labelsize": 9,
-        "axes.titlesize": 10,
-        "xtick.labelsize": 7,
-        "ytick.labelsize": 7,
-    }
+ridge_df <- data.frame(
+  group = obj$condition,
+  value = log1p(obj$nCount_RNA)
 )
 
-PUBLICATION_PALETTE = [
-    "#3A5BA0", "#D4753C", "#5A8F5A", "#C44E52", "#7B5EA7",
-    "#E8A838", "#46878F", "#B07AA1", "#2E86C1", "#8C6D31",
-    "#4E9A9A", "#D98880", "#6B8E23", "#9B59B6", "#1ABC9C",
-    "#86714D", "#8EC9EB", "#6E2F84", "#F5A623", "#7BC657",
-    "#708090", "#8B4513", "#C5A9D8", "#D35400", "#B8860B",
-    "#E2DBA4", "#C0D0CB", "#E46571", "#90141A", "#2E5111",
-]
+write.csv(ridge_df, "ridge_qc_data.csv", row.names = FALSE)
+```
 
-RIDGE_REFERENCE_COLORS = [
-    "#8EC9EB",  # light sky blue
-    "#C5A9D8",  # soft lavender
-    "#8E72A9",  # medium purple
-    "#6E2F84",  # deep plum
-    "#F5A623",  # orange
-    "#D4C33F",  # mustard yellow
-    "#86C95A",  # fresh green
-    "#1C9A46",  # deep green
-]
+#### Load in pandas
 
+```python
+import pandas as pd
 
-def _feature_fontsize(feature_name):
-    n = len(feature_name)
-    if n <= 8:
-        return 18
-    if n <= 14:
-        return 15
-    if n <= 22:
-        return 12
-    return 10
+ridge_df = pd.read_csv("ridge_data.csv")
+```
 
+## `pubplot` Implementation
 
-def _major_tick_step(xlim):
-    span = xlim[1] - xlim[0]
-    if span <= 4:
-        return 1
-    if span <= 8:
-        return 2
-    if span <= 20:
-        return 5
-    return 10
+Source of truth: `pubplot/ridge.py`
 
+This module exposes one main plotting function:
 
-def plot_ridge(
+```python
+from pubplot.ridge import plot_ridge
+```
+
+API:
+
+```python
+plot_ridge(
     df,
     group_col,
     value_col,
@@ -172,159 +174,165 @@ def plot_ridge(
     feature_loc=(0.5, 1.02),
     group_label_fontsize=15,
     save_path=None,
-):
-    """Plot a publication-style ridge plot.
+    save_fmt="png",
+)
+```
 
-    Stacked kernel density curves are drawn on separate baselines, with
-    group labels inside the panel and the feature name centered above the
-    frame.
+## Behavior Implemented in `pubplot/ridge.py`
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Long-format table containing the data.
-    group_col : str
-        Column name for the grouping variable.
-    value_col : str
-        Column name for the continuous feature.
-    feature_name : str
-        Name of the feature shown above the plot.
-    groups_to_plot : list of str or None, optional
-        Groups to include and their order. If None, all groups are used.
-    colors : list of str or None, optional
-        Fill/baseline colors for each group. If None, uses the ridge
-        reference colors.
-    figsize : tuple of float, optional
-        Figure size in inches. Default (4.2, 4.8).
-    xlim : tuple of float or None, optional
-        X-axis limits. If None, computed from the data.
-    bw_method : float or str, optional
-        KDE bandwidth passed to scipy.stats.gaussian_kde. Default 0.25.
-    fill_alpha : float, optional
-        Fill opacity. Default 1.0.
-    baseline_lw : float, optional
-        Line width of each group baseline. Default 1.8.
-    frame_lw : float, optional
-        Line width of the rectangular frame. Default 2.0.
-    feature_loc : tuple of float, optional
-        Position of the feature label in axes coordinates. Default
-        (0.5, 1.02), centered above the frame.
-    group_label_fontsize : float, optional
-        Font size for the group labels inside the plot. Default 15.
-    save_path : str or None, optional
-        Base path for saving (without extension). Saves both SVG and PNG.
+### Group filtering and ordering
 
-    Returns
-    -------
-    tuple of (Figure, Axes)
-        The matplotlib Figure and Axes objects.
-    """
-    groups = groups_to_plot or df[group_col].dropna().unique().tolist()
-    data_by_group = [df.loc[df[group_col] == group, value_col].dropna().to_numpy() for group in groups]
-    groups = [g for g, arr in zip(groups, data_by_group) if len(arr) > 1]
-    data_by_group = [arr for arr in data_by_group if len(arr) > 1]
+- If `groups_to_plot` is provided, it determines which groups are plotted and in what order
+- Otherwise, groups are taken from `df[group_col]` in first-appearance order after dropping missing values
+- Groups with fewer than 2 non-missing values are removed automatically
+- If no valid groups remain, the function raises:
 
-    if not groups:
-        raise ValueError("No groups with enough values to draw densities.")
+```python
+ValueError("No groups with enough values to draw densities.")
+```
 
-    if colors is None:
-        colors = RIDGE_REFERENCE_COLORS[: len(groups)]
-    if len(colors) < len(groups):
-        colors = [colors[i % len(colors)] for i in range(len(groups))]
+### KDE behavior
 
-    all_values = np.concatenate(data_by_group)
-    if xlim is None:
-        x_min = min(0, float(np.floor(all_values.min() * 10) / 10))
-        x_max = float(np.ceil(all_values.max() * 10) / 10)
-        xlim = (x_min, x_max)
+- Density curves are computed with `scipy.stats.gaussian_kde`
+- `bw_method=0.25` by default
+- If a group's values have near-zero variance, the code adds tiny Gaussian noise before KDE so the density can still be estimated
+- Each density is scaled to a maximum height of `0.82` within its ridge band
 
-    x_grid = np.linspace(xlim[0], xlim[1], 400)
-    y_positions = np.arange(len(groups))[::-1]
+### Color logic
 
-    fig, ax = plt.subplots(figsize=figsize)
+- If `colors=None`, the function uses `RIDGE_REFERENCE_COLORS`
+- If fewer colors are supplied than groups, colors are recycled
+- The same color is used for:
+  - ridge fill
+  - density outline
+  - horizontal baseline
 
-    max_height = 0
-    for y0, group, values, color in zip(y_positions, groups, data_by_group, colors):
-        kde = gaussian_kde(values, bw_method=bw_method)
-        density = kde(x_grid)
-        density = density / density.max() * 0.82
-        max_height = max(max_height, density.max())
+### X-axis limits and ticks
 
-        ax.fill_between(x_grid, y0, y0 + density, color=color, alpha=fill_alpha, linewidth=0)
-        ax.plot(x_grid, y0 + density, color=color, linewidth=1.4)
-        ax.hlines(y0, xlim[0], xlim[1], color=color, linewidth=baseline_lw)
+- If `xlim=None`, limits are computed from the data
+- The lower bound is rounded down to one decimal place and clipped at zero with:
 
-        ax.text(
-            xlim[1] - 0.01 * (xlim[1] - xlim[0]),
-            y0 + density.max() * 0.38,
-            group,
-            ha="right",
-            va="center",
-            fontsize=group_label_fontsize,
-            color="#1F1B20",
-        )
+```python
+x_min = min(0, floor(min_value * 10) / 10)
+```
 
-    ax.text(
-        feature_loc[0],
-        feature_loc[1],
-        feature_name,
-        transform=ax.transAxes,
-        ha="center",
-        va="bottom",
-        fontsize=_feature_fontsize(feature_name),
-        fontweight="bold",
-        clip_on=False,
-    )
+- The upper bound is rounded up to one decimal place
+- Major tick spacing is chosen automatically from the x-range:
+  - span `<= 4` → step `1`
+  - span `<= 8` → step `2`
+  - span `<= 20` → step `5`
+  - otherwise → step `10`
+- Minor ticks are disabled
 
-    ax.set_xlim(xlim)
-    ax.set_ylim(-0.05, y_positions.max() + max_height + 0.12)
-    ax.set_yticks([])
-    ax.set_ylabel("")
-    ax.set_xlabel("")
+### Layout and labels
 
-    ax.xaxis.set_major_locator(MultipleLocator(_major_tick_step(xlim)))
-    ax.xaxis.set_minor_locator(NullLocator())
-    ax.yaxis.set_minor_locator(NullLocator())
-    ax.tick_params(axis="x", width=1.6, length=10, labelsize=28, pad=12)
-    ax.tick_params(axis="y", length=0)
+- Group labels are placed **inside the panel on the right**
+- The `feature_name` is drawn above the frame using `feature_loc`
+- Feature title font size is auto-scaled by name length via `_feature_fontsize(...)`
+- The y-axis is hidden completely
+- The plot uses a full rectangular frame
 
-    for spine in ax.spines.values():
-        spine.set_visible(True)
-        spine.set_linewidth(frame_lw)
-        spine.set_color("black")
+### Saving behavior
 
-    ax.grid(False)
-    ax.set_facecolor("white")
-    fig.patch.set_facecolor("white")
+- If `save_path=None`, nothing is written to disk
+- If `save_path` is provided, parent directories are created automatically
+- `save_fmt="png"` saves PNG only
+- `save_fmt="svg"` saves SVG only
+- `save_fmt="both"` saves both PNG and SVG
 
-    fig.tight_layout(pad=0.6)
+## Aesthetic Notes
 
-    if save_path is not None:
-        save_path = Path(save_path)
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(save_path.with_suffix(".png"), dpi=300, bbox_inches="tight")
-        fig.savefig(save_path.with_suffix(".svg"), dpi=300, bbox_inches="tight")
+These rules reflect the actual implementation in `pubplot/ridge.py`.
 
-    return fig, ax
+- Compact stacked ridges with no legend
+- In-panel group labels on the right
+- Feature title centered above the frame
+- Full rectangular border
+- White background, no grid
+- Heavy x-axis tick styling for the publication look
+
+## Usage Examples
+
+### Basic ridge plot
+
+```python
+import pandas as pd
+from pubplot.ridge import plot_ridge
+
+ridge_df = pd.read_csv("ridge_data.csv")
+
+fig, ax = plot_ridge(
+    ridge_df,
+    group_col="group",
+    value_col="value",
+    feature_name="CCL5",
+    save_path="./results/ridge_CCL5",
+    save_fmt="both",
+)
+```
+
+### Subset and order groups
+
+```python
+fig, ax = plot_ridge(
+    ridge_df,
+    group_col="group",
+    value_col="value",
+    feature_name="CCL5",
+    groups_to_plot=["Healthy", "Moderate", "Severe"],
+    save_path="./results/ridge_subset",
+    save_fmt="both",
+)
+```
+
+### Custom x-range and bandwidth
+
+```python
+fig, ax = plot_ridge(
+    ridge_df,
+    group_col="group",
+    value_col="value",
+    feature_name="Module score",
+    xlim=(0, 5),
+    bw_method=0.4,
+    save_path="./results/ridge_score",
+    save_fmt="both",
+)
+```
+
+### Custom colors
+
+```python
+fig, ax = plot_ridge(
+    ridge_df,
+    group_col="group",
+    value_col="value",
+    feature_name="QC metric",
+    colors=["#8EC9EB", "#C5A9D8", "#6E2F84"],
+    save_path="./results/ridge_custom_colors",
+    save_fmt="both",
+)
 ```
 
 ## Colormap Recommendations
 
-| Data encoding | Colormap | Notes |
-|---------------|----------|-------|
-| Ridge groups (reference style) | `RIDGE_REFERENCE_COLORS` | Closely matches the provided ridge plot example |
-| General categorical groups | `PUBLICATION_PALETTE` | Use when more flexibility or more categories are needed |
-| Ordered groups / progression | Same-hue light → dark progression | Best when group order has biological meaning |
-| Highlight one group | One accent + muted others | Use when one condition is the main message |
+| Data encoding | Colors | Notes |
+|---------------|--------|-------|
+| Ridge groups (default) | `RIDGE_REFERENCE_COLORS` | Matches the intended reference style |
+| More flexible categorical styling | `PUBLICATION_PALETTE` | Use when custom grouping requires different tones |
+| Ordered progression | same-hue light → dark | Useful when groups have biological order |
+| Highlight one group | one accent + muted others | Useful when one condition is the main message |
 
 ## Customization Notes
 
-- **Rectangular frame**: Keep all four spines visible. This is part of the intended style.
-- **Feature title placement**: Center the feature name above the frame, not inside the plotting area.
-- **Group labels**: Place labels inside the panel on the right side. This avoids the need for a legend.
-- **Axis style**: Use only the x-axis. Hide all y-axis ticks and labels.
-- **Minimal x-axis ticks**: Use sparse integer major ticks only. Never show dense intermediate ticks.
-- **Bandwidth (`bw_method`)**: Lower values preserve local peaks; higher values smooth noisy distributions.
-- **Best use case**: Ridge plots work best for 4-10 groups. Too many groups can become cramped.
-- **Expression vs QC**: The same function can be used for genes, pathway scores, module scores, concentrations, or QC metrics.
-- **Scale choice**: For highly skewed variables like total counts, use `log1p` before plotting.
+- **`feature_name`** is mandatory and functions as the visual title above the frame
+- **`groups_to_plot`** is the main filtering and ordering parameter
+- **`bw_method`** controls smoothness; smaller values preserve local structure, larger values smooth more aggressively
+- **`xlim`** should be set manually when you need strict cross-figure comparability
+- **Ridge plots work best when each group has enough observations to support density estimation**
+- **For highly skewed variables, transform first** (for example with `log1p`) before plotting
+- **No legend is needed** because the group labels are drawn directly in the panel
+
+## Caption Template
+
+> **Ridge plot of {feature_name} across {grouping}.** Each ridge shows the kernel density estimate of the distribution within one group. Group labels are shown inside the panel. Plot generated with `pubplot` using publication-style ridge defaults.
