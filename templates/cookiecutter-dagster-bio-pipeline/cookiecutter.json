@@ -1,7 +1,0 @@
-{
-  "project_name": "my-analysis",
-  "project_slug": "my-analysis",
-  "package_name": "{{ cookiecutter.project_slug.replace('-', '_') }}",
-  "author_name": "Your Name",
-  "python_version": "3.12"
-}
