@@ -126,7 +126,7 @@ project/
 │   ├── clustered/          # post-normalization/reduction/clustering checkpoint
 │   └── ...                 # only meaningful stage checkpoints, named semantically
 └── results/
-    ├── figures/            # PNG + SVG plots
+    ├── figures/            # PNG or SVG plots
     ├── tables/             # CSV / parquet results
     └── objects/            # final .h5ad, models, etc. only when needed
 ```

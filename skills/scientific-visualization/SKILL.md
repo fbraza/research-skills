@@ -35,7 +35,7 @@ Before creating any figure, verify:
 2. **What is the message?** (What should the reader take away?)
 3. **What is the appropriate plot type?**
 4. **User preferences?** (format, palette, size, journal requirements)
-5. **If no preferences:** use defaults (SVG + PNG, colorblind-friendly, 300 DPI)
+5. **If no preferences:** use defaults (PNG, colorblind-friendly, 300 DPI)
 
 ### Tool Selection
 
@@ -99,8 +99,6 @@ ax.format(
     title='PCA — Treatment vs Control',
 )
 
-# Save both formats
-fig.savefig('./results/figure_name.svg', bbox_inches='tight')
 fig.savefig('./results/figure_name.png', dpi=300, bbox_inches='tight')
 ```
 
@@ -203,8 +201,8 @@ Color is not decorative. It must improve reading, interpretation, and consistenc
 - Aspect ratio must not distort the data
 
 ### Export Standards
-- **Default:** Save in both SVG (vector) and PNG (raster)
-- **SVG text preservation:** Always set `mpl.rcParams['svg.fonttype'] = 'none'` before saving. This ensures text is embedded as editable `<text>` elements in SVG — not converted to individual letter paths/glyphs. This is critical for downstream editing in Illustrator.
+- **Default:** Save in PNG (raster)
+- **SVG text preservation:** if saved in svg, always set `mpl.rcParams['svg.fonttype'] = 'none'` before saving. This ensures text is embedded as editable `<text>` elements in SVG — not converted to individual letter paths/glyphs. This is critical for downstream editing in Illustrator.
 - **Resolution:** Minimum 300 DPI for PNG; 600 DPI for publication
 - **Never use JPEG** for scientific data figures — lossy compression corrupts data
 - **Naming:** Descriptive filenames with version suffixes (`volcano_plot_v1.svg`)
