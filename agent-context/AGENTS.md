@@ -100,50 +100,62 @@ If the agent cannot clearly state the pipeline in plain language, it should re-r
 
 ### Python Skills
 
-When a Python skill is activated for a project, the agent **copies** relevant functions into the project's own `lib/` module tree. Each module maps to a workflow step. A single `main.py` orchestrates the full pipeline.
+When a Python skill is activated for a project, the agent **reads the skill scripts**, understands the workflow, and implements the adapted code inside the project's own `src/` modules. High-level orchestration lives in `pipeline/`, not in a monolithic `main.py`.
 
 **Project structure after deployment:**
 ```
 project/
-├── lib/
-│   ├── __init__.py
-│   ├── qc.py                # filtering + QC metrics (adapted from skill scripts)
-│   ├── normalize.py         # normalization / scaling method(s)
-│   ├── dimensionality.py    # PCA, UMAP, t-SNE, other embeddings
-│   ├── downstream.py        # clustering, DE, annotation, enrichment — study-specific
-│   └── ...                  # one module per workflow step
-├── main.py                  # orchestrates the full pipeline — imports lib.*, calls in order
+├── src/
+│   ├── config.py           # dataclasses for all tunable parameters
+│   ├── io.py               # loading, saving, small reusable data extraction helpers
+│   ├── qc.py               # QC metrics, filtering, doublet logic
+│   ├── preprocessing.py    # normalization, HVG selection, scaling when needed
+│   ├── clustering.py       # PCA, neighbors, UMAP/t-SNE, clustering
+│   ├── annotation.py       # marker-based annotation, label transfer, cell typing
+│   ├── deg.py              # differential expression
+│   ├── enrichment.py       # pathway / geneset enrichment
+│   └── ...                 # add modules only when the workflow truly needs them
+├── pipeline/
+│   ├── 01_qc.py            # stage orchestration + checkpointing + plotting
+│   ├── 02_preprocess_cluster.py
+│   ├── 03_annotation_deg.py
+│   └── run_all.py          # optional convenience entry point
 ├── data/
-│   ├── raw/                 # adata object after initial loading (before any filtering)
-│   ├── qc_filtered/         # adata object after QC filtering
-│   ├── normalized/          # adata object after normalization
-│   ├── reduced/             # adata object with PCA + UMAP/t-SNE embeddings
-│   └── ...                  # one checkpoint per major pipeline stage
+│   ├── raw/                # immutable input checkpoint
+│   ├── qc/                 # post-QC checkpoint
+│   ├── clustered/          # post-normalization/reduction/clustering checkpoint
+│   └── ...                 # only meaningful stage checkpoints, named semantically
 └── results/
-    ├── figures/             # PNG + SVG plots
-    ├── tables/              # CSV results
-    └── objects/             # final .h5ad, models, etc.
+    ├── figures/            # PNG + SVG plots
+    ├── tables/             # CSV / parquet results
+    └── objects/            # final .h5ad, models, etc. only when needed
 ```
 
 **Rules:**
-1. **One module per workflow step.** `qc.py` handles filtering + QC metrics together (they are one logical step). Each downstream task (clustering, DE, annotation, etc.) gets its own module.
-2. **Save checkpoint adata objects at every major stage.** Each step reads from the previous checkpoint and writes to the next. This makes the pipeline resumable — if normalization fails, you don't re-run QC.
-3. **`main.py` is the single orchestrator.** It imports functions from `lib/` and calls them in pipeline order. It should be simple — just imports and function calls with configuration. All artifacts are generated from `main.py`.
-4. **`main.py` is built step by step.** The agent does not write the entire pipeline at once. It implements one step, verifies the output, then adds the next step. Each step is committed before moving on.
-5. **All code is version-controlled** in the project repo.
+1. **`src/` contains reusable implementation code only.** No orchestration, no report assembly, no thin plotting wrappers.
+2. **`pipeline/` contains high-level stage execution.** Each pipeline module loads inputs, calls `src/` functions, saves checkpoints, writes tables, and creates plots.
+3. **Prefer a practical flat `src/` structure first.** Start with modules such as `qc.py`, `preprocessing.py`, `clustering.py`, `annotation.py`. Split into subpackages only when a module becomes too large.
+4. **Use typed dataclasses in `src/config.py` for parameters.** QC thresholds, PCA settings, clustering resolution, random seeds, etc. must live in config objects rather than hardcoded literals spread across functions.
+5. **Checkpoint selectively.** AnnData objects are large, so save only meaningful restart points. Default checkpoints are `data/raw/`, `data/qc/`, and `data/clustered/`. Additional checkpoints must be justified by cost, reproducibility, or iterative tuning needs.
+6. **Prefer semantic checkpoint names over generic `step_x` names.** Examples: `qc/`, `clustered/`, `annotated/`, `pseudobulk/`.
+7. **Plotting code belongs in `pipeline/`.** Use `pypubplot` directly when appropriate. Do not create boilerplate wrapper functions that only forward arguments to `pypubplot`.
+8. **Data reshaping for plotting is allowed in `pipeline/`.** Converting `AnnData` content into `DataFrame`s for plotting is expected there.
+9. **Pipeline files may use `#%%` cells** for IDE-based execution, but the committed code remains plain Python scripts.
+10. **All code is version-controlled** in the project repo.
 
 **Workflow:**
 1. Agent reads the relevant script(s) from the skill's `scripts/` directory
-2. Agent copies the needed functions into the appropriate `lib/` module(s)
-3. Agent adapts functions to the project's specific needs (tissue type, thresholds, gene ID format, etc.)
-4. `main.py` imports from `lib/` — never from the skill directory
-5. Each pipeline step saves a checkpoint adata to `data/<stage>/`
+2. Agent identifies the reusable functions, step order, parameters, and decision points
+3. Agent implements the adapted logic inside `src/` modules
+4. Agent wires the stage execution in `pipeline/` modules
+5. Each pipeline stage reads the previous checkpoint and writes only the next meaningful checkpoint
+6. Plot generation happens in `pipeline/` after converting analysis objects into plotting-friendly tables/dataframes when needed
 
 **Why not import directly from the skill directory?**
-- Functions need project-specific customization (e.g., lung tissue thresholds ≠ PBMC defaults)
-- Jupyter notebooks cannot rely on skill directory paths being on `sys.path`
+- Functions need project-specific customization (e.g., tissue thresholds, gene ID conventions, method choices)
 - The project must be self-contained and reproducible without the skill installed
 - Git tracks every modification — full audit trail of what changed and why
+- Pipeline execution should depend only on the project code, not on external skill paths
 
 ### R Skills
 
