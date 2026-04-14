@@ -4,7 +4,7 @@
 **Category:** Transcriptomics
 **Version:** 1.0
 **Last Updated:** January 2025
-**Short Description:** Best practices on differential expression analysis for bulk RNA-seq data.
+**Description:** Best practices on differential expression analysis for bulk RNA-seq data.
 **Keywords:** RNA-seq, differential expression, DESeq2, padj, FDR, fold change
 
 ---

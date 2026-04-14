@@ -1,0 +1,25 @@
+.DS_Store
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.dagster/
+*.egg-info/
+*.pyc
+.Rhistory
+.RData
+.Rproj.user/
+.env
+
+# Keep folder structure, ignore pipeline-managed data
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+/data/analysis/*
+!/data/analysis/.gitkeep
+/data/results/figures/*
+!/data/results/figures/.gitkeep
+/data/results/tables/*
+!/data/results/tables/.gitkeep

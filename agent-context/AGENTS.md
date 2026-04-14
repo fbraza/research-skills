@@ -9,6 +9,7 @@ Before any analysis, read the relevant know-how guides from `skills/knowhows/`. 
 | Guide | Read before | Covers |
 |---|---|---|
 | `KH_data_analysis_best_practices` | **ALL analysis tasks** | Data validation, duplicate handling, missing data, documenting removals |
+| `KH_dagster_pipeline_architecture` | New or refactored computational projects, including EDA | Dagster asset model, raw/processed/analysis/results layers, Python/R project structure, local-first orchestration |
 | `KH_bulk_rnaseq_differential_expression` | RNA-seq / DEG analysis | padj vs pvalue, fold change thresholds, DESeq2 best practices |
 | `KH_gene_essentiality` | DepMap / CRISPR screen work | Score direction (negative = essential), mandatory inversion before correlation |
 | `KH_pathway_enrichment` | Pathway / enrichment analysis | ORA vs GSEA selection, up/down separation, background gene sets |
@@ -17,13 +18,13 @@ Before any analysis, read the relevant know-how guides from `skills/knowhows/`. 
 
 ## Decision Framework
 
-1. Design Review    → Read skills/experimental-design-statistics (references/design_review_protocol.md). for new experiments or first-time datasets. REJECTED verdict = analysis does not proceed until flaws resolved.
+1. Design Review    → Read skills/experimental-design-statistics (references/design_review_protocol.md) for new experiments or first-time datasets. REJECTED verdict = analysis does not proceed until flaws resolved.
 
 2. Clarify          → Ask about normalization, batch correction, outlier handling, output format. Present structured options with trade-offs.
 
 3. Plan             → For ≥5 steps, write a plan markdown file and get user approval. Wait for approval.
 
-4. Execute          → Use the appropriate skill. Run the scientific-audit skill every 2-3 steps.
+4. Execute          → Use the appropriate skill. Meaningful Dagster assets should have `@asset_check` for data quality. Run the scientific-audit skill for methodology review at major decision points.
 
 5. Deliver          → Direct and concise. Reports only if explicitly requested. Always end with 4 follow-up questions.
 
@@ -39,6 +40,7 @@ Before any analysis, read the relevant know-how guides from `skills/knowhows/`. 
 | Situation | Skill to use |
 |---|---|
 | New experiment / first-time dataset | `experimental-design-statistics` (design_review_protocol.md) |
+| Any new or refactored computational project, including EDA | `dagster-bio-pipeline-scaffold` + `KH_dagster_pipeline_architecture` |
 | ≥5 steps or ambiguous methodology | Write plan + ask user for approval |
 | Bulk RNA-seq DE analysis | `bulk-rnaseq-counts-to-de-deseq2` |
 | Functional enrichment (GSEA/ORA) | `functional-enrichment-from-degs` |
@@ -53,7 +55,7 @@ Before any analysis, read the relevant know-how guides from `skills/knowhows/`. 
 | Any biological claim needing citation | `literature` |
 | Scientific writing (grants, papers, rebuttals) | `scientific-writing` |
 | Figures, reports, presentations | `scientific-visualization` |
-| Every 2-3 analytical steps | `scientific-audit` |
+| Major methodological checkpoints / before interpreting results | `scientific-audit` |
 | Survival / clinical analysis | `survival-analysis-clinical` |
 | Biomarker panel discovery | `lasso-biomarker-panel` |
 | Mendelian randomization | `mendelian-randomization-twosamplemr` |
@@ -85,7 +87,16 @@ Before any analysis, read the relevant know-how guides from `skills/knowhows/`. 
 
 ## Workflow Implementation
 
-Skill `scripts/` directories contain reference implementations — they are **templates, not import targets**. The agent's job is to read, understand, extract the key workflow logic, and adapt it to the project at hand.
+All computational analysis projects in this repository use the canonical **Dagster** architecture. Dagster is the project standard for explicit lineage, checkpointing, rerunability, and a local UI.
+
+In this repository, **all computational analysis work starts from the pipeline scaffold — including exploratory data analysis (EDA)**. Jupyter notebooks are not part of the standard workflow. The only exception is when the user explicitly asks for a one-off utility script.
+
+Before starting or refactoring any computational project:
+1. Read `skills/knowhows/KH_dagster_pipeline_architecture.md`
+2. Load the `dagster-bio-pipeline-scaffold` skill
+3. Use `templates/cookiecutter-dagster-bio-pipeline/` as the executable scaffold source of truth
+
+Skill `scripts/` directories remain **reference implementations — templates, not import targets**. The agent's job is to read, understand, extract the key workflow logic, and adapt it into the project's assets and pure library functions.
 
 ### Universal Principle: Understand → Articulate → Adapt
 
@@ -98,134 +109,62 @@ Regardless of language, the agent's most important task is **understanding the w
 
 If the agent cannot clearly state the pipeline in plain language, it should re-read the scripts before writing any code.
 
-### Python Skills
+### Canonical Layer Model
 
-When a Python skill is activated for a project, the agent **copies** relevant functions into the project's own `lib/` module tree. Each module maps to a workflow step. A single `main.py` orchestrates the full pipeline.
+Every bioinformatics pipeline — regardless of domain or language — follows four data layers. These map to Dagster `key_prefix` values and `data/` subdirectories:
 
-**Project structure after deployment:**
 ```
-project/
-├── lib/
-│   ├── __init__.py
-│   ├── qc.py                # filtering + QC metrics (adapted from skill scripts)
-│   ├── normalize.py         # normalization / scaling method(s)
-│   ├── dimensionality.py    # PCA, UMAP, t-SNE, other embeddings
-│   ├── downstream.py        # clustering, DE, annotation, enrichment — study-specific
-│   └── ...                  # one module per workflow step
-├── main.py                  # orchestrates the full pipeline — imports lib.*, calls in order
-├── data/
-│   ├── raw/                 # adata object after initial loading (before any filtering)
-│   ├── qc_filtered/         # adata object after QC filtering
-│   ├── normalized/          # adata object after normalization
-│   ├── reduced/             # adata object with PCA + UMAP/t-SNE embeddings
-│   └── ...                  # one checkpoint per major pipeline stage
-└── results/
-    ├── figures/             # PNG + SVG plots
-    ├── tables/              # CSV results
-    └── objects/             # final .h5ad, models, etc.
+raw/          → Ingestion: load external data into the pipeline
+                Examples: count matrices, FASTQ metadata, VCF files, AnnData from CellRanger
+
+processed/    → Preparation: QC, filtering, normalization, batch correction
+                Examples: QC-filtered AnnData, normalized counts, filtered VCF
+
+analysis/     → Computation: the analytical work
+                Examples: clustering, DE results, trajectory, enrichment, survival models
+
+results/      → Deliverables: tables, figures, reports
+                Examples: marker gene tables, UMAP PNGs, volcano plots, PDF reports
 ```
 
-**Rules:**
-1. **One module per workflow step.** `qc.py` handles filtering + QC metrics together (they are one logical step). Each downstream task (clustering, DE, annotation, etc.) gets its own module.
-2. **Save checkpoint adata objects at every major stage.** Each step reads from the previous checkpoint and writes to the next. This makes the pipeline resumable — if normalization fails, you don't re-run QC.
-3. **`main.py` is the single orchestrator.** It imports functions from `lib/` and calls them in pipeline order. It should be simple — just imports and function calls with configuration. All artifacts are generated from `main.py`.
-4. **`main.py` is built step by step.** The agent does not write the entire pipeline at once. It implements one step, verifies the output, then adds the next step. Each step is committed before moving on.
-5. **All code is version-controlled** in the project repo.
+### Minimal Architecture Rules
 
-**Workflow:**
-1. Agent reads the relevant script(s) from the skill's `scripts/` directory
-2. Agent copies the needed functions into the appropriate `lib/` module(s)
-3. Agent adapts functions to the project's specific needs (tissue type, thresholds, gene ID format, etc.)
-4. `main.py` imports from `lib/` — never from the skill directory
-5. Each pipeline step saves a checkpoint adata to `data/<stage>/`
+- Keep business logic in `lib/`; keep `defs/assets/` thin.
+- Use Dagster assets to model `raw`, `processed`, `analysis`, and `results`.
+- Use IO managers for pipeline-managed persistence; users may place immutable source files in `data/raw/`.
+- Attach `@asset_check` to meaningful assets with clear quality invariants.
+- Use `scientific-audit` at major methodological or interpretive decision points.
+- Use Dagster Pipes and explicit file-based exchange for R.
+- Use `dg dev` for local inspection and selective reruns.
+- For exact scaffold details, follow the know-how, the scaffold skill, and the cookiecutter template instead of re-specifying them here.
 
-**Why not import directly from the skill directory?**
-- Functions need project-specific customization (e.g., lung tissue thresholds ≠ PBMC defaults)
-- Jupyter notebooks cannot rely on skill directory paths being on `sys.path`
-- The project must be self-contained and reproducible without the skill installed
-- Git tracks every modification — full audit trail of what changed and why
+### Reading Skill Scripts
 
-### R Skills
-
-When an R skill is activated, the agent **reads** the scripts, **understands** the workflow steps, and **writes adapted R code** directly into the project. R scripts are fundamentally different from Python modules — they mix reusable functions with illustrative examples, and use `source()` rather than `import`.
+Skills remain reference implementations. The agent reads skill `scripts/`, understands the workflow, and adapts the logic into Dagster assets.
 
 #### How R Scripts Are Typically Organized
 
-R computational skills follow a consistent architectural pattern in `scripts/`. Not every skill has every category, but the agent should recognize these when present:
-
 | Script Category | Purpose | How to Recognize |
 |---|---|---|
-| **Example data loaders** | Load curated datasets for testing/learning. Often also contain production validation functions. | `load_example_data.R`, functions like `load_*_data()` |
-| **Core workflow** | Step-by-step pipeline with numbered STEPS. The canonical reference for the analysis logic. | Comments like `# STEP 1: ...`, `# STEP 2: ...`, sequential top-to-bottom execution |
-| **Utility functions** | Reusable building blocks with roxygen docs (`#'`, `@param`, `@export`). | Function definitions preceded by `#'` documentation |
-| **Visualization** | Publication-quality plots (PNG + SVG). Helper functions for consistent styling. | `*_plots.R`, `plotting_helpers.R`, `.save_plot()` / `.save_ggplot()` helpers |
-| **Specialized / situational** | Address specific scenarios (batch effects, alternative normalization, external validation, biological interpretation). | Named after the scenario they address |
+| **Example data loaders** | Load curated datasets for testing/learning | `load_example_data.R`, `load_*_data()` |
+| **Core workflow** | Step-by-step pipeline with numbered STEPS | `# STEP 1: ...`, `# STEP 2: ...` |
+| **Utility functions** | Reusable building blocks with roxygen docs | `#'` documentation, `@param`, `@export` |
+| **Visualization** | Publication-quality plots | `*_plots.R`, `.save_plot()` helpers |
+| **Specialized** | Scenario-specific patterns | Named after the scenario |
 
 #### Discriminating Illustrative Code from Production Code
 
-R scripts in computational skills frequently mix illustrative examples with production-ready functions. The agent **must** recognize the difference.
-
 **Illustrative / Example Code — for understanding, not deployment:**
-- Synthetic data generation: `set.seed(42)` followed by `matrix(rnbinom(...))`, `runif()`, `rnorm()`, etc.
-- Comments like `# Example with ...`, `# --- OPTION A: Use example dataset (for testing) ---`
-- Complete top-to-bottom scripts with no function definitions (just sequential executable code)
-- Option A/B/C blocks where Option A loads example data and Option B/C loads user data
-- **Action:** Read and understand — extract the pipeline steps and decision logic. Do NOT copy verbatim.
+- Synthetic data: `set.seed(42)` + `matrix(rnbinom(...))`, `runif()`, `rnorm()`
+- Comments: `# Example with ...`, `# --- OPTION A: Use example dataset ---`
+- Top-to-bottom scripts with no function definitions
+- **Action:** Read and understand. Do NOT copy verbatim.
 
 **Production-Ready Code — for adaptation and deployment:**
-- Function definitions with roxygen documentation (`#' @param`, `#' @return`, `#' @export`)
-- Input validation with informative `stop()` messages
-- `tryCatch` error handling blocks
-- Configurable parameters with sensible defaults
-- **Action:** Adapt and copy into the project. Modify parameters for the study's specifics. Preserve validation logic and error handling.
-
-#### R Project Structure After Deployment
-
-```
-project/
-├── R/
-│   ├── utils.R              # adapted helpers (plotting, validation, .save_plot)
-│   ├── load_validate.R      # data loading + input validation functions
-│   ├── analysis.R           # core pipeline functions (one per workflow step)
-│   └── visualization.R      # adapted plotting functions
-├── main.R                   # orchestrates the full pipeline — sources R/, calls in order
-├── data/
-│   ├── raw/                 # initial loaded data (before any filtering)
-│   ├── qc_filtered/         # after QC/filtering
-│   ├── normalized/          # after normalization/transformation
-│   └── ...                  # one checkpoint per major pipeline stage
-├── results/
-│   ├── plots/               # PNG + SVG outputs
-│   ├── tables/              # CSV results
-│   └── objects/             # .rds analysis objects
-└── analysis_report.Rmd      # or .qmd — the main deliverable
-```
-
-For simpler projects, a flat structure is acceptable:
-```
-project/
-├── scripts/
-│   ├── analysis.R
-│   └── plots.R
-├── data/
-└── results/
-```
-
-**Rules (same as Python):**
-- One module (or section in `analysis.R`) per workflow step
-- Save checkpoint `.rds` objects at every major pipeline stage
-- `main.R` is the single orchestrator — built step by step, verified at each stage
-- All code is version-controlled
-
-#### Deployment Workflow (All Languages)
-
-1. **Read** the core workflow script(s) — the ones with numbered steps or the main `*_workflow.*`
-2. **Articulate** the pipeline in plain language (to the user or in comments)
-3. **Identify** production-ready functions to adapt (roxygen docs, input validation, configurable parameters)
-4. **Identify** illustrative scripts to learn from (synthetic data examples, scenario-specific patterns)
-5. **Write adapted code** into the project, replacing example data loading with project paths, adjusting defaults to study-appropriate values
-6. **Preserve** the key pipeline logic — numbered steps, validation checks, statistical methodology, output chain
-7. **Version-control** all code in the project repo
+- Roxygen documentation (`#' @param`, `#' @return`, `#' @export`)
+- Input validation with `stop()` messages
+- `tryCatch` error handling, configurable parameters
+- **Action:** Adapt into `lib/` functions or R scripts. Modify for the study's specifics.
 
 #### Quick Reference: Reading Skill Scripts
 
@@ -240,13 +179,44 @@ project/
 | `saveRDS()` / `readRDS()` | Object persistence for downstream | Preserve, adapt file paths |
 | `# STEP 1: ... # STEP 2: ...` | Canonical pipeline sequence | Extract step order and logic |
 
+### Pipeline Deployment Workflow
+
+For exact scaffolding and refactoring procedure, use `dagster-bio-pipeline-scaffold`.
+At minimum:
+1. Read the target skill and the Dagster pipeline architecture know-how
+2. Articulate the workflow in plain language
+3. Map stages to `raw` / `processed` / `analysis` / `results`
+4. Scaffold from `templates/cookiecutter-dagster-bio-pipeline/`
+5. Adapt domain logic into `lib/` or self-contained `R/` scripts
+6. Wire assets, checks, resources, and IO managers
+7. Validate with `dg check defs` and iterate with `dg dev`
+
 ---
 
-## Engineering rules
+## Engineering Rules
 
-- When working with python ALWAYS use `uv` in the local virutal environment. 
-- Alway check if we have a `.precommit.yaml` file. If not always remind the user to include one
-- Enforce good practice for linting, respecting coding R and Python style rules
+### Core
+- Always use `uv` for Python environments and dependency management
+- Start all computational projects — including EDA — from the canonical Dagster scaffold
+- Do not use notebook-first workflows; use the scaffolded project structure instead of Jupyter
+- Do not start with ad hoc scripts unless the user explicitly asks for a one-off utility
+- Keep code under version control; gitignore pipeline-managed data and runtime state
+
+### Quality
+- Enforce Python quality tooling (`ruff`, `mypy`, tests`) and R tooling when R code is material
+- Use Dagster `Config` for study-specific parameters instead of magic constants
+- Run `dg check defs` before committing structural Dagster changes
+
+### Interoperability
+- Use `key_prefix` to assign assets to `raw`, `processed`, `analysis`, `results`
+- Keep Python/R exchange file-based and explicit
+- Use Dagster Pipes for R execution in mixed-language pipelines
+
+### Source of truth
+- Keep AGENTS.md short and authoritative
+- Keep architecture rationale in `KH_dagster_pipeline_architecture`
+- Keep scaffolding procedure in `dagster-bio-pipeline-scaffold`
+- Keep exact on-disk structure in `templates/cookiecutter-dagster-bio-pipeline/`
 
 ---
 
@@ -295,7 +265,7 @@ project/
 - Never use a rainbow/jet color scale
 - Always run figure quality check on every figure before delivering
 - Always save figures SVG + PNG unless user specifies otherwise
-- Always save outputs to `./results/`
+- Always save outputs to `./data/results/` (managed by IO managers in Dagster projects)
 
 ### Ethical
 - Never present AI-generated results as experimentally validated
