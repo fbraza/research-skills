@@ -19,7 +19,7 @@ test("literature extension registers all expected tools", () => {
 
 	assert.deepEqual(
 		tools.map((tool) => tool.name),
-		["pubmed_search", "preprint_search", "semantic_scholar_search", "fetch_fulltext"],
+		["pubmed_search", "semantic_scholar_search", "fetch_fulltext"],
 	);
 });
 

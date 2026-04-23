@@ -13,7 +13,7 @@ import {
 	storeSelectionIntoMode,
 } from "./modes.ts";
 import { ensureRuntime } from "./storage.ts";
-import { customOverlay, lastObservedModel, requestEditorRender, runtime } from "./state.ts";
+import { currentThinkingLevel, customOverlay, lastObservedModel, loadCounter, requestEditorRender, runtime } from "./state.ts";
 
 export default function promptEditorExtension(pi: ExtensionAPI) {
 	pi.registerCommand("mode", {
@@ -71,6 +71,7 @@ export default function promptEditorExtension(pi: ExtensionAPI) {
 
 	const handleSessionStartLike = async (ctx: ExtensionContext) => {
 		lastObservedModel.value = { provider: ctx.model?.provider, modelId: ctx.model?.id };
+		currentThinkingLevel.value = pi.getThinkingLevel();
 		await ensureRuntime(pi, ctx);
 		customOverlay.value = null;
 
@@ -83,7 +84,7 @@ export default function promptEditorExtension(pi: ExtensionAPI) {
 			customOverlay.value = getCurrentSelectionSpec(pi, ctx);
 		}
 
-		applyEditor(pi, ctx);
+		applyEditor(ctx);
 	};
 
 	pi.on("session_start", async (_event, ctx) => {
@@ -96,6 +97,7 @@ export default function promptEditorExtension(pi: ExtensionAPI) {
 
 	pi.on("model_select", async (event: ModelSelectEvent, ctx) => {
 		lastObservedModel.value = { provider: event.model.provider, modelId: event.model.id };
+		currentThinkingLevel.value = pi.getThinkingLevel();
 		if (runtime.applying) return;
 
 		await ensureRuntime(pi, ctx);
@@ -112,6 +114,14 @@ export default function promptEditorExtension(pi: ExtensionAPI) {
 
 		if (ctx.hasUI) {
 			requestEditorRender.value?.();
+		}
+	});
+
+	pi.on("session_shutdown", async (_event, ctx) => {
+		loadCounter.value += 1;
+		requestEditorRender.value = undefined;
+		if (ctx.hasUI) {
+			ctx.ui.setEditorComponent(undefined);
 		}
 	});
 }

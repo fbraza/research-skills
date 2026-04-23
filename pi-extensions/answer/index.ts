@@ -25,4 +25,11 @@ export default function answerExtension(pi: ExtensionAPI) {
 		description: "Extract and answer questions",
 		handler: answerHandler,
 	});
+
+	// Register a simple renderer so /answer submissions are visible in the TUI.
+	pi.registerMessageRenderer("answers", {
+		render(_msg, _options) {
+			return [];
+		},
+	});
 }

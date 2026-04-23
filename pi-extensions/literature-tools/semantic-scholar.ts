@@ -22,14 +22,13 @@ export async function trySemanticScholarOpenAccess(doi: string, signal?: AbortSi
 	const data = await fetchJson<{ data?: Array<{ openAccessPdf?: { url?: string }; externalIds?: Record<string, string> }> }>(url.toString(), signal);
 	const match = (data.data ?? []).find((item) => normalizeDoi(item.externalIds?.DOI) === normalizeDoi(doi) && item.openAccessPdf?.url);
 	const pdfUrl = match?.openAccessPdf?.url;
-	if (!pdfUrl || !/biorxiv|medrxiv/i.test(pdfUrl)) {
-		return { source: "not_found", access_note: "No bioRxiv/medRxiv PDF found via Semantic Scholar", is_preprint: true };
+	if (!pdfUrl) {
+		return { source: "not_found", access_note: "No open-access PDF found via Semantic Scholar" };
 	}
 	return {
-		source: "biorxiv",
+		source: "semantic_scholar_oa",
 		pdf_url: pdfUrl,
-		access_note: "bioRxiv/medRxiv PDF found via Semantic Scholar openAccessPdf",
-		is_preprint: true,
+		access_note: "Open-access PDF found via Semantic Scholar openAccessPdf",
 	};
 }
 

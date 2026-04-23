@@ -14,7 +14,6 @@ export type PaperRecord = {
 	open_access_pdf?: string;
 	external_ids?: Record<string, string>;
 	source?: string;
-	is_preprint?: boolean;
 	date?: string;
 	category?: string;
 	version?: string;
@@ -26,5 +25,4 @@ export type FullTextRouteResult = {
 	source: string;
 	pdf_url?: string;
 	access_note: string;
-	is_preprint: boolean;
 };
