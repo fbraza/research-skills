@@ -64,14 +64,14 @@ The following skills are present in [`skills/`](./skills) as source/reference co
 
 | Extension | Purpose | Docs |
 |---|---|---|
-| `answer` | Extract questions from the last assistant message and collect answers in a TUI | [`docs/answer.md`](./docs/answer.md) |
+| Extension | Purpose | Docs |
+|---|---|---|
 | `audit-enforcer` | Run scientific audits, parse findings, and sync them into todos | [`docs/audit-enforcer.md`](./docs/audit-enforcer.md) |
 | `context` | Show loaded extensions, skills, context files, and usage stats | [`docs/context.md`](./docs/context.md) |
 | `init-academic-agent` | Download or update project `AGENTS.md` from GitHub | [`docs/init-academic-agent.md`](./docs/init-academic-agent.md) |
 | `literature-tools` | Typed literature search and PDF retrieval tools | [`docs/literature-tools.md`](./docs/literature-tools.md) |
 | `manager` | Install, update, and remove skills from the repository cache | [`docs/manager.md`](./docs/manager.md) |
 | `multi-edit` | Enhanced replacement for the built-in `edit` tool | [`docs/multi-edit.md`](./docs/multi-edit.md) |
-| `notify` | Send desktop notifications when the agent finishes | [`docs/notify.md`](./docs/notify.md) |
 | `prompt-editor` | Manage reusable prompt modes and switch quickly | [`docs/prompt-editor.md`](./docs/prompt-editor.md) |
 | `session-breakdown` | Visualize recent Pi session activity, tokens, and cost | [`docs/session-breakdown.md`](./docs/session-breakdown.md) |
 | `todos` | File-based todo storage with a tool and TUI manager | [`docs/todos.md`](./docs/todos.md) |
