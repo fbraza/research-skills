@@ -7,7 +7,12 @@ import { parseExtractionResult } from "./parsing.ts";
 import { QnAComponent } from "./qna-component.ts";
 import type { ExtractionResult } from "./types.ts";
 
-function getLastAssistantText(ctx: ExtensionContext): { status: "ok"; text: string } | { status: "incomplete" } | { status: "missing" } {
+export type QuestionExtractionOutcome =
+	| { kind: "ok"; result: ExtractionResult }
+	| { kind: "cancelled" }
+	| { kind: "error"; message: string };
+
+function getLastAssistantText(ctx: ExtensionContext): { status: "ok"; text: string } | { status: "incomplete"; reason: string } | { status: "missing" } {
 	const branch = ctx.sessionManager.getBranch();
 	let lastAssistantText: string | undefined;
 
@@ -16,9 +21,10 @@ function getLastAssistantText(ctx: ExtensionContext): { status: "ok"; text: stri
 		if (entry.type === "message") {
 			const msg = entry.message;
 			if ("role" in msg && msg.role === "assistant") {
-				if (msg.stopReason !== "stop") {
-					ctx.ui.notify(`Last assistant message incomplete (${msg.stopReason})`, "error");
-					return { status: "incomplete" };
+				// Allow "stop", "length", and "toolUse" — these can all contain valid questions.
+				// Only reject genuine error/aborted states.
+				if (msg.stopReason === "error" || msg.stopReason === "aborted") {
+					return { status: "incomplete", reason: msg.stopReason };
 				}
 				const textParts = msg.content
 					.filter((c): c is { type: "text"; text: string } => c.type === "text")
@@ -42,10 +48,10 @@ async function extractQuestions(
 	ctx: ExtensionContext,
 	lastAssistantText: string,
 	extractionModel: Model<Api>,
-): Promise<ExtractionResult | null> {
-	return await ctx.ui.custom<ExtractionResult | null>((tui, theme, _kb, done) => {
+): Promise<QuestionExtractionOutcome> {
+	return await ctx.ui.custom<QuestionExtractionOutcome>((tui, theme, _kb, done) => {
 		const loader = new BorderedLoader(tui, theme, `Extracting questions using ${extractionModel.id}...`);
-		loader.onAbort = () => done(null);
+		loader.onAbort = () => done({ kind: "cancelled" });
 
 		const doExtract = async () => {
 			const auth = await ctx.modelRegistry.getApiKeyAndHeaders(extractionModel);
@@ -62,11 +68,11 @@ async function extractQuestions(
 			const response = await complete(
 				extractionModel,
 				{ systemPrompt: SYSTEM_PROMPT, messages: [userMessage] },
-				{ apiKey: auth.apiKey, headers: auth.headers, signal: loader.signal },
+				{ apiKey: auth.apiKey, signal: loader.signal },
 			);
 
 			if (response.stopReason === "aborted") {
-				return null;
+				return { kind: "cancelled" } as QuestionExtractionOutcome;
 			}
 
 			const responseText = response.content
@@ -74,12 +80,19 @@ async function extractQuestions(
 				.map((c) => c.text)
 				.join("\n");
 
-			return parseExtractionResult(responseText);
+			const parsed = parseExtractionResult(responseText);
+			if (!parsed) {
+				return { kind: "error", message: "Could not parse questions from model response" } as QuestionExtractionOutcome;
+			}
+			return { kind: "ok", result: parsed } as QuestionExtractionOutcome;
 		};
 
 		doExtract()
 			.then(done)
-			.catch(() => done(null));
+			.catch((err) => {
+				const msg = err instanceof Error ? err.message : String(err);
+				done({ kind: "error", message: msg });
+			});
 
 		return loader;
 	});
@@ -87,54 +100,65 @@ async function extractQuestions(
 
 export function createAnswerHandler(pi: ExtensionAPI) {
 	return async function answerHandler(ctx: ExtensionContext) {
-		if (!ctx.hasUI) {
-			ctx.ui.notify("answer requires interactive mode", "error");
-			return;
+		try {
+			if (!ctx.hasUI) {
+				ctx.ui.notify("answer requires interactive mode", "error");
+				return;
+			}
+
+			if (!ctx.model) {
+				ctx.ui.notify("No model selected", "error");
+				return;
+			}
+
+			const lastAssistant = getLastAssistantText(ctx);
+			if (lastAssistant.status === "incomplete") {
+				ctx.ui.notify(`Last assistant message incomplete (${lastAssistant.reason})`, "error");
+				return;
+			}
+			if (lastAssistant.status === "missing") {
+				ctx.ui.notify("No assistant text found in the last message", "error");
+				return;
+			}
+
+			const extractionModel = await selectExtractionModel(ctx.model, ctx.modelRegistry);
+			const outcome = await extractQuestions(ctx, lastAssistant.text, extractionModel);
+
+			if (outcome.kind === "cancelled") {
+				ctx.ui.notify("Cancelled", "info");
+				return;
+			}
+
+			if (outcome.kind === "error") {
+				ctx.ui.notify(`Question extraction failed: ${outcome.message}`, "error");
+				return;
+			}
+
+			if (outcome.result.questions.length === 0) {
+				ctx.ui.notify("No questions found in the last message", "info");
+				return;
+			}
+
+			const answersResult = await ctx.ui.custom<string | null>((tui, _theme, _kb, done) => {
+				return new QnAComponent(outcome.result.questions, tui, done);
+			});
+
+			if (answersResult === null) {
+				ctx.ui.notify("Cancelled", "info");
+				return;
+			}
+
+			pi.sendMessage(
+				{
+					customType: "answers",
+					content: "I answered your questions in the following way:\n\n" + answersResult,
+					display: true,
+				},
+				{ triggerTurn: true },
+			);
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			ctx.ui.notify(`/answer failed: ${msg}`, "error");
 		}
-
-		if (!ctx.model) {
-			ctx.ui.notify("No model selected", "error");
-			return;
-		}
-
-		const lastAssistant = getLastAssistantText(ctx);
-		if (lastAssistant.status === "incomplete") {
-			return;
-		}
-		if (lastAssistant.status === "missing") {
-			ctx.ui.notify("No assistant messages found", "error");
-			return;
-		}
-
-		const extractionModel = await selectExtractionModel(ctx.model, ctx.modelRegistry);
-		const extractionResult = await extractQuestions(ctx, lastAssistant.text, extractionModel);
-
-		if (extractionResult === null) {
-			ctx.ui.notify("Cancelled", "info");
-			return;
-		}
-
-		if (extractionResult.questions.length === 0) {
-			ctx.ui.notify("No questions found in the last message", "info");
-			return;
-		}
-
-		const answersResult = await ctx.ui.custom<string | null>((tui, _theme, _kb, done) => {
-			return new QnAComponent(extractionResult.questions, tui, done);
-		});
-
-		if (answersResult === null) {
-			ctx.ui.notify("Cancelled", "info");
-			return;
-		}
-
-		pi.sendMessage(
-			{
-				customType: "answers",
-				content: "I answered your questions in the following way:\n\n" + answersResult,
-				display: true,
-			},
-			{ triggerTurn: true },
-		);
 	};
 }

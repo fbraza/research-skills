@@ -15,7 +15,6 @@
 ## How it works
 
 - `pubmed_search` uses NCBI E-utilities (`esearch` + `efetch`) and parses PubMed XML metadata
-- `preprint_search` queries the bioRxiv / medRxiv API and filters results client-side
 - `semantic_scholar_search` queries the Semantic Scholar Graph API
 - `fetch_fulltext` follows a retrieval chain:
   1. PMC
@@ -47,3 +46,5 @@ Use these tools when a skill or an agent needs typed, structured literature retr
 - PubMed and Semantic Scholar rate limits still apply
 - Publisher landing page parsing is heuristic and may require future host-specific refinements
 - Sci-Hub is a last-resort fallback and should be treated as such
+such
+ub is a last-resort fallback and should be treated as such

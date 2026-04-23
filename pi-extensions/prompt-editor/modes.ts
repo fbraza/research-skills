@@ -1,6 +1,6 @@
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext, ThinkingLevel } from "@mariozechner/pi-coding-agent";
 import { CUSTOM_MODE_NAME } from "./constants.ts";
-import { customOverlay, lastObservedModel, requestEditorRender, runtime } from "./state.ts";
+import { currentThinkingLevel, customOverlay, lastObservedModel, requestEditorRender, runtime } from "./state.ts";
 import { ensureRuntime } from "./storage.ts";
 import type { ModeSpec, ModesFile } from "./types.ts";
 
@@ -8,8 +8,9 @@ export function orderedModeNames(modes: Record<string, ModeSpec>): string[] {
 	return Object.keys(modes).filter((name) => name !== CUSTOM_MODE_NAME);
 }
 
-export function getModeBorderColor(ctx: ExtensionContext, pi: ExtensionAPI, mode: string): (text: string) => string {
-	const theme = ctx.ui.theme;
+type BorderTheme = Pick<ExtensionContext["ui"]["theme"], "fg" | "getFgAnsi" | "getThinkingBorderColor">;
+
+export function getModeBorderColor(theme: BorderTheme, mode: string, thinkingLevel: ThinkingLevel): (text: string) => string {
 	const spec = runtime.data.modes[mode];
 
 	if (spec?.color) {
@@ -19,7 +20,7 @@ export function getModeBorderColor(ctx: ExtensionContext, pi: ExtensionAPI, mode
 		} catch {}
 	}
 
-	return theme.getThinkingBorderColor(pi.getThinkingLevel());
+	return theme.getThinkingBorderColor(thinkingLevel);
 }
 
 export function inferModeFromSelection(ctx: ExtensionContext, pi: ExtensionAPI, data: ModesFile): string | null {
@@ -67,10 +68,11 @@ export function inferModeFromSelection(ctx: ExtensionContext, pi: ExtensionAPI, 
 }
 
 export function getCurrentSelectionSpec(pi: ExtensionAPI, _ctx: ExtensionContext): ModeSpec {
+	currentThinkingLevel.value = pi.getThinkingLevel();
 	return {
 		provider: lastObservedModel.value.provider,
 		modelId: lastObservedModel.value.modelId,
-		thinkingLevel: pi.getThinkingLevel(),
+		thinkingLevel: currentThinkingLevel.value,
 	};
 }
 
@@ -136,6 +138,7 @@ export async function applyMode(pi: ExtensionAPI, ctx: ExtensionContext, mode: s
 
 		if (spec.thinkingLevel) {
 			pi.setThinkingLevel(spec.thinkingLevel);
+			currentThinkingLevel.value = pi.getThinkingLevel();
 		}
 	} finally {
 		runtime.applying = false;

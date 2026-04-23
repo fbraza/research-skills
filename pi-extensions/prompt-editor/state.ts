@@ -1,3 +1,4 @@
+import type { ThinkingLevel } from "@mariozechner/pi-coding-agent";
 import type { ModeRuntime, ModeSpec } from "./types.ts";
 
 export const runtime: ModeRuntime = {
@@ -13,4 +14,5 @@ export const runtime: ModeRuntime = {
 export const customOverlay: { value: ModeSpec | null } = { value: null };
 export const requestEditorRender: { value?: () => void } = {};
 export const lastObservedModel: { value: { provider?: string; modelId?: string } } = { value: {} };
+export const currentThinkingLevel: { value: ThinkingLevel } = { value: "off" };
 export const loadCounter: { value: number } = { value: 0 };

@@ -242,7 +242,7 @@ export function createFetchFulltextTool() {
 	return {
 		name: "fetch_fulltext",
 		label: "Fetch Full Text",
-		description: "Retrieve a paper PDF using PMC, publisher OA, preprint OA, then Sci-Hub fallback.",
+		description: "Retrieve a paper PDF using PMC, publisher OA, then Sci-Hub fallback.",
 		parameters: FETCH_FULLTEXT_PARAMS,
 		async execute(_toolCallId: string, params: any, signal?: AbortSignal, onUpdate?: (update: any) => void) {
 			if (!params.pmid && !params.doi) {
@@ -280,7 +280,15 @@ export function createFetchFulltextTool() {
 				}
 
 				emitProgress(onUpdate, `Checking Semantic Scholar open-access PDF metadata for DOI ${doi}...`);
-				const preprint = await trySemanticScholarOpenAccess(doi, signal);
+				let preprint: FullTextRouteResult;
+				try {
+					preprint = await trySemanticScholarOpenAccess(doi, signal);
+				} catch (err) {
+					preprint = {
+						source: "not_found",
+						access_note: `Semantic Scholar lookup failed: ${err instanceof Error ? err.message : String(err)}`,
+					};
+				}
 				attempts.push(preprint);
 				if (preprint.source !== "not_found" && preprint.pdf_url) {
 					const result: Record<string, unknown> = { ...preprint };
@@ -300,7 +308,6 @@ export function createFetchFulltextTool() {
 
 			const result = {
 				source: "not_found",
-				is_preprint: false,
 				access_note: "No full-text PDF found via PMC, publisher OA, Semantic Scholar OA, or Sci-Hub",
 				attempts,
 			};

@@ -1,6 +1,6 @@
 # Sci-Hub PDF Resolver — Routine Quick-Reference
 
-Resolves DOIs to direct PDF URLs via Sci-Hub mirrors. **Always check institutional access and open-access sources first** (PubMed Central, publisher OA, bioRxiv). Use Sci-Hub only as a last resort.
+Resolves DOIs to direct PDF URLs via Sci-Hub mirrors. **Always check institutional access and open-access sources first** (PubMed Central, publisher OA). Use Sci-Hub only as a last resort.
 
 **Script:** `scripts/scihub_pdf_resolver.py` — zero-dependency Python script.
 

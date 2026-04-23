@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { CustomEditor } from "@mariozechner/pi-coding-agent";
 import path from "node:path";
 import fs from "node:fs/promises";
@@ -6,7 +6,7 @@ import type { Dirent } from "node:fs";
 import { MAX_HISTORY_ENTRIES, MAX_RECENT_PROMPTS } from "./constants.ts";
 import { getModeBorderColor } from "./modes.ts";
 import { getGlobalAgentDir } from "./storage.ts";
-import { loadCounter, requestEditorRender, runtime } from "./state.ts";
+import { currentThinkingLevel, loadCounter, requestEditorRender, runtime } from "./state.ts";
 import type { PromptEntry } from "./types.ts";
 
 class PromptEditor extends CustomEditor {
@@ -206,18 +206,20 @@ function historiesMatch(a: PromptEntry[], b: PromptEntry[]): boolean {
 	return true;
 }
 
-function setEditor(pi: ExtensionAPI, ctx: ExtensionContext, history: PromptEntry[]) {
+function setEditor(ctx: ExtensionContext, history: PromptEntry[]) {
+	const uiTheme = ctx.ui.theme;
 	ctx.ui.setEditorComponent((tui, theme, keybindings) => {
 		const editor = new PromptEditor(tui, theme, keybindings);
 		requestEditorRender.value = () => editor.requestRenderNow();
 		editor.modeLabelProvider = () => runtime.currentMode;
-		editor.modeLabelColor = (text: string) => ctx.ui.theme.fg("dim", text);
+		editor.modeLabelColor = (text: string) => uiTheme.fg("dim", text);
+		const bashBorderColor = uiTheme.getBashModeBorderColor();
 		const borderColor = (text: string) => {
 			const isBashMode = editor.getText().trimStart().startsWith("!");
 			if (isBashMode) {
-				return ctx.ui.theme.getBashModeBorderColor()(text);
+				return bashBorderColor(text);
 			}
-			return getModeBorderColor(ctx, pi, runtime.currentMode)(text);
+			return getModeBorderColor(uiTheme, runtime.currentMode, currentThinkingLevel.value)(text);
 		};
 
 		editor.borderColor = borderColor;
@@ -229,7 +231,7 @@ function setEditor(pi: ExtensionAPI, ctx: ExtensionContext, history: PromptEntry
 	});
 }
 
-export function applyEditor(pi: ExtensionAPI, ctx: ExtensionContext) {
+export function applyEditor(ctx: ExtensionContext) {
 	if (!ctx.hasUI) return;
 
 	const sessionFile = ctx.sessionManager.getSessionFile();
@@ -239,7 +241,7 @@ export function applyEditor(pi: ExtensionAPI, ctx: ExtensionContext) {
 
 	const currentLoad = ++loadCounter.value;
 	const initialText = ctx.ui.getEditorText();
-	setEditor(pi, ctx, immediateHistory);
+	setEditor(ctx, immediateHistory);
 
 	void (async () => {
 		const previousPrompts = await loadPromptHistoryForCwd(ctx.cwd, sessionFile ?? undefined);
@@ -247,6 +249,6 @@ export function applyEditor(pi: ExtensionAPI, ctx: ExtensionContext) {
 		if (ctx.ui.getEditorText() !== initialText) return;
 		const history = buildHistoryList(currentPrompts, previousPrompts);
 		if (historiesMatch(history, immediateHistory)) return;
-		setEditor(pi, ctx, history);
+		setEditor(ctx, history);
 	})();
 }

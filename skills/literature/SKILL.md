@@ -1,7 +1,7 @@
 ---
 name: literature
 description: Unified literature search, verification, full-text retrieval, and synthesis workflow for scientific questions. Use when any biological claim needs a verified citation, when reviewing a gene/pathway/disease/drug/target, when surveying preclinical evidence for a target in a disease, when checking novelty, when retrieving full text for specific papers, or when turning a paper set into a structured hypothesis synthesis.
-allowed-tools: Read, Write, WebFetch, WebSearch, pubmed_search, preprint_search, semantic_scholar_search, fetch_fulltext
+allowed-tools: Read, Write, WebFetch, WebSearch, pubmed_search, semantic_scholar_search, fetch_fulltext
 starting-prompt: Conduct a literature review on my research topic with verified citations, structured synthesis, and a per-paper summary table.
 ---
 
@@ -28,7 +28,6 @@ Do not use this skill for:
 
 - Every citation must be real and verifiable.
 - Never fabricate PMIDs, DOIs, titles, journals, years, or author lists.
-- Flag preprints explicitly as not peer reviewed.
 - Distinguish human, animal, and in vitro evidence.
 - Weight evidence quality by study design and replication.
 - Record how full text was obtained for each paper.
@@ -50,7 +49,6 @@ Always clarify:
 Use the custom literature tools in this order:
 - **Primary:** `pubmed_search`
 - **Supplementary:** `semantic_scholar_search`
-- **Preprints when relevant:** `preprint_search`
 
 These extension tools are the preferred search path for this skill. Do not fall back to generic `WebFetch` / `WebSearch` first when one of these typed tools fits the task.
 
@@ -59,24 +57,22 @@ Read these references before constructing queries:
 - `references/pubmed_search_syntax.md`
 - `references/pubmed_common_queries.md`
 - `references/semanticscholar_routine.md`
-- `references/biorxiv_routine.md`
 
 ### Step 3 — Screen and prioritise
 
-- Deduplicate across PubMed, Semantic Scholar, and preprint sources.
+- Deduplicate across PubMed and Semantic Scholar sources.
 - Prioritise by relevance, recency, citation count, and study type.
 - Default to deep reading of the top 20 papers unless the user asks otherwise.
 - For preclinical requests, keep studies with experimental target perturbation evidence.
 
 ### Step 4 — Retrieve full text
 
-Use `fetch_fulltext` for top papers. Prefer it over ad-hoc `WebFetch` PDF retrieval because it applies the defined PMC → publisher OA → preprint → Sci-Hub chain.
+Use `fetch_fulltext` for top papers. Prefer it over ad-hoc `WebFetch` PDF retrieval because it applies the defined PMC → publisher OA → Sci-Hub chain.
 
 Access chain:
 1. PMC
 2. publisher open-access page
-3. bioRxiv / medRxiv open PDF
-4. Sci-Hub fallback
+3. Sci-Hub fallback
 
 Read:
 - `references/full-text-access-guide.md`
@@ -108,12 +104,11 @@ For preclinical extraction details, read:
 Rank evidence broadly as:
 - **High:** replicated clinical evidence, meta-analysis, systematic review, strong human studies
 - **Moderate:** strong animal studies, coherent multi-model evidence, robust mechanistic studies
-- **Low/Preliminary:** single-study results, preprints, purely computational inference, unreplicated in vitro work
+- **Low/Preliminary:** single-study results, purely computational inference, unreplicated in vitro work
 
 ### What to mark as preliminary
 - single-study findings
 - animal-only findings for human claims
-- preprints
 - in vitro findings without in vivo follow-up
 
 ### What to refuse without qualification
@@ -160,11 +155,9 @@ Typical outputs in `./results/`:
 ## Companion references
 
 - `references/pubmed_api_reference.md`
-- `references/biorxiv_api_reference.md`
 - `references/pubmed_routine.md`
 - `references/pubmed_search_syntax.md`
 - `references/pubmed_common_queries.md`
-- `references/biorxiv_routine.md`
 - `references/semanticscholar_routine.md`
 - `references/preclinical-extraction-guide.md`
 - `references/full-text-access-guide.md`
