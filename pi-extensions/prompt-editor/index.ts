@@ -62,7 +62,7 @@ export default function promptEditorExtension(pi: ExtensionAPI) {
 		},
 	});
 
-	pi.registerShortcut("ctrl+space", {
+	pi.registerShortcut("ctrl+shift+space", {
 		description: "Cycle prompt mode",
 		handler: async (ctx) => {
 			await cycleMode(pi, ctx, 1);
